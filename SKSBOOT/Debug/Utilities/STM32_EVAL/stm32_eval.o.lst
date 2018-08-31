@@ -1,0 +1,929 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32_eval.c"
+  15              		.section	.text.STM_EVAL_LEDInit,"ax",%progbits
+  16              		.align	1
+  17              		.global	STM_EVAL_LEDInit
+  18              		.thumb
+  19              		.thumb_func
+  21              	STM_EVAL_LEDInit:
+  22              		@ args = 0, pretend = 0, frame = 8
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24 0000 0C4B     		ldr	r3, .L2
+  25 0002 13B5     		push	{r0, r1, r4, lr}
+  26 0004 0446     		mov	r4, r0
+  27 0006 0121     		movs	r1, #1
+  28 0008 53F82000 		ldr	r0, [r3, r0, lsl #2]
+  29 000c FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  30 0010 094B     		ldr	r3, .L2+4
+  31 0012 01A9     		add	r1, sp, #4
+  32 0014 33F81430 		ldrh	r3, [r3, r4, lsl #1]
+  33 0018 ADF80430 		strh	r3, [sp, #4]	@ movhi
+  34 001c 1023     		movs	r3, #16
+  35 001e 8DF80730 		strb	r3, [sp, #7]
+  36 0022 0323     		movs	r3, #3
+  37 0024 8DF80630 		strb	r3, [sp, #6]
+  38 0028 044B     		ldr	r3, .L2+8
+  39 002a 53F82400 		ldr	r0, [r3, r4, lsl #2]
+  40 002e FFF7FEFF 		bl	GPIO_Init
+  41 0032 1CBD     		pop	{r2, r3, r4, pc}
+  42              	.L3:
+  43              		.align	2
+  44              	.L2:
+  45 0034 00000000 		.word	.LANCHOR0
+  46 0038 00000000 		.word	.LANCHOR1
+  47 003c 00000000 		.word	.LANCHOR2
+  49              		.section	.text.STM_EVAL_LEDOn,"ax",%progbits
+  50              		.align	1
+  51              		.global	STM_EVAL_LEDOn
+  52              		.thumb
+  53              		.thumb_func
+  55              	STM_EVAL_LEDOn:
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58              		@ link register save eliminated.
+  59 0000 034B     		ldr	r3, .L5
+  60 0002 044A     		ldr	r2, .L5+4
+  61 0004 53F82030 		ldr	r3, [r3, r0, lsl #2]
+  62 0008 32F81020 		ldrh	r2, [r2, r0, lsl #1]
+  63 000c 1A61     		str	r2, [r3, #16]
+  64 000e 7047     		bx	lr
+  65              	.L6:
+  66              		.align	2
+  67              	.L5:
+  68 0010 00000000 		.word	.LANCHOR2
+  69 0014 00000000 		.word	.LANCHOR1
+  71              		.section	.text.STM_EVAL_LEDOff,"ax",%progbits
+  72              		.align	1
+  73              		.global	STM_EVAL_LEDOff
+  74              		.thumb
+  75              		.thumb_func
+  77              	STM_EVAL_LEDOff:
+  78              		@ args = 0, pretend = 0, frame = 0
+  79              		@ frame_needed = 0, uses_anonymous_args = 0
+  80              		@ link register save eliminated.
+  81 0000 034B     		ldr	r3, .L8
+  82 0002 044A     		ldr	r2, .L8+4
+  83 0004 53F82030 		ldr	r3, [r3, r0, lsl #2]
+  84 0008 32F81020 		ldrh	r2, [r2, r0, lsl #1]
+  85 000c 5A61     		str	r2, [r3, #20]
+  86 000e 7047     		bx	lr
+  87              	.L9:
+  88              		.align	2
+  89              	.L8:
+  90 0010 00000000 		.word	.LANCHOR2
+  91 0014 00000000 		.word	.LANCHOR1
+  93              		.section	.text.STM_EVAL_LEDToggle,"ax",%progbits
+  94              		.align	1
+  95              		.global	STM_EVAL_LEDToggle
+  96              		.thumb
+  97              		.thumb_func
+  99              	STM_EVAL_LEDToggle:
+ 100              		@ args = 0, pretend = 0, frame = 0
+ 101              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102              		@ link register save eliminated.
+ 103 0000 044B     		ldr	r3, .L11
+ 104 0002 0549     		ldr	r1, .L11+4
+ 105 0004 53F82030 		ldr	r3, [r3, r0, lsl #2]
+ 106 0008 31F81010 		ldrh	r1, [r1, r0, lsl #1]
+ 107 000c DA68     		ldr	r2, [r3, #12]
+ 108 000e 4A40     		eors	r2, r2, r1
+ 109 0010 DA60     		str	r2, [r3, #12]
+ 110 0012 7047     		bx	lr
+ 111              	.L12:
+ 112              		.align	2
+ 113              	.L11:
+ 114 0014 00000000 		.word	.LANCHOR2
+ 115 0018 00000000 		.word	.LANCHOR1
+ 117              		.section	.text.STM_EVAL_PBInit,"ax",%progbits
+ 118              		.align	1
+ 119              		.global	STM_EVAL_PBInit
+ 120              		.thumb
+ 121              		.thumb_func
+ 123              	STM_EVAL_PBInit:
+ 124              		@ args = 0, pretend = 0, frame = 16
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126 0000 30B5     		push	{r4, r5, lr}
+ 127 0002 244B     		ldr	r3, .L18
+ 128 0004 0446     		mov	r4, r0
+ 129 0006 53F82000 		ldr	r0, [r3, r0, lsl #2]
+ 130 000a 85B0     		sub	sp, sp, #20
+ 131 000c 0D46     		mov	r5, r1
+ 132 000e 40F00100 		orr	r0, r0, #1
+ 133 0012 0121     		movs	r1, #1
+ 134 0014 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 135 0018 0423     		movs	r3, #4
+ 136 001a 8DF80330 		strb	r3, [sp, #3]
+ 137 001e 1E4B     		ldr	r3, .L18+4
+ 138 0020 04A9     		add	r1, sp, #16
+ 139 0022 33F81420 		ldrh	r2, [r3, r4, lsl #1]
+ 140 0026 21F8102D 		strh	r2, [r1, #-16]!	@ movhi
+ 141 002a 1C4A     		ldr	r2, .L18+8
+ 142 002c 6946     		mov	r1, sp
+ 143 002e 52F82400 		ldr	r0, [r2, r4, lsl #2]
+ 144 0032 FFF7FEFF 		bl	GPIO_Init
+ 145 0036 012D     		cmp	r5, #1
+ 146 0038 29D1     		bne	.L13
+ 147 003a 194B     		ldr	r3, .L18+12
+ 148 003c 13F81400 		ldrb	r0, [r3, r4, lsl #1]	@ zero_extendqisi2
+ 149 0040 184B     		ldr	r3, .L18+16
+ 150 0042 13F81410 		ldrb	r1, [r3, r4, lsl #1]	@ zero_extendqisi2
+ 151 0046 FFF7FEFF 		bl	GPIO_EXTILineConfig
+ 152 004a 174B     		ldr	r3, .L18+20
+ 153 004c 33F81430 		ldrh	r3, [r3, r4, lsl #1]
+ 154 0050 0293     		str	r3, [sp, #8]
+ 155 0052 0023     		movs	r3, #0
+ 156 0054 8DF80C30 		strb	r3, [sp, #12]
+ 157 0058 0CB1     		cbz	r4, .L15
+ 158 005a 0C23     		movs	r3, #12
+ 159 005c 00E0     		b	.L17
+ 160              	.L15:
+ 161 005e 0823     		movs	r3, #8
+ 162              	.L17:
+ 163 0060 0125     		movs	r5, #1
+ 164 0062 02A8     		add	r0, sp, #8
+ 165 0064 8DF80D30 		strb	r3, [sp, #13]
+ 166 0068 8DF80E50 		strb	r5, [sp, #14]
+ 167 006c FFF7FEFF 		bl	EXTI_Init
+ 168 0070 0E4B     		ldr	r3, .L18+24
+ 169 0072 01A8     		add	r0, sp, #4
+ 170 0074 33F81430 		ldrh	r3, [r3, r4, lsl #1]
+ 171 0078 8DF80750 		strb	r5, [sp, #7]
+ 172 007c 8DF80430 		strb	r3, [sp, #4]
+ 173 0080 0F23     		movs	r3, #15
+ 174 0082 8DF80530 		strb	r3, [sp, #5]
+ 175 0086 8DF80630 		strb	r3, [sp, #6]
+ 176 008a FFF7FEFF 		bl	NVIC_Init
+ 177              	.L13:
+ 178 008e 05B0     		add	sp, sp, #20
+ 179 0090 30BD     		pop	{r4, r5, pc}
+ 180              	.L19:
+ 181 0092 00BF     		.align	2
+ 182              	.L18:
+ 183 0094 00000000 		.word	.LANCHOR3
+ 184 0098 00000000 		.word	.LANCHOR4
+ 185 009c 00000000 		.word	.LANCHOR5
+ 186 00a0 00000000 		.word	.LANCHOR6
+ 187 00a4 00000000 		.word	.LANCHOR7
+ 188 00a8 00000000 		.word	.LANCHOR8
+ 189 00ac 00000000 		.word	.LANCHOR9
+ 191              		.section	.text.STM_EVAL_PBGetState,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	STM_EVAL_PBGetState
+ 194              		.thumb
+ 195              		.thumb_func
+ 197              	STM_EVAL_PBGetState:
+ 198              		@ args = 0, pretend = 0, frame = 0
+ 199              		@ frame_needed = 0, uses_anonymous_args = 0
+ 200 0000 054A     		ldr	r2, .L21
+ 201 0002 08B5     		push	{r3, lr}
+ 202 0004 0346     		mov	r3, r0
+ 203 0006 52F82000 		ldr	r0, [r2, r0, lsl #2]
+ 204 000a 044A     		ldr	r2, .L21+4
+ 205 000c 32F81310 		ldrh	r1, [r2, r3, lsl #1]
+ 206 0010 FFF7FEFF 		bl	GPIO_ReadInputDataBit
+ 207 0014 08BD     		pop	{r3, pc}
+ 208              	.L22:
+ 209 0016 00BF     		.align	2
+ 210              	.L21:
+ 211 0018 00000000 		.word	.LANCHOR5
+ 212 001c 00000000 		.word	.LANCHOR4
+ 214              		.section	.text.STM_EVAL_COMInit,"ax",%progbits
+ 215              		.align	1
+ 216              		.global	STM_EVAL_COMInit
+ 217              		.thumb
+ 218              		.thumb_func
+ 220              	STM_EVAL_COMInit:
+ 221              		@ args = 0, pretend = 0, frame = 8
+ 222              		@ frame_needed = 0, uses_anonymous_args = 0
+ 223 0000 224B     		ldr	r3, .L26
+ 224 0002 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 225 0004 0446     		mov	r4, r0
+ 226 0006 53F82000 		ldr	r0, [r3, r0, lsl #2]
+ 227 000a 214B     		ldr	r3, .L26+4
+ 228 000c 0E46     		mov	r6, r1
+ 229 000e 53F82430 		ldr	r3, [r3, r4, lsl #2]
+ 230 0012 0121     		movs	r1, #1
+ 231 0014 1843     		orrs	r0, r0, r3
+ 232 0016 40F00100 		orr	r0, r0, #1
+ 233 001a FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 234 001e 1D4B     		ldr	r3, .L26+8
+ 235 0020 24B9     		cbnz	r4, .L24
+ 236 0022 1868     		ldr	r0, [r3, #0]
+ 237 0024 0121     		movs	r1, #1
+ 238 0026 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 239 002a 04E0     		b	.L25
+ 240              	.L24:
+ 241 002c 53F82400 		ldr	r0, [r3, r4, lsl #2]
+ 242 0030 0121     		movs	r1, #1
+ 243 0032 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 244              	.L25:
+ 245 0036 1823     		movs	r3, #24
+ 246 0038 8DF80730 		strb	r3, [sp, #7]
+ 247 003c 164B     		ldr	r3, .L26+12
+ 248 003e 01A9     		add	r1, sp, #4
+ 249 0040 33F81430 		ldrh	r3, [r3, r4, lsl #1]
+ 250 0044 154D     		ldr	r5, .L26+16
+ 251 0046 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 252 004a 0323     		movs	r3, #3
+ 253 004c 8DF80630 		strb	r3, [sp, #6]
+ 254 0050 134B     		ldr	r3, .L26+20
+ 255 0052 53F82400 		ldr	r0, [r3, r4, lsl #2]
+ 256 0056 FFF7FEFF 		bl	GPIO_Init
+ 257 005a 0423     		movs	r3, #4
+ 258 005c 8DF80730 		strb	r3, [sp, #7]
+ 259 0060 104B     		ldr	r3, .L26+24
+ 260 0062 01A9     		add	r1, sp, #4
+ 261 0064 33F81430 		ldrh	r3, [r3, r4, lsl #1]
+ 262 0068 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 263 006c 0E4B     		ldr	r3, .L26+28
+ 264 006e 53F82400 		ldr	r0, [r3, r4, lsl #2]
+ 265 0072 FFF7FEFF 		bl	GPIO_Init
+ 266 0076 55F82400 		ldr	r0, [r5, r4, lsl #2]
+ 267 007a 3146     		mov	r1, r6
+ 268 007c FFF7FEFF 		bl	USART_Init
+ 269 0080 55F82400 		ldr	r0, [r5, r4, lsl #2]
+ 270 0084 0121     		movs	r1, #1
+ 271 0086 FFF7FEFF 		bl	USART_Cmd
+ 272 008a 7CBD     		pop	{r2, r3, r4, r5, r6, pc}
+ 273              	.L27:
+ 274              		.align	2
+ 275              	.L26:
+ 276 008c 00000000 		.word	.LANCHOR10
+ 277 0090 00000000 		.word	.LANCHOR11
+ 278 0094 00000000 		.word	.LANCHOR12
+ 279 0098 00000000 		.word	.LANCHOR13
+ 280 009c 00000000 		.word	.LANCHOR17
+ 281 00a0 00000000 		.word	.LANCHOR14
+ 282 00a4 00000000 		.word	.LANCHOR15
+ 283 00a8 00000000 		.word	.LANCHOR16
+ 285              		.section	.text.SD_LowLevel_DeInit,"ax",%progbits
+ 286              		.align	1
+ 287              		.global	SD_LowLevel_DeInit
+ 288              		.thumb
+ 289              		.thumb_func
+ 291              	SD_LowLevel_DeInit:
+ 292              		@ args = 0, pretend = 0, frame = 8
+ 293              		@ frame_needed = 0, uses_anonymous_args = 0
+ 294 0000 13B5     		push	{r0, r1, r4, lr}
+ 295 0002 0020     		movs	r0, #0
+ 296 0004 FFF7FEFF 		bl	SDIO_ClockCmd
+ 297 0008 0020     		movs	r0, #0
+ 298 000a FFF7FEFF 		bl	SDIO_SetPowerState
+ 299 000e 0424     		movs	r4, #4
+ 300 0010 FFF7FEFF 		bl	SDIO_DeInit
+ 301 0014 0021     		movs	r1, #0
+ 302 0016 4FF48060 		mov	r0, #1024
+ 303 001a FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 304 001e 4FF4F853 		mov	r3, #7936
+ 305 0022 0DEB0401 		add	r1, sp, r4
+ 306 0026 0748     		ldr	r0, .L29
+ 307 0028 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 308 002c 8DF80740 		strb	r4, [sp, #7]
+ 309 0030 FFF7FEFF 		bl	GPIO_Init
+ 310 0034 0448     		ldr	r0, .L29+4
+ 311 0036 0DEB0401 		add	r1, sp, r4
+ 312 003a ADF80440 		strh	r4, [sp, #4]	@ movhi
+ 313 003e FFF7FEFF 		bl	GPIO_Init
+ 314 0042 1CBD     		pop	{r2, r3, r4, pc}
+ 315              	.L30:
+ 316              		.align	2
+ 317              	.L29:
+ 318 0044 00100140 		.word	1073811456
+ 319 0048 00140140 		.word	1073812480
+ 321              		.section	.text.SD_LowLevel_Init,"ax",%progbits
+ 322              		.align	1
+ 323              		.global	SD_LowLevel_Init
+ 324              		.thumb
+ 325              		.thumb_func
+ 327              	SD_LowLevel_Init:
+ 328              		@ args = 0, pretend = 0, frame = 8
+ 329              		@ frame_needed = 0, uses_anonymous_args = 0
+ 330 0000 07B5     		push	{r0, r1, r2, lr}
+ 331 0002 B020     		movs	r0, #176
+ 332 0004 0121     		movs	r1, #1
+ 333 0006 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 334 000a 4FF4F853 		mov	r3, #7936
+ 335 000e ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 336 0012 0323     		movs	r3, #3
+ 337 0014 8DF80630 		strb	r3, [sp, #6]
+ 338 0018 01A9     		add	r1, sp, #4
+ 339 001a 1823     		movs	r3, #24
+ 340 001c 1048     		ldr	r0, .L32
+ 341 001e 8DF80730 		strb	r3, [sp, #7]
+ 342 0022 FFF7FEFF 		bl	GPIO_Init
+ 343 0026 0423     		movs	r3, #4
+ 344 0028 0DEB0301 		add	r1, sp, r3
+ 345 002c 0D48     		ldr	r0, .L32+4
+ 346 002e ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 347 0032 FFF7FEFF 		bl	GPIO_Init
+ 348 0036 4FF40063 		mov	r3, #2048
+ 349 003a ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 350 003e 01A9     		add	r1, sp, #4
+ 351 0040 4823     		movs	r3, #72
+ 352 0042 0948     		ldr	r0, .L32+8
+ 353 0044 8DF80730 		strb	r3, [sp, #7]
+ 354 0048 FFF7FEFF 		bl	GPIO_Init
+ 355 004c 0121     		movs	r1, #1
+ 356 004e 4FF48060 		mov	r0, #1024
+ 357 0052 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 358 0056 0220     		movs	r0, #2
+ 359 0058 0121     		movs	r1, #1
+ 360 005a FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 361 005e 0EBD     		pop	{r1, r2, r3, pc}
+ 362              	.L33:
+ 363              		.align	2
+ 364              	.L32:
+ 365 0060 00100140 		.word	1073811456
+ 366 0064 00140140 		.word	1073812480
+ 367 0068 001C0140 		.word	1073814528
+ 369              		.section	.text.SD_LowLevel_DMA_TxConfig,"ax",%progbits
+ 370              		.align	1
+ 371              		.global	SD_LowLevel_DMA_TxConfig
+ 372              		.thumb
+ 373              		.thumb_func
+ 375              	SD_LowLevel_DMA_TxConfig:
+ 376              		@ args = 0, pretend = 0, frame = 48
+ 377              		@ frame_needed = 0, uses_anonymous_args = 0
+ 378 0000 70B5     		push	{r4, r5, r6, lr}
+ 379 0002 154C     		ldr	r4, .L35
+ 380 0004 8CB0     		sub	sp, sp, #48
+ 381 0006 0546     		mov	r5, r0
+ 382 0008 1448     		ldr	r0, .L35+4
+ 383 000a 0E46     		mov	r6, r1
+ 384 000c FFF7FEFF 		bl	DMA_ClearFlag
+ 385 0010 2046     		mov	r0, r4
+ 386 0012 0021     		movs	r1, #0
+ 387 0014 FFF7FEFF 		bl	DMA_Cmd
+ 388 0018 8022     		movs	r2, #128
+ 389 001a 114B     		ldr	r3, .L35+8
+ 390 001c 0692     		str	r2, [sp, #24]
+ 391 001e 4FF40072 		mov	r2, #512
+ 392 0022 0193     		str	r3, [sp, #4]
+ 393 0024 0792     		str	r2, [sp, #28]
+ 394 0026 1023     		movs	r3, #16
+ 395 0028 4FF40062 		mov	r2, #2048
+ 396 002c 0393     		str	r3, [sp, #12]
+ 397 002e 0892     		str	r2, [sp, #32]
+ 398 0030 0023     		movs	r3, #0
+ 399 0032 4FF40052 		mov	r2, #8192
+ 400 0036 2046     		mov	r0, r4
+ 401 0038 01A9     		add	r1, sp, #4
+ 402 003a B608     		lsrs	r6, r6, #2
+ 403 003c 0295     		str	r5, [sp, #8]
+ 404 003e 0496     		str	r6, [sp, #16]
+ 405 0040 0593     		str	r3, [sp, #20]
+ 406 0042 0993     		str	r3, [sp, #36]
+ 407 0044 0A92     		str	r2, [sp, #40]
+ 408 0046 0B93     		str	r3, [sp, #44]
+ 409 0048 FFF7FEFF 		bl	DMA_Init
+ 410 004c 2046     		mov	r0, r4
+ 411 004e 0121     		movs	r1, #1
+ 412 0050 FFF7FEFF 		bl	DMA_Cmd
+ 413 0054 0CB0     		add	sp, sp, #48
+ 414 0056 70BD     		pop	{r4, r5, r6, pc}
+ 415              	.L36:
+ 416              		.align	2
+ 417              	.L35:
+ 418 0058 44040240 		.word	1073873988
+ 419 005c 00F00010 		.word	268496896
+ 420 0060 80800140 		.word	1073840256
+ 422              		.section	.text.SD_LowLevel_DMA_RxConfig,"ax",%progbits
+ 423              		.align	1
+ 424              		.global	SD_LowLevel_DMA_RxConfig
+ 425              		.thumb
+ 426              		.thumb_func
+ 428              	SD_LowLevel_DMA_RxConfig:
+ 429              		@ args = 0, pretend = 0, frame = 48
+ 430              		@ frame_needed = 0, uses_anonymous_args = 0
+ 431 0000 70B5     		push	{r4, r5, r6, lr}
+ 432 0002 154C     		ldr	r4, .L38
+ 433 0004 8CB0     		sub	sp, sp, #48
+ 434 0006 0546     		mov	r5, r0
+ 435 0008 1448     		ldr	r0, .L38+4
+ 436 000a 0E46     		mov	r6, r1
+ 437 000c FFF7FEFF 		bl	DMA_ClearFlag
+ 438 0010 2046     		mov	r0, r4
+ 439 0012 0021     		movs	r1, #0
+ 440 0014 FFF7FEFF 		bl	DMA_Cmd
+ 441 0018 8022     		movs	r2, #128
+ 442 001a 0692     		str	r2, [sp, #24]
+ 443 001c 104B     		ldr	r3, .L38+8
+ 444 001e 4FF40072 		mov	r2, #512
+ 445 0022 0792     		str	r2, [sp, #28]
+ 446 0024 4FF40062 		mov	r2, #2048
+ 447 0028 0193     		str	r3, [sp, #4]
+ 448 002a 0892     		str	r2, [sp, #32]
+ 449 002c 0023     		movs	r3, #0
+ 450 002e 4FF40052 		mov	r2, #8192
+ 451 0032 2046     		mov	r0, r4
+ 452 0034 01A9     		add	r1, sp, #4
+ 453 0036 B608     		lsrs	r6, r6, #2
+ 454 0038 0295     		str	r5, [sp, #8]
+ 455 003a 0393     		str	r3, [sp, #12]
+ 456 003c 0496     		str	r6, [sp, #16]
+ 457 003e 0593     		str	r3, [sp, #20]
+ 458 0040 0993     		str	r3, [sp, #36]
+ 459 0042 0A92     		str	r2, [sp, #40]
+ 460 0044 0B93     		str	r3, [sp, #44]
+ 461 0046 FFF7FEFF 		bl	DMA_Init
+ 462 004a 2046     		mov	r0, r4
+ 463 004c 0121     		movs	r1, #1
+ 464 004e FFF7FEFF 		bl	DMA_Cmd
+ 465 0052 0CB0     		add	sp, sp, #48
+ 466 0054 70BD     		pop	{r4, r5, r6, pc}
+ 467              	.L39:
+ 468 0056 00BF     		.align	2
+ 469              	.L38:
+ 470 0058 44040240 		.word	1073873988
+ 471 005c 00F00010 		.word	268496896
+ 472 0060 80800140 		.word	1073840256
+ 474              		.section	.text.SD_DMAEndOfTransferStatus,"ax",%progbits
+ 475              		.align	1
+ 476              		.global	SD_DMAEndOfTransferStatus
+ 477              		.thumb
+ 478              		.thumb_func
+ 480              	SD_DMAEndOfTransferStatus:
+ 481              		@ args = 0, pretend = 0, frame = 0
+ 482              		@ frame_needed = 0, uses_anonymous_args = 0
+ 483 0000 08B5     		push	{r3, lr}
+ 484 0002 0248     		ldr	r0, .L41
+ 485 0004 FFF7FEFF 		bl	DMA_GetFlagStatus
+ 486 0008 08BD     		pop	{r3, pc}
+ 487              	.L42:
+ 488 000a 00BF     		.align	2
+ 489              	.L41:
+ 490 000c 00200010 		.word	268443648
+ 492              		.section	.text.sFLASH_LowLevel_DeInit,"ax",%progbits
+ 493              		.align	1
+ 494              		.global	sFLASH_LowLevel_DeInit
+ 495              		.thumb
+ 496              		.thumb_func
+ 498              	sFLASH_LowLevel_DeInit:
+ 499              		@ args = 0, pretend = 0, frame = 8
+ 500              		@ frame_needed = 0, uses_anonymous_args = 0
+ 501 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+ 502 0002 194C     		ldr	r4, .L44
+ 503 0004 0021     		movs	r1, #0
+ 504 0006 2046     		mov	r0, r4
+ 505 0008 FFF7FEFF 		bl	SPI_Cmd
+ 506 000c 2046     		mov	r0, r4
+ 507 000e 0425     		movs	r5, #4
+ 508 0010 FFF7FEFF 		bl	SPI_I2S_DeInit
+ 509 0014 A4F52054 		sub	r4, r4, #10240
+ 510 0018 0021     		movs	r1, #0
+ 511 001a 4FF48050 		mov	r0, #4096
+ 512 001e FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 513 0022 2023     		movs	r3, #32
+ 514 0024 2046     		mov	r0, r4
+ 515 0026 0DEB0501 		add	r1, sp, r5
+ 516 002a ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 517 002e 8DF80750 		strb	r5, [sp, #7]
+ 518 0032 FFF7FEFF 		bl	GPIO_Init
+ 519 0036 4023     		movs	r3, #64
+ 520 0038 2046     		mov	r0, r4
+ 521 003a 0DEB0501 		add	r1, sp, r5
+ 522 003e ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 523 0042 FFF7FEFF 		bl	GPIO_Init
+ 524 0046 8023     		movs	r3, #128
+ 525 0048 2046     		mov	r0, r4
+ 526 004a 0DEB0501 		add	r1, sp, r5
+ 527 004e ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 528 0052 FFF7FEFF 		bl	GPIO_Init
+ 529 0056 0548     		ldr	r0, .L44+4
+ 530 0058 0DEB0501 		add	r1, sp, r5
+ 531 005c ADF80450 		strh	r5, [sp, #4]	@ movhi
+ 532 0060 FFF7FEFF 		bl	GPIO_Init
+ 533 0064 3EBD     		pop	{r1, r2, r3, r4, r5, pc}
+ 534              	.L45:
+ 535 0066 00BF     		.align	2
+ 536              	.L44:
+ 537 0068 00300140 		.word	1073819648
+ 538 006c 000C0140 		.word	1073810432
+ 540              		.section	.text.sFLASH_LowLevel_Init,"ax",%progbits
+ 541              		.align	1
+ 542              		.global	sFLASH_LowLevel_Init
+ 543              		.thumb
+ 544              		.thumb_func
+ 546              	sFLASH_LowLevel_Init:
+ 547              		@ args = 0, pretend = 0, frame = 8
+ 548              		@ frame_needed = 0, uses_anonymous_args = 0
+ 549 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+ 550 0002 0C20     		movs	r0, #12
+ 551 0004 0121     		movs	r1, #1
+ 552 0006 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 553 000a 0121     		movs	r1, #1
+ 554 000c 4FF48050 		mov	r0, #4096
+ 555 0010 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 556 0014 154C     		ldr	r4, .L47
+ 557 0016 2023     		movs	r3, #32
+ 558 0018 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 559 001c 0323     		movs	r3, #3
+ 560 001e 8DF80630 		strb	r3, [sp, #6]
+ 561 0022 2046     		mov	r0, r4
+ 562 0024 1823     		movs	r3, #24
+ 563 0026 01A9     		add	r1, sp, #4
+ 564 0028 0425     		movs	r5, #4
+ 565 002a 8DF80730 		strb	r3, [sp, #7]
+ 566 002e FFF7FEFF 		bl	GPIO_Init
+ 567 0032 8023     		movs	r3, #128
+ 568 0034 2046     		mov	r0, r4
+ 569 0036 01A9     		add	r1, sp, #4
+ 570 0038 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 571 003c FFF7FEFF 		bl	GPIO_Init
+ 572 0040 4023     		movs	r3, #64
+ 573 0042 2046     		mov	r0, r4
+ 574 0044 0DEB0501 		add	r1, sp, r5
+ 575 0048 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 576 004c 8DF80750 		strb	r5, [sp, #7]
+ 577 0050 FFF7FEFF 		bl	GPIO_Init
+ 578 0054 1023     		movs	r3, #16
+ 579 0056 0648     		ldr	r0, .L47+4
+ 580 0058 0DEB0501 		add	r1, sp, r5
+ 581 005c ADF80450 		strh	r5, [sp, #4]	@ movhi
+ 582 0060 8DF80730 		strb	r3, [sp, #7]
+ 583 0064 FFF7FEFF 		bl	GPIO_Init
+ 584 0068 3EBD     		pop	{r1, r2, r3, r4, r5, pc}
+ 585              	.L48:
+ 586 006a 00BF     		.align	2
+ 587              	.L47:
+ 588 006c 00080140 		.word	1073809408
+ 589 0070 000C0140 		.word	1073810432
+ 591              		.section	.text.LM75_LowLevel_DeInit,"ax",%progbits
+ 592              		.align	1
+ 593              		.global	LM75_LowLevel_DeInit
+ 594              		.thumb
+ 595              		.thumb_func
+ 597              	LM75_LowLevel_DeInit:
+ 598              		@ args = 0, pretend = 0, frame = 8
+ 599              		@ frame_needed = 0, uses_anonymous_args = 0
+ 600 0000 13B5     		push	{r0, r1, r4, lr}
+ 601 0002 144C     		ldr	r4, .L50
+ 602 0004 0021     		movs	r1, #0
+ 603 0006 2046     		mov	r0, r4
+ 604 0008 FFF7FEFF 		bl	I2C_Cmd
+ 605 000c 2046     		mov	r0, r4
+ 606 000e FFF7FEFF 		bl	I2C_DeInit
+ 607 0012 0021     		movs	r1, #0
+ 608 0014 4FF40010 		mov	r0, #2097152
+ 609 0018 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 610 001c 4023     		movs	r3, #64
+ 611 001e 04F53844 		add	r4, r4, #47104
+ 612 0022 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 613 0026 0423     		movs	r3, #4
+ 614 0028 0DEB0301 		add	r1, sp, r3
+ 615 002c 2046     		mov	r0, r4
+ 616 002e 8DF80730 		strb	r3, [sp, #7]
+ 617 0032 FFF7FEFF 		bl	GPIO_Init
+ 618 0036 8023     		movs	r3, #128
+ 619 0038 2046     		mov	r0, r4
+ 620 003a 01A9     		add	r1, sp, #4
+ 621 003c ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 622 0040 FFF7FEFF 		bl	GPIO_Init
+ 623 0044 2023     		movs	r3, #32
+ 624 0046 2046     		mov	r0, r4
+ 625 0048 01A9     		add	r1, sp, #4
+ 626 004a ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 627 004e FFF7FEFF 		bl	GPIO_Init
+ 628 0052 1CBD     		pop	{r2, r3, r4, pc}
+ 629              	.L51:
+ 630              		.align	2
+ 631              	.L50:
+ 632 0054 00540040 		.word	1073763328
+ 634              		.section	.text.LM75_LowLevel_Init,"ax",%progbits
+ 635              		.align	1
+ 636              		.global	LM75_LowLevel_Init
+ 637              		.thumb
+ 638              		.thumb_func
+ 640              	LM75_LowLevel_Init:
+ 641              		@ args = 0, pretend = 0, frame = 8
+ 642              		@ frame_needed = 0, uses_anonymous_args = 0
+ 643 0000 13B5     		push	{r0, r1, r4, lr}
+ 644 0002 0121     		movs	r1, #1
+ 645 0004 4FF40010 		mov	r0, #2097152
+ 646 0008 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 647 000c 0820     		movs	r0, #8
+ 648 000e 0121     		movs	r1, #1
+ 649 0010 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 650 0014 0F4C     		ldr	r4, .L53
+ 651 0016 4023     		movs	r3, #64
+ 652 0018 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 653 001c 0323     		movs	r3, #3
+ 654 001e 8DF80630 		strb	r3, [sp, #6]
+ 655 0022 2046     		mov	r0, r4
+ 656 0024 1C23     		movs	r3, #28
+ 657 0026 01A9     		add	r1, sp, #4
+ 658 0028 8DF80730 		strb	r3, [sp, #7]
+ 659 002c FFF7FEFF 		bl	GPIO_Init
+ 660 0030 8023     		movs	r3, #128
+ 661 0032 2046     		mov	r0, r4
+ 662 0034 01A9     		add	r1, sp, #4
+ 663 0036 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 664 003a FFF7FEFF 		bl	GPIO_Init
+ 665 003e 2023     		movs	r3, #32
+ 666 0040 ADF80430 		strh	r3, [sp, #4]	@ movhi
+ 667 0044 2046     		mov	r0, r4
+ 668 0046 4823     		movs	r3, #72
+ 669 0048 01A9     		add	r1, sp, #4
+ 670 004a 8DF80730 		strb	r3, [sp, #7]
+ 671 004e FFF7FEFF 		bl	GPIO_Init
+ 672 0052 1CBD     		pop	{r2, r3, r4, pc}
+ 673              	.L54:
+ 674              		.align	2
+ 675              	.L53:
+ 676 0054 000C0140 		.word	1073810432
+ 678              		.global	COM_RX_PIN
+ 679              		.global	COM_TX_PIN
+ 680              		.global	COM_RX_PORT_CLK
+ 681              		.global	COM_TX_PORT_CLK
+ 682              		.global	COM_USART_CLK
+ 683              		.global	COM_RX_PORT
+ 684              		.global	COM_TX_PORT
+ 685              		.global	COM_USART
+ 686              		.global	BUTTON_IRQn
+ 687              		.global	BUTTON_PIN_SOURCE
+ 688              		.global	BUTTON_PORT_SOURCE
+ 689              		.global	BUTTON_EXTI_LINE
+ 690              		.global	BUTTON_CLK
+ 691              		.global	BUTTON_PIN
+ 692              		.global	BUTTON_PORT
+ 693              		.global	GPIO_CLK
+ 694              		.global	GPIO_PIN
+ 695              		.global	GPIO_PORT
+ 696              		.section	.data.COM_RX_PORT,"aw",%progbits
+ 697              		.align	2
+ 698              		.set	.LANCHOR16,. + 0
+ 701              	COM_RX_PORT:
+ 702 0000 00080140 		.word	1073809408
+ 703 0004 00080140 		.word	1073809408
+ 704              		.section	.data.COM_TX_PORT,"aw",%progbits
+ 705              		.align	2
+ 706              		.set	.LANCHOR14,. + 0
+ 709              	COM_TX_PORT:
+ 710 0000 00080140 		.word	1073809408
+ 711 0004 00080140 		.word	1073809408
+ 712              		.section	.rodata.BUTTON_CLK,"a",%progbits
+ 713              		.align	2
+ 714              		.set	.LANCHOR3,. + 0
+ 717              	BUTTON_CLK:
+ 718 0000 04000000 		.word	4
+ 719 0004 10000000 		.word	16
+ 720 0008 00010000 		.word	256
+ 721 000c 00010000 		.word	256
+ 722 0010 00010000 		.word	256
+ 723 0014 00010000 		.word	256
+ 724 0018 20000000 		.word	32
+ 725 001c 00010000 		.word	256
+ 726              		.section	.data.GPIO_PORT,"aw",%progbits
+ 727              		.align	2
+ 728              		.set	.LANCHOR2,. + 0
+ 731              	GPIO_PORT:
+ 732 0000 001C0140 		.word	1073814528
+ 733 0004 001C0140 		.word	1073814528
+ 734 0008 001C0140 		.word	1073814528
+ 735 000c 001C0140 		.word	1073814528
+ 736              		.section	.rodata.BUTTON_PIN,"a",%progbits
+ 737              		.align	1
+ 738              		.set	.LANCHOR4,. + 0
+ 741              	BUTTON_PIN:
+ 742 0000 0100     		.short	1
+ 743 0002 0020     		.short	8192
+ 744 0004 0001     		.short	256
+ 745 0006 0020     		.short	8192
+ 746 0008 0040     		.short	16384
+ 747 000a 0080     		.short	-32768
+ 748 000c 0800     		.short	8
+ 749 000e 8000     		.short	128
+ 750              		.section	.rodata.GPIO_CLK,"a",%progbits
+ 751              		.align	2
+ 752              		.set	.LANCHOR0,. + 0
+ 755              	GPIO_CLK:
+ 756 0000 80000000 		.word	128
+ 757 0004 80000000 		.word	128
+ 758 0008 80000000 		.word	128
+ 759 000c 80000000 		.word	128
+ 760              		.section	.rodata.COM_USART_CLK,"a",%progbits
+ 761              		.align	2
+ 762              		.set	.LANCHOR12,. + 0
+ 765              	COM_USART_CLK:
+ 766 0000 00400000 		.word	16384
+ 767 0004 00000200 		.word	131072
+ 768              		.section	.rodata.GPIO_PIN,"a",%progbits
+ 769              		.align	1
+ 770              		.set	.LANCHOR1,. + 0
+ 773              	GPIO_PIN:
+ 774 0000 4000     		.short	64
+ 775 0002 8000     		.short	128
+ 776 0004 0001     		.short	256
+ 777 0006 0002     		.short	512
+ 778              		.section	.rodata.COM_RX_PIN,"a",%progbits
+ 779              		.align	1
+ 780              		.set	.LANCHOR15,. + 0
+ 783              	COM_RX_PIN:
+ 784 0000 0004     		.short	1024
+ 785 0002 0800     		.short	8
+ 786              		.section	.rodata.COM_RX_PORT_CLK,"a",%progbits
+ 787              		.align	2
+ 788              		.set	.LANCHOR11,. + 0
+ 791              	COM_RX_PORT_CLK:
+ 792 0000 04000000 		.word	4
+ 793 0004 04000000 		.word	4
+ 794              		.section	.rodata.BUTTON_PORT_SOURCE,"a",%progbits
+ 795              		.align	1
+ 796              		.set	.LANCHOR6,. + 0
+ 799              	BUTTON_PORT_SOURCE:
+ 800 0000 0000     		.short	0
+ 801 0002 0200     		.short	2
+ 802 0004 0600     		.short	6
+ 803 0006 0600     		.short	6
+ 804 0008 0600     		.short	6
+ 805 000a 0600     		.short	6
+ 806 000c 0300     		.short	3
+ 807 000e 0600     		.short	6
+ 808              		.section	.rodata.COM_TX_PORT_CLK,"a",%progbits
+ 809              		.align	2
+ 810              		.set	.LANCHOR10,. + 0
+ 813              	COM_TX_PORT_CLK:
+ 814 0000 04000000 		.word	4
+ 815 0004 04000000 		.word	4
+ 816              		.section	.data.BUTTON_PORT,"aw",%progbits
+ 817              		.align	2
+ 818              		.set	.LANCHOR5,. + 0
+ 821              	BUTTON_PORT:
+ 822 0000 00080140 		.word	1073809408
+ 823 0004 00100140 		.word	1073811456
+ 824 0008 00200140 		.word	1073815552
+ 825 000c 00200140 		.word	1073815552
+ 826 0010 00200140 		.word	1073815552
+ 827 0014 00200140 		.word	1073815552
+ 828 0018 00140140 		.word	1073812480
+ 829 001c 00200140 		.word	1073815552
+ 830              		.section	.rodata.COM_TX_PIN,"a",%progbits
+ 831              		.align	1
+ 832              		.set	.LANCHOR13,. + 0
+ 835              	COM_TX_PIN:
+ 836 0000 0002     		.short	512
+ 837 0002 0400     		.short	4
+ 838              		.section	.rodata.BUTTON_PIN_SOURCE,"a",%progbits
+ 839              		.align	1
+ 840              		.set	.LANCHOR7,. + 0
+ 843              	BUTTON_PIN_SOURCE:
+ 844 0000 0000     		.short	0
+ 845 0002 0D00     		.short	13
+ 846 0004 0800     		.short	8
+ 847 0006 0D00     		.short	13
+ 848 0008 0E00     		.short	14
+ 849 000a 0F00     		.short	15
+ 850 000c 0300     		.short	3
+ 851 000e 0700     		.short	7
+ 852              		.section	.rodata.BUTTON_IRQn,"a",%progbits
+ 853              		.align	1
+ 854              		.set	.LANCHOR9,. + 0
+ 857              	BUTTON_IRQn:
+ 858 0000 0600     		.short	6
+ 859 0002 2800     		.short	40
+ 860 0004 1700     		.short	23
+ 861 0006 2800     		.short	40
+ 862 0008 2800     		.short	40
+ 863 000a 2800     		.short	40
+ 864 000c 0900     		.short	9
+ 865 000e 1700     		.short	23
+ 866              		.section	.rodata.BUTTON_EXTI_LINE,"a",%progbits
+ 867              		.align	1
+ 868              		.set	.LANCHOR8,. + 0
+ 871              	BUTTON_EXTI_LINE:
+ 872 0000 0100     		.short	1
+ 873 0002 0020     		.short	8192
+ 874 0004 0001     		.short	256
+ 875 0006 0020     		.short	8192
+ 876 0008 0040     		.short	16384
+ 877 000a 0080     		.short	-32768
+ 878 000c 0800     		.short	8
+ 879 000e 8000     		.short	128
+ 880              		.section	.data.COM_USART,"aw",%progbits
+ 881              		.align	2
+ 882              		.set	.LANCHOR17,. + 0
+ 885              	COM_USART:
+ 886 0000 00380140 		.word	1073821696
+ 887 0004 00440040 		.word	1073759232
+ 888              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32_eval.c
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:16     .text.STM_EVAL_LEDInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:21     .text.STM_EVAL_LEDInit:00000000 STM_EVAL_LEDInit
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:45     .text.STM_EVAL_LEDInit:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:50     .text.STM_EVAL_LEDOn:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:55     .text.STM_EVAL_LEDOn:00000000 STM_EVAL_LEDOn
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:68     .text.STM_EVAL_LEDOn:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:72     .text.STM_EVAL_LEDOff:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:77     .text.STM_EVAL_LEDOff:00000000 STM_EVAL_LEDOff
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:90     .text.STM_EVAL_LEDOff:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:94     .text.STM_EVAL_LEDToggle:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:99     .text.STM_EVAL_LEDToggle:00000000 STM_EVAL_LEDToggle
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:114    .text.STM_EVAL_LEDToggle:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:118    .text.STM_EVAL_PBInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:123    .text.STM_EVAL_PBInit:00000000 STM_EVAL_PBInit
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:183    .text.STM_EVAL_PBInit:00000094 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:192    .text.STM_EVAL_PBGetState:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:197    .text.STM_EVAL_PBGetState:00000000 STM_EVAL_PBGetState
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:211    .text.STM_EVAL_PBGetState:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:215    .text.STM_EVAL_COMInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:220    .text.STM_EVAL_COMInit:00000000 STM_EVAL_COMInit
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:276    .text.STM_EVAL_COMInit:0000008c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:286    .text.SD_LowLevel_DeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:291    .text.SD_LowLevel_DeInit:00000000 SD_LowLevel_DeInit
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:318    .text.SD_LowLevel_DeInit:00000044 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:322    .text.SD_LowLevel_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:327    .text.SD_LowLevel_Init:00000000 SD_LowLevel_Init
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:365    .text.SD_LowLevel_Init:00000060 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:370    .text.SD_LowLevel_DMA_TxConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:375    .text.SD_LowLevel_DMA_TxConfig:00000000 SD_LowLevel_DMA_TxConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:418    .text.SD_LowLevel_DMA_TxConfig:00000058 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:423    .text.SD_LowLevel_DMA_RxConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:428    .text.SD_LowLevel_DMA_RxConfig:00000000 SD_LowLevel_DMA_RxConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:470    .text.SD_LowLevel_DMA_RxConfig:00000058 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:475    .text.SD_DMAEndOfTransferStatus:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:480    .text.SD_DMAEndOfTransferStatus:00000000 SD_DMAEndOfTransferStatus
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:490    .text.SD_DMAEndOfTransferStatus:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:493    .text.sFLASH_LowLevel_DeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:498    .text.sFLASH_LowLevel_DeInit:00000000 sFLASH_LowLevel_DeInit
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:537    .text.sFLASH_LowLevel_DeInit:00000068 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:541    .text.sFLASH_LowLevel_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:546    .text.sFLASH_LowLevel_Init:00000000 sFLASH_LowLevel_Init
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:588    .text.sFLASH_LowLevel_Init:0000006c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:592    .text.LM75_LowLevel_DeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:597    .text.LM75_LowLevel_DeInit:00000000 LM75_LowLevel_DeInit
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:632    .text.LM75_LowLevel_DeInit:00000054 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:635    .text.LM75_LowLevel_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:640    .text.LM75_LowLevel_Init:00000000 LM75_LowLevel_Init
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:676    .text.LM75_LowLevel_Init:00000054 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:783    .rodata.COM_RX_PIN:00000000 COM_RX_PIN
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:835    .rodata.COM_TX_PIN:00000000 COM_TX_PIN
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:791    .rodata.COM_RX_PORT_CLK:00000000 COM_RX_PORT_CLK
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:813    .rodata.COM_TX_PORT_CLK:00000000 COM_TX_PORT_CLK
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:765    .rodata.COM_USART_CLK:00000000 COM_USART_CLK
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:701    .data.COM_RX_PORT:00000000 COM_RX_PORT
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:709    .data.COM_TX_PORT:00000000 COM_TX_PORT
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:885    .data.COM_USART:00000000 COM_USART
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:857    .rodata.BUTTON_IRQn:00000000 BUTTON_IRQn
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:843    .rodata.BUTTON_PIN_SOURCE:00000000 BUTTON_PIN_SOURCE
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:799    .rodata.BUTTON_PORT_SOURCE:00000000 BUTTON_PORT_SOURCE
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:871    .rodata.BUTTON_EXTI_LINE:00000000 BUTTON_EXTI_LINE
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:717    .rodata.BUTTON_CLK:00000000 BUTTON_CLK
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:741    .rodata.BUTTON_PIN:00000000 BUTTON_PIN
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:821    .data.BUTTON_PORT:00000000 BUTTON_PORT
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:755    .rodata.GPIO_CLK:00000000 GPIO_CLK
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:773    .rodata.GPIO_PIN:00000000 GPIO_PIN
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:731    .data.GPIO_PORT:00000000 GPIO_PORT
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:697    .data.COM_RX_PORT:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:705    .data.COM_TX_PORT:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:713    .rodata.BUTTON_CLK:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:727    .data.GPIO_PORT:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:737    .rodata.BUTTON_PIN:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:751    .rodata.GPIO_CLK:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:761    .rodata.COM_USART_CLK:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:769    .rodata.GPIO_PIN:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:779    .rodata.COM_RX_PIN:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:787    .rodata.COM_RX_PORT_CLK:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:795    .rodata.BUTTON_PORT_SOURCE:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:809    .rodata.COM_TX_PORT_CLK:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:817    .data.BUTTON_PORT:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:831    .rodata.COM_TX_PIN:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:839    .rodata.BUTTON_PIN_SOURCE:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:853    .rodata.BUTTON_IRQn:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:867    .rodata.BUTTON_EXTI_LINE:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3cP2fZ.s:881    .data.COM_USART:00000000 $d
+
+UNDEFINED SYMBOLS
+RCC_APB2PeriphClockCmd
+GPIO_Init
+GPIO_EXTILineConfig
+EXTI_Init
+NVIC_Init
+GPIO_ReadInputDataBit
+RCC_APB1PeriphClockCmd
+USART_Init
+USART_Cmd
+SDIO_ClockCmd
+SDIO_SetPowerState
+SDIO_DeInit
+RCC_AHBPeriphClockCmd
+DMA_ClearFlag
+DMA_Cmd
+DMA_Init
+DMA_GetFlagStatus
+SPI_Cmd
+SPI_I2S_DeInit
+I2C_Cmd
+I2C_DeInit

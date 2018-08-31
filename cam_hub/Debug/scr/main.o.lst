@@ -1,0 +1,2254 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.PC_USART_Init,"ax",%progbits
+  18              		.align	1
+  19              		.global	PC_USART_Init
+  20              		.code	16
+  21              		.thumb_func
+  23              	PC_USART_Init:
+  24              	.LFB34:
+  25              		.file 1 "../scr/main.c"
+   1:../scr/main.c **** /**
+   2:../scr/main.c ****  ******************************************************************************
+   3:../scr/main.c ****  * @file    Project/STM32F0xx_StdPeriph_Templates/main.c
+   4:../scr/main.c ****  * @author  MCD Application Team
+   5:../scr/main.c ****  * @version V1.5.0
+   6:../scr/main.c ****  * @date    05-December-2014
+   7:../scr/main.c ****  * @brief   Main program body
+   8:../scr/main.c ****  ******************************************************************************
+   9:../scr/main.c ****  * @attention
+  10:../scr/main.c ****  *
+  11:../scr/main.c ****  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  12:../scr/main.c ****  *
+  13:../scr/main.c ****  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../scr/main.c ****  * You may not use this file except in compliance with the License.
+  15:../scr/main.c ****  * You may obtain a copy of the License at:
+  16:../scr/main.c ****  *
+  17:../scr/main.c ****  *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../scr/main.c ****  *
+  19:../scr/main.c ****  * Unless required by applicable law or agreed to in writing, software
+  20:../scr/main.c ****  * distributed under the License is distributed on an "AS IS" BASIS,
+  21:../scr/main.c ****  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../scr/main.c ****  * See the License for the specific language governing permissions and
+  23:../scr/main.c ****  * limitations under the License.
+  24:../scr/main.c ****  *
+  25:../scr/main.c ****  ******************************************************************************
+  26:../scr/main.c ****  */
+  27:../scr/main.c **** /* Includes ------------------------------------------------------------------*/
+  28:../scr/main.c **** #include "main.h"
+  29:../scr/main.c **** #include "alarm.h"
+  30:../scr/main.c **** #include "xprintf.h"
+  31:../scr/main.c **** /** @addtogroup STM32F0xx_StdPeriph_Templates
+  32:../scr/main.c ****  * @{
+  33:../scr/main.c ****  */
+  34:../scr/main.c **** /* Private typedef -----------------------------------------------------------*/
+  35:../scr/main.c **** /* Private define ------------------------------------------------------------*/
+  36:../scr/main.c **** /*
+  37:../scr/main.c ****  #define APPLICATION_ADDRESS     (uint32_t)0x08002800
+  38:../scr/main.c ****  Private macro -------------------------------------------------------------
+  39:../scr/main.c ****  Private variables ---------------------------------------------------------
+  40:../scr/main.c ****  #if   (defined ( __CC_ARM ))
+  41:../scr/main.c ****  __IO uint32_t VectorTable[48] __attribute__((at(0x20000000)));
+  42:../scr/main.c ****  #elif (defined (__ICCARM__))
+  43:../scr/main.c ****  #pragma location = 0x20000000
+  44:../scr/main.c ****  __no_init __IO uint32_t VectorTable[48];
+  45:../scr/main.c ****  #elif defined   (  __GNUC__  )
+  46:../scr/main.c ****  __IO uint32_t VectorTable[48] __attribute__((section(".RAMVectorTable")));
+  47:../scr/main.c ****  #elif defined ( __TASKING__ )
+  48:../scr/main.c ****  __IO uint32_t VectorTable[48] __at(0x20000000);
+  49:../scr/main.c ****  #endif
+  50:../scr/main.c ****  */
+  51:../scr/main.c **** 
+  52:../scr/main.c **** /* Private function prototypes -----------------------------------------------*/
+  53:../scr/main.c **** static void RCC_Configuration(void);
+  54:../scr/main.c **** static void GPIO_Configuration(void);
+  55:../scr/main.c **** static void NVIC_Configuration(void);
+  56:../scr/main.c **** volatile uint32_t ulSecCount = 0;
+  57:../scr/main.c **** volatile uint32_t ulTickCount = 0;
+  58:../scr/main.c **** volatile uint32_t ulMiliCount = 0;
+  59:../scr/main.c **** volatile unsigned long ulTick100 = 0; //Tick Count from start to now, 100ms
+  60:../scr/main.c **** /* Private functions ---------------------------------------------------------*/
+  61:../scr/main.c **** static void prvSetupHardware(void) {
+  62:../scr/main.c **** 	RCC_Configuration();
+  63:../scr/main.c **** 	NVIC_Configuration();
+  64:../scr/main.c **** 	GPIO_Configuration();
+  65:../scr/main.c **** 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
+  66:../scr/main.c **** }
+  67:../scr/main.c **** /*******************************************************************************
+  68:../scr/main.c ****  * Function Name  : USART1_Init
+  69:../scr/main.c ****  * Description    : Initialize the IAP: Configure RCC, USART and GPIOs.
+  70:../scr/main.c ****  * Input          : None
+  71:../scr/main.c ****  * Output         : None
+  72:../scr/main.c ****  * Return         : None
+  73:../scr/main.c ****  * Note                   : You have to run RCC_Configuration() before calling this function
+  74:../scr/main.c ****  *******************************************************************************/
+  75:../scr/main.c **** void PC_USART_Init(int baudrate) {
+  26              		.loc 1 75 0
+  27              		.cfi_startproc
+  28              	.LVL0:
+  29 0000 10B5     		push	{r4, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 4, -8
+  33              		.cfi_offset 14, -4
+  76:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+  77:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+  78:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  79:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  80:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+  81:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+  82:../scr/main.c **** 			USART_HardwareFlowControl_None;
+  83:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  84:../scr/main.c **** 	/* Configure the USART1 */
+  85:../scr/main.c **** 	USART_Init(USART1, &USART_InitStructure);
+  34              		.loc 1 85 0
+  35 0002 0C4C     		ldr	r4, .L2
+  75:../scr/main.c **** void PC_USART_Init(int baudrate) {
+  36              		.loc 1 75 0
+  37 0004 86B0     		sub	sp, sp, #24
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 32
+  78:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  40              		.loc 1 78 0
+  41 0006 0023     		mov	r3, #0
+  77:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+  42              		.loc 1 77 0
+  43 0008 0090     		str	r0, [sp]
+  78:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  44              		.loc 1 78 0
+  45 000a 0193     		str	r3, [sp, #4]
+  79:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  46              		.loc 1 79 0
+  47 000c 0293     		str	r3, [sp, #8]
+  80:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+  48              		.loc 1 80 0
+  49 000e 0393     		str	r3, [sp, #12]
+  81:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+  50              		.loc 1 81 0
+  51 0010 0593     		str	r3, [sp, #20]
+  52              		.loc 1 85 0
+  53 0012 201C     		mov	r0, r4
+  54              	.LVL1:
+  83:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  55              		.loc 1 83 0
+  56 0014 0C23     		mov	r3, #12
+  57              		.loc 1 85 0
+  58 0016 6946     		mov	r1, sp
+  83:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  59              		.loc 1 83 0
+  60 0018 0493     		str	r3, [sp, #16]
+  61              		.loc 1 85 0
+  62 001a FFF7FEFF 		bl	USART_Init
+  63              	.LVL2:
+  86:../scr/main.c **** 	/* Enable USART1 interrupt */
+  87:../scr/main.c **** 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+  64              		.loc 1 87 0
+  65 001e 201C     		mov	r0, r4
+  66 0020 0122     		mov	r2, #1
+  67 0022 0549     		ldr	r1, .L2+4
+  68 0024 FFF7FEFF 		bl	USART_ITConfig
+  69              	.LVL3:
+  88:../scr/main.c **** 	/* Enable the USART1 */
+  89:../scr/main.c **** 	USART_Cmd(USART1, ENABLE);
+  70              		.loc 1 89 0
+  71 0028 201C     		mov	r0, r4
+  72 002a 0121     		mov	r1, #1
+  73 002c FFF7FEFF 		bl	USART_Cmd
+  74              	.LVL4:
+  90:../scr/main.c **** }
+  75              		.loc 1 90 0
+  76 0030 06B0     		add	sp, sp, #24
+  77              		@ sp needed for prologue
+  78 0032 10BD     		pop	{r4, pc}
+  79              	.L3:
+  80              		.align	2
+  81              	.L2:
+  82 0034 00380140 		.word	1073821696
+  83 0038 05010500 		.word	327941
+  84              		.cfi_endproc
+  85              	.LFE34:
+  87              		.section	.text.USART2_Init,"ax",%progbits
+  88              		.align	1
+  89              		.global	USART2_Init
+  90              		.code	16
+  91              		.thumb_func
+  93              	USART2_Init:
+  94              	.LFB35:
+  91:../scr/main.c **** void USART2_Init(int baudrate) {
+  95              		.loc 1 91 0
+  96              		.cfi_startproc
+  97              	.LVL5:
+  98 0000 10B5     		push	{r4, lr}
+  99              	.LCFI2:
+ 100              		.cfi_def_cfa_offset 8
+ 101              		.cfi_offset 4, -8
+ 102              		.cfi_offset 14, -4
+  92:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+  93:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+  94:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  95:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  96:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+  97:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+  98:../scr/main.c **** 			USART_HardwareFlowControl_None;
+  99:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 100:../scr/main.c **** 	/* Configure the USART2 */
+ 101:../scr/main.c **** 	USART_Init(USART2, &USART_InitStructure);
+ 103              		.loc 1 101 0
+ 104 0002 0C4C     		ldr	r4, .L5
+  91:../scr/main.c **** void USART2_Init(int baudrate) {
+ 105              		.loc 1 91 0
+ 106 0004 86B0     		sub	sp, sp, #24
+ 107              	.LCFI3:
+ 108              		.cfi_def_cfa_offset 32
+  94:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 109              		.loc 1 94 0
+ 110 0006 0023     		mov	r3, #0
+  93:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 111              		.loc 1 93 0
+ 112 0008 0090     		str	r0, [sp]
+  94:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 113              		.loc 1 94 0
+ 114 000a 0193     		str	r3, [sp, #4]
+  95:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 115              		.loc 1 95 0
+ 116 000c 0293     		str	r3, [sp, #8]
+  96:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 117              		.loc 1 96 0
+ 118 000e 0393     		str	r3, [sp, #12]
+  97:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 119              		.loc 1 97 0
+ 120 0010 0593     		str	r3, [sp, #20]
+ 121              		.loc 1 101 0
+ 122 0012 201C     		mov	r0, r4
+ 123              	.LVL6:
+  99:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 124              		.loc 1 99 0
+ 125 0014 0C23     		mov	r3, #12
+ 126              		.loc 1 101 0
+ 127 0016 6946     		mov	r1, sp
+  99:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 128              		.loc 1 99 0
+ 129 0018 0493     		str	r3, [sp, #16]
+ 130              		.loc 1 101 0
+ 131 001a FFF7FEFF 		bl	USART_Init
+ 132              	.LVL7:
+ 102:../scr/main.c **** 	/* Enable USART2 interrupt */
+ 103:../scr/main.c **** 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+ 133              		.loc 1 103 0
+ 134 001e 201C     		mov	r0, r4
+ 135 0020 0122     		mov	r2, #1
+ 136 0022 0549     		ldr	r1, .L5+4
+ 137 0024 FFF7FEFF 		bl	USART_ITConfig
+ 138              	.LVL8:
+ 104:../scr/main.c **** 	/* Enable the USART2 */
+ 105:../scr/main.c **** 	USART_Cmd(USART2, ENABLE);
+ 139              		.loc 1 105 0
+ 140 0028 201C     		mov	r0, r4
+ 141 002a 0121     		mov	r1, #1
+ 142 002c FFF7FEFF 		bl	USART_Cmd
+ 143              	.LVL9:
+ 106:../scr/main.c **** }
+ 144              		.loc 1 106 0
+ 145 0030 06B0     		add	sp, sp, #24
+ 146              		@ sp needed for prologue
+ 147 0032 10BD     		pop	{r4, pc}
+ 148              	.L6:
+ 149              		.align	2
+ 150              	.L5:
+ 151 0034 00440040 		.word	1073759232
+ 152 0038 05010500 		.word	327941
+ 153              		.cfi_endproc
+ 154              	.LFE35:
+ 156              		.section	.text.USART3_Init,"ax",%progbits
+ 157              		.align	1
+ 158              		.global	USART3_Init
+ 159              		.code	16
+ 160              		.thumb_func
+ 162              	USART3_Init:
+ 163              	.LFB36:
+ 107:../scr/main.c **** void USART3_Init(int baudrate) {
+ 164              		.loc 1 107 0
+ 165              		.cfi_startproc
+ 166              	.LVL10:
+ 167 0000 10B5     		push	{r4, lr}
+ 168              	.LCFI4:
+ 169              		.cfi_def_cfa_offset 8
+ 170              		.cfi_offset 4, -8
+ 171              		.cfi_offset 14, -4
+ 108:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+ 109:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 110:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 111:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 112:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 113:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 114:../scr/main.c **** 			USART_HardwareFlowControl_None;
+ 115:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 116:../scr/main.c **** 	/* Configure the USART3 */
+ 117:../scr/main.c **** 	USART_Init(USART3, &USART_InitStructure);
+ 172              		.loc 1 117 0
+ 173 0002 0C4C     		ldr	r4, .L8
+ 107:../scr/main.c **** void USART3_Init(int baudrate) {
+ 174              		.loc 1 107 0
+ 175 0004 86B0     		sub	sp, sp, #24
+ 176              	.LCFI5:
+ 177              		.cfi_def_cfa_offset 32
+ 110:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 178              		.loc 1 110 0
+ 179 0006 0023     		mov	r3, #0
+ 109:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 180              		.loc 1 109 0
+ 181 0008 0090     		str	r0, [sp]
+ 110:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 182              		.loc 1 110 0
+ 183 000a 0193     		str	r3, [sp, #4]
+ 111:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 184              		.loc 1 111 0
+ 185 000c 0293     		str	r3, [sp, #8]
+ 112:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 186              		.loc 1 112 0
+ 187 000e 0393     		str	r3, [sp, #12]
+ 113:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 188              		.loc 1 113 0
+ 189 0010 0593     		str	r3, [sp, #20]
+ 190              		.loc 1 117 0
+ 191 0012 201C     		mov	r0, r4
+ 192              	.LVL11:
+ 115:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 193              		.loc 1 115 0
+ 194 0014 0C23     		mov	r3, #12
+ 195              		.loc 1 117 0
+ 196 0016 6946     		mov	r1, sp
+ 115:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 197              		.loc 1 115 0
+ 198 0018 0493     		str	r3, [sp, #16]
+ 199              		.loc 1 117 0
+ 200 001a FFF7FEFF 		bl	USART_Init
+ 201              	.LVL12:
+ 118:../scr/main.c **** 	/* Enable USART3 interrupt */
+ 119:../scr/main.c **** 	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+ 202              		.loc 1 119 0
+ 203 001e 201C     		mov	r0, r4
+ 204 0020 0122     		mov	r2, #1
+ 205 0022 0549     		ldr	r1, .L8+4
+ 206 0024 FFF7FEFF 		bl	USART_ITConfig
+ 207              	.LVL13:
+ 120:../scr/main.c **** 	/* Enable the USART3 */
+ 121:../scr/main.c **** 	USART_Cmd(USART3, ENABLE);
+ 208              		.loc 1 121 0
+ 209 0028 201C     		mov	r0, r4
+ 210 002a 0121     		mov	r1, #1
+ 211 002c FFF7FEFF 		bl	USART_Cmd
+ 212              	.LVL14:
+ 122:../scr/main.c **** }
+ 213              		.loc 1 122 0
+ 214 0030 06B0     		add	sp, sp, #24
+ 215              		@ sp needed for prologue
+ 216 0032 10BD     		pop	{r4, pc}
+ 217              	.L9:
+ 218              		.align	2
+ 219              	.L8:
+ 220 0034 00480040 		.word	1073760256
+ 221 0038 05010500 		.word	327941
+ 222              		.cfi_endproc
+ 223              	.LFE36:
+ 225              		.section	.text.USART4_Init,"ax",%progbits
+ 226              		.align	1
+ 227              		.global	USART4_Init
+ 228              		.code	16
+ 229              		.thumb_func
+ 231              	USART4_Init:
+ 232              	.LFB37:
+ 123:../scr/main.c **** void USART4_Init(int baudrate) {
+ 233              		.loc 1 123 0
+ 234              		.cfi_startproc
+ 235              	.LVL15:
+ 236 0000 10B5     		push	{r4, lr}
+ 237              	.LCFI6:
+ 238              		.cfi_def_cfa_offset 8
+ 239              		.cfi_offset 4, -8
+ 240              		.cfi_offset 14, -4
+ 124:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+ 125:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 126:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 127:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 128:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 129:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 130:../scr/main.c **** 			USART_HardwareFlowControl_None;
+ 131:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 132:../scr/main.c **** 	/* Configure the USART4 */
+ 133:../scr/main.c **** 	USART_Init(USART4, &USART_InitStructure);
+ 241              		.loc 1 133 0
+ 242 0002 0C4C     		ldr	r4, .L11
+ 123:../scr/main.c **** void USART4_Init(int baudrate) {
+ 243              		.loc 1 123 0
+ 244 0004 86B0     		sub	sp, sp, #24
+ 245              	.LCFI7:
+ 246              		.cfi_def_cfa_offset 32
+ 126:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 247              		.loc 1 126 0
+ 248 0006 0023     		mov	r3, #0
+ 125:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 249              		.loc 1 125 0
+ 250 0008 0090     		str	r0, [sp]
+ 126:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 251              		.loc 1 126 0
+ 252 000a 0193     		str	r3, [sp, #4]
+ 127:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 253              		.loc 1 127 0
+ 254 000c 0293     		str	r3, [sp, #8]
+ 128:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 255              		.loc 1 128 0
+ 256 000e 0393     		str	r3, [sp, #12]
+ 129:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 257              		.loc 1 129 0
+ 258 0010 0593     		str	r3, [sp, #20]
+ 259              		.loc 1 133 0
+ 260 0012 201C     		mov	r0, r4
+ 261              	.LVL16:
+ 131:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 262              		.loc 1 131 0
+ 263 0014 0C23     		mov	r3, #12
+ 264              		.loc 1 133 0
+ 265 0016 6946     		mov	r1, sp
+ 131:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 266              		.loc 1 131 0
+ 267 0018 0493     		str	r3, [sp, #16]
+ 268              		.loc 1 133 0
+ 269 001a FFF7FEFF 		bl	USART_Init
+ 270              	.LVL17:
+ 134:../scr/main.c **** 	/* Enable USART4 interrupt */
+ 135:../scr/main.c **** 	USART_ITConfig(USART4, USART_IT_RXNE, ENABLE);
+ 271              		.loc 1 135 0
+ 272 001e 201C     		mov	r0, r4
+ 273 0020 0122     		mov	r2, #1
+ 274 0022 0549     		ldr	r1, .L11+4
+ 275 0024 FFF7FEFF 		bl	USART_ITConfig
+ 276              	.LVL18:
+ 136:../scr/main.c **** 	/* Enable the USART4 */
+ 137:../scr/main.c **** 	USART_Cmd(USART4, ENABLE);
+ 277              		.loc 1 137 0
+ 278 0028 201C     		mov	r0, r4
+ 279 002a 0121     		mov	r1, #1
+ 280 002c FFF7FEFF 		bl	USART_Cmd
+ 281              	.LVL19:
+ 138:../scr/main.c **** }
+ 282              		.loc 1 138 0
+ 283 0030 06B0     		add	sp, sp, #24
+ 284              		@ sp needed for prologue
+ 285 0032 10BD     		pop	{r4, pc}
+ 286              	.L12:
+ 287              		.align	2
+ 288              	.L11:
+ 289 0034 004C0040 		.word	1073761280
+ 290 0038 05010500 		.word	327941
+ 291              		.cfi_endproc
+ 292              	.LFE37:
+ 294              		.section	.text.USART5_Init,"ax",%progbits
+ 295              		.align	1
+ 296              		.global	USART5_Init
+ 297              		.code	16
+ 298              		.thumb_func
+ 300              	USART5_Init:
+ 301              	.LFB38:
+ 139:../scr/main.c **** void USART5_Init(int baudrate) {
+ 302              		.loc 1 139 0
+ 303              		.cfi_startproc
+ 304              	.LVL20:
+ 305 0000 10B5     		push	{r4, lr}
+ 306              	.LCFI8:
+ 307              		.cfi_def_cfa_offset 8
+ 308              		.cfi_offset 4, -8
+ 309              		.cfi_offset 14, -4
+ 140:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+ 141:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 142:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 143:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 144:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 145:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 146:../scr/main.c **** 			USART_HardwareFlowControl_None;
+ 147:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 148:../scr/main.c **** 	/* Configure the USART5 */
+ 149:../scr/main.c **** 	USART_Init(USART5, &USART_InitStructure);
+ 310              		.loc 1 149 0
+ 311 0002 0C4C     		ldr	r4, .L14
+ 139:../scr/main.c **** void USART5_Init(int baudrate) {
+ 312              		.loc 1 139 0
+ 313 0004 86B0     		sub	sp, sp, #24
+ 314              	.LCFI9:
+ 315              		.cfi_def_cfa_offset 32
+ 142:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 316              		.loc 1 142 0
+ 317 0006 0023     		mov	r3, #0
+ 141:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 318              		.loc 1 141 0
+ 319 0008 0090     		str	r0, [sp]
+ 142:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 320              		.loc 1 142 0
+ 321 000a 0193     		str	r3, [sp, #4]
+ 143:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 322              		.loc 1 143 0
+ 323 000c 0293     		str	r3, [sp, #8]
+ 144:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 324              		.loc 1 144 0
+ 325 000e 0393     		str	r3, [sp, #12]
+ 145:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 326              		.loc 1 145 0
+ 327 0010 0593     		str	r3, [sp, #20]
+ 328              		.loc 1 149 0
+ 329 0012 201C     		mov	r0, r4
+ 330              	.LVL21:
+ 147:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 331              		.loc 1 147 0
+ 332 0014 0C23     		mov	r3, #12
+ 333              		.loc 1 149 0
+ 334 0016 6946     		mov	r1, sp
+ 147:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 335              		.loc 1 147 0
+ 336 0018 0493     		str	r3, [sp, #16]
+ 337              		.loc 1 149 0
+ 338 001a FFF7FEFF 		bl	USART_Init
+ 339              	.LVL22:
+ 150:../scr/main.c **** 	/* Enable USART5 interrupt */
+ 151:../scr/main.c **** 	USART_ITConfig(USART5, USART_IT_RXNE, ENABLE);
+ 340              		.loc 1 151 0
+ 341 001e 201C     		mov	r0, r4
+ 342 0020 0122     		mov	r2, #1
+ 343 0022 0549     		ldr	r1, .L14+4
+ 344 0024 FFF7FEFF 		bl	USART_ITConfig
+ 345              	.LVL23:
+ 152:../scr/main.c **** 	/* Enable the USART5 */
+ 153:../scr/main.c **** 	USART_Cmd(USART5, ENABLE);
+ 346              		.loc 1 153 0
+ 347 0028 201C     		mov	r0, r4
+ 348 002a 0121     		mov	r1, #1
+ 349 002c FFF7FEFF 		bl	USART_Cmd
+ 350              	.LVL24:
+ 154:../scr/main.c **** }
+ 351              		.loc 1 154 0
+ 352 0030 06B0     		add	sp, sp, #24
+ 353              		@ sp needed for prologue
+ 354 0032 10BD     		pop	{r4, pc}
+ 355              	.L15:
+ 356              		.align	2
+ 357              	.L14:
+ 358 0034 00500040 		.word	1073762304
+ 359 0038 05010500 		.word	327941
+ 360              		.cfi_endproc
+ 361              	.LFE38:
+ 363              		.section	.text.USART6_Init,"ax",%progbits
+ 364              		.align	1
+ 365              		.global	USART6_Init
+ 366              		.code	16
+ 367              		.thumb_func
+ 369              	USART6_Init:
+ 370              	.LFB39:
+ 155:../scr/main.c **** void USART6_Init(int baudrate) {
+ 371              		.loc 1 155 0
+ 372              		.cfi_startproc
+ 373              	.LVL25:
+ 374 0000 10B5     		push	{r4, lr}
+ 375              	.LCFI10:
+ 376              		.cfi_def_cfa_offset 8
+ 377              		.cfi_offset 4, -8
+ 378              		.cfi_offset 14, -4
+ 156:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+ 157:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 158:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 159:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 160:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 161:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 162:../scr/main.c **** 			USART_HardwareFlowControl_None;
+ 163:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 164:../scr/main.c **** 	/* Configure the USART6 */
+ 165:../scr/main.c **** 	USART_Init(USART6, &USART_InitStructure);
+ 379              		.loc 1 165 0
+ 380 0002 0C4C     		ldr	r4, .L17
+ 155:../scr/main.c **** void USART6_Init(int baudrate) {
+ 381              		.loc 1 155 0
+ 382 0004 86B0     		sub	sp, sp, #24
+ 383              	.LCFI11:
+ 384              		.cfi_def_cfa_offset 32
+ 158:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 385              		.loc 1 158 0
+ 386 0006 0023     		mov	r3, #0
+ 157:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 387              		.loc 1 157 0
+ 388 0008 0090     		str	r0, [sp]
+ 158:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 389              		.loc 1 158 0
+ 390 000a 0193     		str	r3, [sp, #4]
+ 159:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 391              		.loc 1 159 0
+ 392 000c 0293     		str	r3, [sp, #8]
+ 160:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 393              		.loc 1 160 0
+ 394 000e 0393     		str	r3, [sp, #12]
+ 161:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 395              		.loc 1 161 0
+ 396 0010 0593     		str	r3, [sp, #20]
+ 397              		.loc 1 165 0
+ 398 0012 201C     		mov	r0, r4
+ 399              	.LVL26:
+ 163:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 400              		.loc 1 163 0
+ 401 0014 0C23     		mov	r3, #12
+ 402              		.loc 1 165 0
+ 403 0016 6946     		mov	r1, sp
+ 163:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 404              		.loc 1 163 0
+ 405 0018 0493     		str	r3, [sp, #16]
+ 406              		.loc 1 165 0
+ 407 001a FFF7FEFF 		bl	USART_Init
+ 408              	.LVL27:
+ 166:../scr/main.c **** 	/* Enable USART6 interrupt */
+ 167:../scr/main.c **** 	USART_ITConfig(USART6, USART_IT_RXNE, ENABLE);
+ 409              		.loc 1 167 0
+ 410 001e 201C     		mov	r0, r4
+ 411 0020 0122     		mov	r2, #1
+ 412 0022 0549     		ldr	r1, .L17+4
+ 413 0024 FFF7FEFF 		bl	USART_ITConfig
+ 414              	.LVL28:
+ 168:../scr/main.c **** 	/* Enable the USART6 */
+ 169:../scr/main.c **** 	USART_Cmd(USART6, ENABLE);
+ 415              		.loc 1 169 0
+ 416 0028 201C     		mov	r0, r4
+ 417 002a 0121     		mov	r1, #1
+ 418 002c FFF7FEFF 		bl	USART_Cmd
+ 419              	.LVL29:
+ 170:../scr/main.c **** }
+ 420              		.loc 1 170 0
+ 421 0030 06B0     		add	sp, sp, #24
+ 422              		@ sp needed for prologue
+ 423 0032 10BD     		pop	{r4, pc}
+ 424              	.L18:
+ 425              		.align	2
+ 426              	.L17:
+ 427 0034 00140140 		.word	1073812480
+ 428 0038 05010500 		.word	327941
+ 429              		.cfi_endproc
+ 430              	.LFE39:
+ 432              		.section	.text.USART7_Init,"ax",%progbits
+ 433              		.align	1
+ 434              		.global	USART7_Init
+ 435              		.code	16
+ 436              		.thumb_func
+ 438              	USART7_Init:
+ 439              	.LFB40:
+ 171:../scr/main.c **** void USART7_Init(int baudrate) {
+ 440              		.loc 1 171 0
+ 441              		.cfi_startproc
+ 442              	.LVL30:
+ 443 0000 10B5     		push	{r4, lr}
+ 444              	.LCFI12:
+ 445              		.cfi_def_cfa_offset 8
+ 446              		.cfi_offset 4, -8
+ 447              		.cfi_offset 14, -4
+ 172:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+ 173:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 174:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 175:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 176:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 177:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 178:../scr/main.c **** 			USART_HardwareFlowControl_None;
+ 179:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 180:../scr/main.c **** 	/* Configure the USART7 */
+ 181:../scr/main.c **** 	USART_Init(USART7, &USART_InitStructure);
+ 448              		.loc 1 181 0
+ 449 0002 0C4C     		ldr	r4, .L20
+ 171:../scr/main.c **** void USART7_Init(int baudrate) {
+ 450              		.loc 1 171 0
+ 451 0004 86B0     		sub	sp, sp, #24
+ 452              	.LCFI13:
+ 453              		.cfi_def_cfa_offset 32
+ 174:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 454              		.loc 1 174 0
+ 455 0006 0023     		mov	r3, #0
+ 173:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 456              		.loc 1 173 0
+ 457 0008 0090     		str	r0, [sp]
+ 174:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 458              		.loc 1 174 0
+ 459 000a 0193     		str	r3, [sp, #4]
+ 175:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 460              		.loc 1 175 0
+ 461 000c 0293     		str	r3, [sp, #8]
+ 176:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 462              		.loc 1 176 0
+ 463 000e 0393     		str	r3, [sp, #12]
+ 177:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 464              		.loc 1 177 0
+ 465 0010 0593     		str	r3, [sp, #20]
+ 466              		.loc 1 181 0
+ 467 0012 201C     		mov	r0, r4
+ 468              	.LVL31:
+ 179:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 469              		.loc 1 179 0
+ 470 0014 0C23     		mov	r3, #12
+ 471              		.loc 1 181 0
+ 472 0016 6946     		mov	r1, sp
+ 179:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 473              		.loc 1 179 0
+ 474 0018 0493     		str	r3, [sp, #16]
+ 475              		.loc 1 181 0
+ 476 001a FFF7FEFF 		bl	USART_Init
+ 477              	.LVL32:
+ 182:../scr/main.c **** 	/* Enable USART7 interrupt */
+ 183:../scr/main.c **** 	USART_ITConfig(USART7, USART_IT_RXNE, ENABLE);
+ 478              		.loc 1 183 0
+ 479 001e 201C     		mov	r0, r4
+ 480 0020 0122     		mov	r2, #1
+ 481 0022 0549     		ldr	r1, .L20+4
+ 482 0024 FFF7FEFF 		bl	USART_ITConfig
+ 483              	.LVL33:
+ 184:../scr/main.c **** 	/* Enable the USART7 */
+ 185:../scr/main.c **** 	USART_Cmd(USART7, ENABLE);
+ 484              		.loc 1 185 0
+ 485 0028 201C     		mov	r0, r4
+ 486 002a 0121     		mov	r1, #1
+ 487 002c FFF7FEFF 		bl	USART_Cmd
+ 488              	.LVL34:
+ 186:../scr/main.c **** }
+ 489              		.loc 1 186 0
+ 490 0030 06B0     		add	sp, sp, #24
+ 491              		@ sp needed for prologue
+ 492 0032 10BD     		pop	{r4, pc}
+ 493              	.L21:
+ 494              		.align	2
+ 495              	.L20:
+ 496 0034 00180140 		.word	1073813504
+ 497 0038 05010500 		.word	327941
+ 498              		.cfi_endproc
+ 499              	.LFE40:
+ 501              		.section	.text.USART8_Init,"ax",%progbits
+ 502              		.align	1
+ 503              		.global	USART8_Init
+ 504              		.code	16
+ 505              		.thumb_func
+ 507              	USART8_Init:
+ 508              	.LFB41:
+ 187:../scr/main.c **** void USART8_Init(int baudrate) {
+ 509              		.loc 1 187 0
+ 510              		.cfi_startproc
+ 511              	.LVL35:
+ 512 0000 10B5     		push	{r4, lr}
+ 513              	.LCFI14:
+ 514              		.cfi_def_cfa_offset 8
+ 515              		.cfi_offset 4, -8
+ 516              		.cfi_offset 14, -4
+ 188:../scr/main.c **** 	USART_InitTypeDef USART_InitStructure;
+ 189:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 190:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 191:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 192:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 193:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 194:../scr/main.c **** 			USART_HardwareFlowControl_None;
+ 195:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 196:../scr/main.c **** 	/* Configure the USART8 */
+ 197:../scr/main.c **** 	USART_Init(USART8, &USART_InitStructure);
+ 517              		.loc 1 197 0
+ 518 0002 0C4C     		ldr	r4, .L23
+ 187:../scr/main.c **** void USART8_Init(int baudrate) {
+ 519              		.loc 1 187 0
+ 520 0004 86B0     		sub	sp, sp, #24
+ 521              	.LCFI15:
+ 522              		.cfi_def_cfa_offset 32
+ 190:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 523              		.loc 1 190 0
+ 524 0006 0023     		mov	r3, #0
+ 189:../scr/main.c **** 	USART_InitStructure.USART_BaudRate = baudrate;
+ 525              		.loc 1 189 0
+ 526 0008 0090     		str	r0, [sp]
+ 190:../scr/main.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 527              		.loc 1 190 0
+ 528 000a 0193     		str	r3, [sp, #4]
+ 191:../scr/main.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 529              		.loc 1 191 0
+ 530 000c 0293     		str	r3, [sp, #8]
+ 192:../scr/main.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 531              		.loc 1 192 0
+ 532 000e 0393     		str	r3, [sp, #12]
+ 193:../scr/main.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 533              		.loc 1 193 0
+ 534 0010 0593     		str	r3, [sp, #20]
+ 535              		.loc 1 197 0
+ 536 0012 201C     		mov	r0, r4
+ 537              	.LVL36:
+ 195:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 538              		.loc 1 195 0
+ 539 0014 0C23     		mov	r3, #12
+ 540              		.loc 1 197 0
+ 541 0016 6946     		mov	r1, sp
+ 195:../scr/main.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 542              		.loc 1 195 0
+ 543 0018 0493     		str	r3, [sp, #16]
+ 544              		.loc 1 197 0
+ 545 001a FFF7FEFF 		bl	USART_Init
+ 546              	.LVL37:
+ 198:../scr/main.c **** 	/* Enable USART8 interrupt */
+ 199:../scr/main.c **** 	USART_ITConfig(USART8, USART_IT_RXNE, ENABLE);
+ 547              		.loc 1 199 0
+ 548 001e 201C     		mov	r0, r4
+ 549 0020 0122     		mov	r2, #1
+ 550 0022 0549     		ldr	r1, .L23+4
+ 551 0024 FFF7FEFF 		bl	USART_ITConfig
+ 552              	.LVL38:
+ 200:../scr/main.c **** 	/* Enable the USART8 */
+ 201:../scr/main.c **** 	USART_Cmd(USART8, ENABLE);
+ 553              		.loc 1 201 0
+ 554 0028 201C     		mov	r0, r4
+ 555 002a 0121     		mov	r1, #1
+ 556 002c FFF7FEFF 		bl	USART_Cmd
+ 557              	.LVL39:
+ 202:../scr/main.c **** }
+ 558              		.loc 1 202 0
+ 559 0030 06B0     		add	sp, sp, #24
+ 560              		@ sp needed for prologue
+ 561 0032 10BD     		pop	{r4, pc}
+ 562              	.L24:
+ 563              		.align	2
+ 564              	.L23:
+ 565 0034 001C0140 		.word	1073814528
+ 566 0038 05010500 		.word	327941
+ 567              		.cfi_endproc
+ 568              	.LFE41:
+ 570              		.global	__aeabi_uidiv
+ 571              		.section	.text.startup.main,"ax",%progbits
+ 572              		.align	1
+ 573              		.global	main
+ 574              		.code	16
+ 575              		.thumb_func
+ 577              	main:
+ 578              	.LFB42:
+ 203:../scr/main.c **** long check_time = 0;
+ 204:../scr/main.c **** int main(void) {
+ 579              		.loc 1 204 0
+ 580              		.cfi_startproc
+ 581 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 582              	.LCFI16:
+ 583              		.cfi_def_cfa_offset 20
+ 584              		.cfi_offset 4, -20
+ 585              		.cfi_offset 5, -16
+ 586              		.cfi_offset 6, -12
+ 587              		.cfi_offset 7, -8
+ 588              		.cfi_offset 14, -4
+ 589 0002 85B0     		sub	sp, sp, #20
+ 590              	.LCFI17:
+ 591              		.cfi_def_cfa_offset 40
+ 592              	.LBB14:
+ 593              	.LBB15:
+ 594              	.LBB16:
+ 595              	.LBB17:
+ 205:../scr/main.c **** 	/*
+ 206:../scr/main.c **** 	 uint32_t i = 0;
+ 207:../scr/main.c **** 	 for (i = 0; i < 48; i++) {
+ 208:../scr/main.c **** 	 VectorTable[i] = *(__IO uint32_t*) (APPLICATION_ADDRESS + (i << 2));
+ 209:../scr/main.c **** 	 }
+ 210:../scr/main.c **** 
+ 211:../scr/main.c **** 	 Enable the SYSCFG peripheral clock
+ 212:../scr/main.c **** 	 RCC_APB2PeriphResetCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+ 213:../scr/main.c **** 	 Remap SRAM at 0x00000000
+ 214:../scr/main.c **** 	 SYSCFG_MemoryRemapConfig(SYSCFG_MemoryRemap_SRAM);
+ 215:../scr/main.c **** 	 */
+ 216:../scr/main.c **** 	//SystemInit();
+ 217:../scr/main.c **** 	prvSetupHardware();
+ 218:../scr/main.c **** 	PC_USART_Init(115200);
+ 219:../scr/main.c **** 	SysTick_Config(SystemCoreClock / 1000);
+ 220:../scr/main.c **** 	xdev_out(SerialPutChar);
+ 221:../scr/main.c **** 	xprintf("cam hub demo\r\n");
+ 222:../scr/main.c **** 	GPIO_ResetBits(GPIOB, GPIO_Pin_9);
+ 223:../scr/main.c **** 	while (1) {
+ 224:../scr/main.c **** 		if (check_time < ulMiliCount) {
+ 225:../scr/main.c **** 			GPIO_WriteBit(GPIOB, GPIO_Pin_8,
+ 226:../scr/main.c **** 					!GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_8));
+ 227:../scr/main.c **** 			check_time = ulMiliCount + 100;
+ 228:../scr/main.c **** 		}
+ 229:../scr/main.c **** 	}
+ 230:../scr/main.c **** 	//Main_Menu();
+ 231:../scr/main.c **** }
+ 232:../scr/main.c **** void RCC_Configuration(void) {
+ 233:../scr/main.c **** 	/* Function used to set the RCC clock configuration to the default reset state */
+ 234:../scr/main.c **** 	RCC_DeInit();
+ 596              		.loc 1 234 0
+ 597 0004 FFF7FEFF 		bl	RCC_DeInit
+ 598              	.LVL40:
+ 235:../scr/main.c **** 	/* Peripheral clocks configuration functions **********************************/
+ 236:../scr/main.c **** 	RCC_AHBPeriphClockCmd(
+ 599              		.loc 1 236 0
+ 600 0008 FC20     		mov	r0, #252
+ 601 000a C003     		lsl	r0, r0, #15
+ 602 000c 0121     		mov	r1, #1
+ 603 000e FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 604              	.LVL41:
+ 237:../scr/main.c **** 			RCC_AHBPeriph_GPIOA | RCC_AHBPeriph_GPIOB | RCC_AHBPeriph_GPIOC
+ 238:../scr/main.c **** 					| RCC_AHBPeriph_GPIOD | RCC_AHBPeriph_GPIOE
+ 239:../scr/main.c **** 					| RCC_AHBPeriph_GPIOF, ENABLE);
+ 240:../scr/main.c **** 	RCC_APB2PeriphClockCmd(
+ 605              		.loc 1 240 0
+ 606 0012 7848     		ldr	r0, .L30
+ 607 0014 0121     		mov	r1, #1
+ 608 0016 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 609              	.LVL42:
+ 241:../scr/main.c **** 			RCC_APB2Periph_USART1 | RCC_APB2Periph_USART6
+ 242:../scr/main.c **** 					| RCC_APB2Periph_USART7 | RCC_APB2Periph_USART8, ENABLE);
+ 243:../scr/main.c **** 	RCC_APB1PeriphClockCmd(
+ 610              		.loc 1 243 0
+ 611 001a F020     		mov	r0, #240
+ 612              	.LBE17:
+ 613              	.LBE16:
+ 614              	.LBB20:
+ 615              	.LBB21:
+ 244:../scr/main.c **** 			RCC_APB1Periph_USART2 | RCC_APB1Periph_USART3
+ 245:../scr/main.c **** 					| RCC_APB1Periph_USART4 | RCC_APB1Periph_USART5, ENABLE);
+ 246:../scr/main.c **** }
+ 247:../scr/main.c **** void NVIC_Configuration(void) {
+ 248:../scr/main.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+ 249:../scr/main.c **** 	/*uart2
+ 250:../scr/main.c **** 	 */
+ 251:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+ 616              		.loc 1 251 0
+ 617 001c 01AC     		add	r4, sp, #4
+ 618              	.LBE21:
+ 619              	.LBE20:
+ 620              	.LBB24:
+ 621              	.LBB18:
+ 243:../scr/main.c **** 	RCC_APB1PeriphClockCmd(
+ 622              		.loc 1 243 0
+ 623 001e 0121     		mov	r1, #1
+ 624 0020 4003     		lsl	r0, r0, #13
+ 625              	.LBE18:
+ 626              	.LBE24:
+ 627              	.LBB25:
+ 628              	.LBB22:
+ 252:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 1;
+ 629              		.loc 1 252 0
+ 630 0022 0125     		mov	r5, #1
+ 631              	.LBE22:
+ 632              	.LBE25:
+ 633              	.LBB26:
+ 634              	.LBB19:
+ 243:../scr/main.c **** 	RCC_APB1PeriphClockCmd(
+ 635              		.loc 1 243 0
+ 636 0024 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 637              	.LVL43:
+ 638              	.LBE19:
+ 639              	.LBE26:
+ 640              	.LBB27:
+ 641              	.LBB23:
+ 251:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+ 642              		.loc 1 251 0
+ 643 0028 1C23     		mov	r3, #28
+ 253:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 254:../scr/main.c **** 	NVIC_Init(&NVIC_InitStructure);
+ 644              		.loc 1 254 0
+ 645 002a 201C     		mov	r0, r4
+ 251:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+ 646              		.loc 1 251 0
+ 647 002c 2370     		strb	r3, [r4]
+ 252:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 1;
+ 648              		.loc 1 252 0
+ 649 002e 6570     		strb	r5, [r4, #1]
+ 253:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 650              		.loc 1 253 0
+ 651 0030 A570     		strb	r5, [r4, #2]
+ 652              		.loc 1 254 0
+ 653 0032 FFF7FEFF 		bl	NVIC_Init
+ 654              	.LVL44:
+ 255:../scr/main.c **** 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+ 655              		.loc 1 255 0
+ 656 0036 7049     		ldr	r1, .L30+4
+ 657 0038 2A1C     		mov	r2, r5
+ 658 003a 7048     		ldr	r0, .L30+8
+ 256:../scr/main.c **** 
+ 257:../scr/main.c **** 	/*uart1
+ 258:../scr/main.c **** 	 */
+ 259:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+ 260:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 659              		.loc 1 260 0
+ 660 003c 0026     		mov	r6, #0
+ 255:../scr/main.c **** 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+ 661              		.loc 1 255 0
+ 662 003e FFF7FEFF 		bl	USART_ITConfig
+ 663              	.LVL45:
+ 259:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+ 664              		.loc 1 259 0
+ 665 0042 1B23     		mov	r3, #27
+ 261:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 262:../scr/main.c **** 	NVIC_Init(&NVIC_InitStructure);
+ 666              		.loc 1 262 0
+ 667 0044 201C     		mov	r0, r4
+ 259:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+ 668              		.loc 1 259 0
+ 669 0046 2370     		strb	r3, [r4]
+ 260:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 670              		.loc 1 260 0
+ 671 0048 6670     		strb	r6, [r4, #1]
+ 261:../scr/main.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 672              		.loc 1 261 0
+ 673 004a A570     		strb	r5, [r4, #2]
+ 674              		.loc 1 262 0
+ 675 004c FFF7FEFF 		bl	NVIC_Init
+ 676              	.LVL46:
+ 263:../scr/main.c **** 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+ 677              		.loc 1 263 0
+ 678 0050 6B48     		ldr	r0, .L30+12
+ 679 0052 6949     		ldr	r1, .L30+4
+ 680 0054 2A1C     		mov	r2, r5
+ 681 0056 FFF7FEFF 		bl	USART_ITConfig
+ 682              	.LVL47:
+ 683              	.LBE23:
+ 684              	.LBE27:
+ 685              	.LBB28:
+ 686              	.LBB29:
+ 264:../scr/main.c **** }
+ 265:../scr/main.c **** void GPIO_Configuration(void) {
+ 266:../scr/main.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+ 267:../scr/main.c **** 	/*portA initialization
+ 268:../scr/main.c **** 	 * GPIO_Pin_0	:UART4 TX
+ 269:../scr/main.c **** 	 * GPIO_Pin_1	:UART4 RX
+ 270:../scr/main.c **** 	 * GPIO_Pin_2	:UART2 TX
+ 271:../scr/main.c **** 	 * GPIO_Pin_3	:UART2 RX
+ 272:../scr/main.c **** 	 * GPIO_Pin_4	:UART6 TX
+ 273:../scr/main.c **** 	 * GPIO_Pin_5	:UART6 TX
+ 274:../scr/main.c **** 	 */
+ 275:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource0, GPIO_AF_4);
+ 687              		.loc 1 275 0
+ 688 005a 9020     		mov	r0, #144
+ 689 005c C005     		lsl	r0, r0, #23
+ 690 005e 311C     		mov	r1, r6
+ 691 0060 0422     		mov	r2, #4
+ 692 0062 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 693              	.LVL48:
+ 276:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource1, GPIO_AF_4);
+ 694              		.loc 1 276 0
+ 695 0066 9020     		mov	r0, #144
+ 696 0068 C005     		lsl	r0, r0, #23
+ 697 006a 291C     		mov	r1, r5
+ 698 006c 0422     		mov	r2, #4
+ 699 006e FFF7FEFF 		bl	GPIO_PinAFConfig
+ 700              	.LVL49:
+ 277:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_1);
+ 701              		.loc 1 277 0
+ 702 0072 9020     		mov	r0, #144
+ 703 0074 C005     		lsl	r0, r0, #23
+ 704 0076 0221     		mov	r1, #2
+ 705 0078 2A1C     		mov	r2, r5
+ 706 007a FFF7FEFF 		bl	GPIO_PinAFConfig
+ 707              	.LVL50:
+ 278:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_1);
+ 708              		.loc 1 278 0
+ 709 007e 9020     		mov	r0, #144
+ 710 0080 C005     		lsl	r0, r0, #23
+ 711 0082 0321     		mov	r1, #3
+ 712 0084 2A1C     		mov	r2, r5
+ 713 0086 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 714              	.LVL51:
+ 279:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource4, GPIO_AF_5);
+ 715              		.loc 1 279 0
+ 716 008a 9020     		mov	r0, #144
+ 717 008c C005     		lsl	r0, r0, #23
+ 718 008e 0421     		mov	r1, #4
+ 719 0090 0522     		mov	r2, #5
+ 720 0092 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 721              	.LVL52:
+ 280:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_5);
+ 722              		.loc 1 280 0
+ 723 0096 0521     		mov	r1, #5
+ 724 0098 9020     		mov	r0, #144
+ 725 009a 0A1C     		mov	r2, r1
+ 726 009c C005     		lsl	r0, r0, #23
+ 281:../scr/main.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2
+ 727              		.loc 1 281 0
+ 728 009e 02AC     		add	r4, sp, #8
+ 280:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_5);
+ 729              		.loc 1 280 0
+ 730 00a0 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 731              	.LVL53:
+ 732              		.loc 1 281 0
+ 733 00a4 3F23     		mov	r3, #63
+ 282:../scr/main.c **** 			| GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
+ 283:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 284:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 285:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 286:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 287:../scr/main.c **** 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+ 734              		.loc 1 287 0
+ 735 00a6 9020     		mov	r0, #144
+ 283:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 736              		.loc 1 283 0
+ 737 00a8 0227     		mov	r7, #2
+ 281:../scr/main.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2
+ 738              		.loc 1 281 0
+ 739 00aa 0293     		str	r3, [sp, #8]
+ 740              		.loc 1 287 0
+ 741 00ac C005     		lsl	r0, r0, #23
+ 284:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 742              		.loc 1 284 0
+ 743 00ae 0323     		mov	r3, #3
+ 744              		.loc 1 287 0
+ 745 00b0 211C     		mov	r1, r4
+ 284:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 746              		.loc 1 284 0
+ 747 00b2 6371     		strb	r3, [r4, #5]
+ 283:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 748              		.loc 1 283 0
+ 749 00b4 2771     		strb	r7, [r4, #4]
+ 285:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 750              		.loc 1 285 0
+ 751 00b6 A671     		strb	r6, [r4, #6]
+ 286:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 752              		.loc 1 286 0
+ 753 00b8 E571     		strb	r5, [r4, #7]
+ 754              		.loc 1 287 0
+ 755 00ba FFF7FEFF 		bl	GPIO_Init
+ 756              	.LVL54:
+ 288:../scr/main.c **** 	/*portB initialization
+ 289:../scr/main.c **** 	 * GPIO_Pin_3	:UART5 TX
+ 290:../scr/main.c **** 	 * GPIO_Pin_4	:UART5 RX
+ 291:../scr/main.c **** 	 * GPIO_Pin_6	:UART1 TX
+ 292:../scr/main.c **** 	 * GPIO_Pin_7	:UART1 RX
+ 293:../scr/main.c **** 	 * GPIO_Pin_10	:UART3 TX
+ 294:../scr/main.c **** 	 * GPIO_Pin_11	:UART3 TX
+ 295:../scr/main.c **** 	 */
+ 296:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_4);
+ 757              		.loc 1 296 0
+ 758 00be 9020     		mov	r0, #144
+ 759 00c0 C005     		lsl	r0, r0, #23
+ 760 00c2 0321     		mov	r1, #3
+ 761 00c4 0422     		mov	r2, #4
+ 762 00c6 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 763              	.LVL55:
+ 297:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource4, GPIO_AF_4);
+ 764              		.loc 1 297 0
+ 765 00ca 0421     		mov	r1, #4
+ 766 00cc 9020     		mov	r0, #144
+ 767 00ce 0A1C     		mov	r2, r1
+ 768 00d0 C005     		lsl	r0, r0, #23
+ 769 00d2 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 770              	.LVL56:
+ 298:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_0);
+ 771              		.loc 1 298 0
+ 772 00d6 9020     		mov	r0, #144
+ 773 00d8 C005     		lsl	r0, r0, #23
+ 774 00da 0621     		mov	r1, #6
+ 775 00dc 321C     		mov	r2, r6
+ 776 00de FFF7FEFF 		bl	GPIO_PinAFConfig
+ 777              	.LVL57:
+ 299:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource7, GPIO_AF_0);
+ 778              		.loc 1 299 0
+ 779 00e2 9020     		mov	r0, #144
+ 780 00e4 C005     		lsl	r0, r0, #23
+ 781 00e6 0721     		mov	r1, #7
+ 782 00e8 321C     		mov	r2, r6
+ 783 00ea FFF7FEFF 		bl	GPIO_PinAFConfig
+ 784              	.LVL58:
+ 300:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_4);
+ 785              		.loc 1 300 0
+ 786 00ee 9020     		mov	r0, #144
+ 787 00f0 C005     		lsl	r0, r0, #23
+ 788 00f2 0A21     		mov	r1, #10
+ 789 00f4 0422     		mov	r2, #4
+ 790 00f6 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 791              	.LVL59:
+ 301:../scr/main.c **** 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, GPIO_AF_4);
+ 792              		.loc 1 301 0
+ 793 00fa 9020     		mov	r0, #144
+ 794 00fc 0422     		mov	r2, #4
+ 795 00fe C005     		lsl	r0, r0, #23
+ 796 0100 0B21     		mov	r1, #11
+ 797 0102 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 798              	.LVL60:
+ 302:../scr/main.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_6
+ 799              		.loc 1 302 0
+ 800 0106 3F4B     		ldr	r3, .L30+16
+ 303:../scr/main.c **** 			| GPIO_Pin_7 | GPIO_Pin_10 | GPIO_Pin_11;
+ 304:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 305:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 306:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 307:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 308:../scr/main.c **** 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+ 801              		.loc 1 308 0
+ 802 0108 9020     		mov	r0, #144
+ 302:../scr/main.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_6
+ 803              		.loc 1 302 0
+ 804 010a 0293     		str	r3, [sp, #8]
+ 805              		.loc 1 308 0
+ 806 010c C005     		lsl	r0, r0, #23
+ 305:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 807              		.loc 1 305 0
+ 808 010e 0323     		mov	r3, #3
+ 809              		.loc 1 308 0
+ 810 0110 211C     		mov	r1, r4
+ 305:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 811              		.loc 1 305 0
+ 812 0112 6371     		strb	r3, [r4, #5]
+ 304:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 813              		.loc 1 304 0
+ 814 0114 2771     		strb	r7, [r4, #4]
+ 306:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 815              		.loc 1 306 0
+ 816 0116 A671     		strb	r6, [r4, #6]
+ 307:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 817              		.loc 1 307 0
+ 818 0118 E571     		strb	r5, [r4, #7]
+ 819              		.loc 1 308 0
+ 820 011a FFF7FEFF 		bl	GPIO_Init
+ 821              	.LVL61:
+ 309:../scr/main.c **** 	/*portC initialization
+ 310:../scr/main.c **** 	 * GPIO_Pin_0	:UART7 TX
+ 311:../scr/main.c **** 	 * GPIO_Pin_1	:UART7 RX
+ 312:../scr/main.c **** 	 * GPIO_Pin_2	:UART8 TX
+ 313:../scr/main.c **** 	 * GPIO_Pin_3	:UART8 TX
+ 314:../scr/main.c **** 	 */
+ 315:../scr/main.c **** 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource0, GPIO_AF_1);
+ 822              		.loc 1 315 0
+ 823 011e 3A48     		ldr	r0, .L30+20
+ 824 0120 311C     		mov	r1, r6
+ 825 0122 2A1C     		mov	r2, r5
+ 826 0124 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 827              	.LVL62:
+ 316:../scr/main.c **** 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource1, GPIO_AF_1);
+ 828              		.loc 1 316 0
+ 829 0128 3748     		ldr	r0, .L30+20
+ 830 012a 291C     		mov	r1, r5
+ 831 012c 2A1C     		mov	r2, r5
+ 832 012e FFF7FEFF 		bl	GPIO_PinAFConfig
+ 833              	.LVL63:
+ 317:../scr/main.c **** 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource2, GPIO_AF_2);
+ 834              		.loc 1 317 0
+ 835 0132 3548     		ldr	r0, .L30+20
+ 836 0134 391C     		mov	r1, r7
+ 837 0136 3A1C     		mov	r2, r7
+ 838 0138 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 839              	.LVL64:
+ 318:../scr/main.c **** 	GPIO_PinAFConfig(GPIOC, GPIO_PinSource3, GPIO_AF_2);
+ 840              		.loc 1 318 0
+ 841 013c 3A1C     		mov	r2, r7
+ 842 013e 3248     		ldr	r0, .L30+20
+ 843 0140 0321     		mov	r1, #3
+ 844 0142 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 845              	.LVL65:
+ 319:../scr/main.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2
+ 846              		.loc 1 319 0
+ 847 0146 0F23     		mov	r3, #15
+ 848 0148 0293     		str	r3, [sp, #8]
+ 320:../scr/main.c **** 			| GPIO_Pin_3;
+ 321:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 322:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 323:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 324:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 325:../scr/main.c **** 	GPIO_Init(GPIOC, &GPIO_InitStructure);
+ 849              		.loc 1 325 0
+ 850 014a 2F48     		ldr	r0, .L30+20
+ 322:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 851              		.loc 1 322 0
+ 852 014c 0323     		mov	r3, #3
+ 853              		.loc 1 325 0
+ 854 014e 211C     		mov	r1, r4
+ 322:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 855              		.loc 1 322 0
+ 856 0150 6371     		strb	r3, [r4, #5]
+ 321:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 857              		.loc 1 321 0
+ 858 0152 2771     		strb	r7, [r4, #4]
+ 323:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 859              		.loc 1 323 0
+ 860 0154 A671     		strb	r6, [r4, #6]
+ 324:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 861              		.loc 1 324 0
+ 862 0156 E571     		strb	r5, [r4, #7]
+ 863              		.loc 1 325 0
+ 864 0158 FFF7FEFF 		bl	GPIO_Init
+ 865              	.LVL66:
+ 326:../scr/main.c **** 	/*led
+ 327:../scr/main.c **** 	 * PB8: LED GREEN
+ 328:../scr/main.c **** 	 * PB9: LED RED
+ 329:../scr/main.c **** 	 */
+ 330:../scr/main.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+ 866              		.loc 1 330 0
+ 867 015c C023     		mov	r3, #192
+ 868 015e BB40     		lsl	r3, r3, r7
+ 331:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 332:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 333:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 334:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 335:../scr/main.c **** 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+ 869              		.loc 1 335 0
+ 870 0160 211C     		mov	r1, r4
+ 330:../scr/main.c **** 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+ 871              		.loc 1 330 0
+ 872 0162 0293     		str	r3, [sp, #8]
+ 873              		.loc 1 335 0
+ 874 0164 2948     		ldr	r0, .L30+24
+ 332:../scr/main.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 875              		.loc 1 332 0
+ 876 0166 0323     		mov	r3, #3
+ 877 0168 6371     		strb	r3, [r4, #5]
+ 331:../scr/main.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 878              		.loc 1 331 0
+ 879 016a 2571     		strb	r5, [r4, #4]
+ 333:../scr/main.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 880              		.loc 1 333 0
+ 881 016c A671     		strb	r6, [r4, #6]
+ 334:../scr/main.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 882              		.loc 1 334 0
+ 883 016e E571     		strb	r5, [r4, #7]
+ 884              		.loc 1 335 0
+ 885 0170 FFF7FEFF 		bl	GPIO_Init
+ 886              	.LVL67:
+ 887              	.LBE29:
+ 888              	.LBE28:
+  65:../scr/main.c **** 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
+ 889              		.loc 1 65 0
+ 890 0174 0420     		mov	r0, #4
+ 891 0176 FFF7FEFF 		bl	SysTick_CLKSourceConfig
+ 892              	.LVL68:
+ 893              	.LBE15:
+ 894              	.LBE14:
+ 218:../scr/main.c **** 	PC_USART_Init(115200);
+ 895              		.loc 1 218 0
+ 896 017a E120     		mov	r0, #225
+ 897 017c 4002     		lsl	r0, r0, #9
+ 898 017e FFF7FEFF 		bl	PC_USART_Init
+ 899              	.LVL69:
+ 219:../scr/main.c **** 	SysTick_Config(SystemCoreClock / 1000);
+ 900              		.loc 1 219 0
+ 901 0182 234B     		ldr	r3, .L30+28
+ 902              	.LVL70:
+ 903 0184 FA21     		mov	r1, #250
+ 904 0186 1868     		ldr	r0, [r3]
+ 905 0188 B940     		lsl	r1, r1, r7
+ 906 018a FFF7FEFF 		bl	__aeabi_uidiv
+ 907              	.LVL71:
+ 908              	.LBB30:
+ 909              	.LBB31:
+ 910              		.file 2 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\CMSIS\\Include/core_cm0.h"
+   1:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /**************************************************************************//**
+   2:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  * @file     core_cm0.h
+   3:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  * @brief    CMSIS Cortex-M0 Core Peripheral Access Layer Header File
+   4:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  * @version  V3.20
+   5:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  * @date     25. February 2013
+   6:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  *
+   7:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  * @note
+   8:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  *
+   9:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+  10:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* Copyright (c) 2009 - 2013 ARM LIMITED
+  11:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  12:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    All rights reserved.
+  13:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    Redistribution and use in source and binary forms, with or without
+  14:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    modification, are permitted provided that the following conditions are met:
+  15:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    - Redistributions of source code must retain the above copyright
+  16:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      notice, this list of conditions and the following disclaimer.
+  17:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    - Redistributions in binary form must reproduce the above copyright
+  18:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      notice, this list of conditions and the following disclaimer in the
+  19:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      documentation and/or other materials provided with the distribution.
+  20:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  21:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      to endorse or promote products derived from this software without
+  22:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      specific prior written permission.
+  23:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    *
+  24:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  25:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  26:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  27:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  28:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  29:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  30:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  31:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  32:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  33:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  34:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    POSSIBILITY OF SUCH DAMAGE.
+  35:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    ---------------------------------------------------------------------------*/
+  36:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  37:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  38:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #if defined ( __ICCARM__ )
+  39:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  #pragma system_include  /* treat file as system include file for MISRA check */
+  40:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+  41:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  42:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #ifdef __cplusplus
+  43:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  extern "C" {
+  44:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+  45:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  46:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CORE_CM0_H_GENERIC
+  47:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define __CORE_CM0_H_GENERIC
+  48:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  49:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \page CMSIS_MISRA_Exceptions  MISRA-C:2004 Compliance Exceptions
+  50:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   CMSIS violates the following MISRA-C:2004 rules:
+  51:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  52:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    \li Required Rule 8.5, object/function definition in header file.<br>
+  53:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      Function definitions in header files are used to allow 'inlining'.
+  54:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  55:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    \li Required Rule 18.4, declaration of union type or object of union type: '{...}'.<br>
+  56:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      Unions are used for effective representation of core registers.
+  57:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  58:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****    \li Advisory Rule 19.7, Function-like macro defined.<br>
+  59:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****      Function-like macros are used to allow more efficient code.
+  60:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+  61:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  62:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  63:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+  64:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  *                 CMSIS definitions
+  65:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+  66:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup Cortex_M0
+  67:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+  68:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+  69:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  70:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*  CMSIS CM0 definitions */
+  71:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION_MAIN  (0x03)                                   /*!< [31:16] CMSIS HAL m
+  72:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION_SUB   (0x20)                                   /*!< [15:0]  CMSIS HAL s
+  73:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION       ((__CM0_CMSIS_VERSION_MAIN << 16) | \
+  74:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****                                     __CM0_CMSIS_VERSION_SUB          )     /*!< CMSIS HAL version n
+  75:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  76:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define __CORTEX_M                (0x00)                                   /*!< Cortex-M Core      
+  77:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  78:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  79:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #if   defined ( __CC_ARM )
+  80:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for ARM Comp
+  81:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         __inline                                   /*!< inline keyword for ARM C
+  82:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static __inline
+  83:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  84:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __ICCARM__ )
+  85:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for IAR Comp
+  86:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for IAR C
+  87:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  88:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  89:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __GNUC__ )
+  90:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for GNU Comp
+  91:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for GNU C
+  92:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  93:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  94:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __TASKING__ )
+  95:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for TASKING 
+  96:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for TASKI
+  97:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  98:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+  99:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 100:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 101:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** __FPU_USED indicates whether an FPU is used or not. This core does not support an FPU at all
+ 102:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** */
+ 103:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define __FPU_USED       0
+ 104:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 105:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #if defined ( __CC_ARM )
+ 106:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __TARGET_FPU_VFP
+ 107:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 108:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 109:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 110:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __ICCARM__ )
+ 111:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __ARMVFP__
+ 112:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 113:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 114:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 115:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __GNUC__ )
+ 116:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #if defined (__VFP_FP__) && !defined(__SOFTFP__)
+ 117:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 118:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 119:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 120:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __TASKING__ )
+ 121:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __FPU_VFP__
+ 122:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+ 123:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 124:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 125:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 126:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #include <stdint.h>                      /* standard types definitions                      */
+ 127:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #include <core_cmInstr.h>                /* Core Instruction Access                         */
+ 128:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #include <core_cmFunc.h>                 /* Core Function Access                            */
+ 129:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #include <stm32f0xx.h>
+ 130:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif /* __CORE_CM0_H_GENERIC */
+ 131:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 132:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CMSIS_GENERIC
+ 133:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 134:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CORE_CM0_H_DEPENDANT
+ 135:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define __CORE_CM0_H_DEPENDANT
+ 136:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 137:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* check device defines and use defaults */
+ 138:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #if defined __CHECK_DEVICE_DEFINES
+ 139:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __CM0_REV
+ 140:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #define __CM0_REV               0x0000
+ 141:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__CM0_REV not defined in device header file; using default!"
+ 142:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 143:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 144:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __NVIC_PRIO_BITS
+ 145:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #define __NVIC_PRIO_BITS          2
+ 146:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+ 147:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 148:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 149:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __Vendor_SysTickConfig
+ 150:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #define __Vendor_SysTickConfig    0
+ 151:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+ 152:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 153:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 154:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 155:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* IO definitions (access restrictions to peripheral registers) */
+ 156:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /**
+ 157:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_glob_defs CMSIS Global Defines
+ 158:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 159:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     <strong>IO Type Qualifiers</strong> are used
+ 160:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \li to specify the access to peripheral variables.
+ 161:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \li for automatic generation of peripheral register debug information.
+ 162:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** */
+ 163:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #ifdef __cplusplus
+ 164:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define   __I     volatile             /*!< Defines 'read only' permissions                 */
+ 165:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 166:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   #define   __I     volatile const       /*!< Defines 'read only' permissions                 */
+ 167:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 168:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define     __O     volatile             /*!< Defines 'write only' permissions                */
+ 169:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
+ 170:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 171:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group Cortex_M0 */
+ 172:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 173:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 174:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 175:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+ 176:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  *                 Register Abstraction
+ 177:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   Core Register contain:
+ 178:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   - Core Register
+ 179:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   - Core NVIC Register
+ 180:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   - Core SCB Register
+ 181:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   - Core SysTick Register
+ 182:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+ 183:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \defgroup CMSIS_core_register Defines and Type Definitions
+ 184:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief Type definitions and defines for Cortex-M processor based devices.
+ 185:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** */
+ 186:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 187:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 188:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_CORE  Status and Control Registers
+ 189:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief  Core Register type definitions.
+ 190:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 191:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 192:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 193:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Application Program Status Register (APSR).
+ 194:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 195:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 196:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 197:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 198:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 199:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #if (__CORTEX_M != 0x04)
+ 200:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:27;              /*!< bit:  0..26  Reserved                           */
+ 201:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 202:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:16;              /*!< bit:  0..15  Reserved                           */
+ 203:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t GE:4;                       /*!< bit: 16..19  Greater than or Equal flags        */
+ 204:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved1:7;               /*!< bit: 20..26  Reserved                           */
+ 205:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 206:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Q:1;                        /*!< bit:     27  Saturation condition flag          */
+ 207:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t V:1;                        /*!< bit:     28  Overflow condition code flag       */
+ 208:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t C:1;                        /*!< bit:     29  Carry condition code flag          */
+ 209:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Z:1;                        /*!< bit:     30  Zero condition code flag           */
+ 210:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t N:1;                        /*!< bit:     31  Negative condition code flag       */
+ 211:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 212:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 213:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** } APSR_Type;
+ 214:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 215:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 216:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Interrupt Program Status Register (IPSR).
+ 217:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 218:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 219:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 220:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 221:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 222:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t ISR:9;                      /*!< bit:  0.. 8  Exception number                   */
+ 223:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:23;              /*!< bit:  9..31  Reserved                           */
+ 224:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 225:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 226:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** } IPSR_Type;
+ 227:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 228:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 229:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Special-Purpose Program Status Registers (xPSR).
+ 230:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 231:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 232:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 233:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 234:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 235:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t ISR:9;                      /*!< bit:  0.. 8  Exception number                   */
+ 236:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #if (__CORTEX_M != 0x04)
+ 237:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:15;              /*!< bit:  9..23  Reserved                           */
+ 238:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 239:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:7;               /*!< bit:  9..15  Reserved                           */
+ 240:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t GE:4;                       /*!< bit: 16..19  Greater than or Equal flags        */
+ 241:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved1:4;               /*!< bit: 20..23  Reserved                           */
+ 242:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 243:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t T:1;                        /*!< bit:     24  Thumb bit        (read 0)          */
+ 244:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t IT:2;                       /*!< bit: 25..26  saved IT state   (read 0)          */
+ 245:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Q:1;                        /*!< bit:     27  Saturation condition flag          */
+ 246:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t V:1;                        /*!< bit:     28  Overflow condition code flag       */
+ 247:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t C:1;                        /*!< bit:     29  Carry condition code flag          */
+ 248:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Z:1;                        /*!< bit:     30  Zero condition code flag           */
+ 249:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t N:1;                        /*!< bit:     31  Negative condition code flag       */
+ 250:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 251:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 252:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** } xPSR_Type;
+ 253:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 254:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 255:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Control Registers (CONTROL).
+ 256:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 257:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 258:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 259:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 260:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 261:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t nPRIV:1;                    /*!< bit:      0  Execution privilege in Thread mode */
+ 262:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t SPSEL:1;                    /*!< bit:      1  Stack to be used                   */
+ 263:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t FPCA:1;                     /*!< bit:      2  FP extension active flag           */
+ 264:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:29;              /*!< bit:  3..31  Reserved                           */
+ 265:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 266:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 267:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** } CONTROL_Type;
+ 268:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 269:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_CORE */
+ 270:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 271:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 272:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 273:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_NVIC  Nested Vectored Interrupt Controller (NVIC)
+ 274:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the NVIC Registers
+ 275:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 276:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 277:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 278:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the Nested Vectored Interrupt Controller (NVIC).
+ 279:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 280:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 281:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 282:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ISER[1];                 /*!< Offset: 0x000 (R/W)  Interrupt Set Enable Register   
+ 283:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED0[31];
+ 284:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICER[1];                 /*!< Offset: 0x080 (R/W)  Interrupt Clear Enable Register 
+ 285:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RSERVED1[31];
+ 286:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ISPR[1];                 /*!< Offset: 0x100 (R/W)  Interrupt Set Pending Register  
+ 287:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED2[31];
+ 288:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICPR[1];                 /*!< Offset: 0x180 (R/W)  Interrupt Clear Pending Register
+ 289:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED3[31];
+ 290:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED4[64];
+ 291:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t IP[8];                   /*!< Offset: 0x300 (R/W)  Interrupt Priority Register     
+ 292:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }  NVIC_Type;
+ 293:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 294:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_NVIC */
+ 295:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 296:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 297:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 298:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_SCB     System Control Block (SCB)
+ 299:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the System Control Block Registers
+ 300:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 301:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 302:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 303:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the System Control Block (SCB).
+ 304:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 305:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 306:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 307:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __I  uint32_t CPUID;                   /*!< Offset: 0x000 (R/ )  CPUID Base Register             
+ 308:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICSR;                    /*!< Offset: 0x004 (R/W)  Interrupt Control and State Regi
+ 309:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED0;
+ 310:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t AIRCR;                   /*!< Offset: 0x00C (R/W)  Application Interrupt and Reset 
+ 311:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SCR;                     /*!< Offset: 0x010 (R/W)  System Control Register         
+ 312:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t CCR;                     /*!< Offset: 0x014 (R/W)  Configuration Control Register  
+ 313:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED1;
+ 314:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SHP[2];                  /*!< Offset: 0x01C (R/W)  System Handlers Priority Registe
+ 315:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SHCSR;                   /*!< Offset: 0x024 (R/W)  System Handler Control and State
+ 316:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** } SCB_Type;
+ 317:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 318:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SCB CPUID Register Definitions */
+ 319:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_IMPLEMENTER_Pos          24                                             /*!< SCB 
+ 320:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_IMPLEMENTER_Msk          (0xFFUL << SCB_CPUID_IMPLEMENTER_Pos)          /*!< SCB 
+ 321:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 322:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_VARIANT_Pos              20                                             /*!< SCB 
+ 323:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_VARIANT_Msk              (0xFUL << SCB_CPUID_VARIANT_Pos)               /*!< SCB 
+ 324:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 325:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_ARCHITECTURE_Pos         16                                             /*!< SCB 
+ 326:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_ARCHITECTURE_Msk         (0xFUL << SCB_CPUID_ARCHITECTURE_Pos)          /*!< SCB 
+ 327:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 328:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_PARTNO_Pos                4                                             /*!< SCB 
+ 329:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_PARTNO_Msk               (0xFFFUL << SCB_CPUID_PARTNO_Pos)              /*!< SCB 
+ 330:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 331:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_REVISION_Pos              0                                             /*!< SCB 
+ 332:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_REVISION_Msk             (0xFUL << SCB_CPUID_REVISION_Pos)              /*!< SCB 
+ 333:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 334:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Interrupt Control State Register Definitions */
+ 335:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_NMIPENDSET_Pos            31                                             /*!< SCB 
+ 336:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_NMIPENDSET_Msk            (1UL << SCB_ICSR_NMIPENDSET_Pos)               /*!< SCB 
+ 337:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 338:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVSET_Pos             28                                             /*!< SCB 
+ 339:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVSET_Msk             (1UL << SCB_ICSR_PENDSVSET_Pos)                /*!< SCB 
+ 340:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 341:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVCLR_Pos             27                                             /*!< SCB 
+ 342:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVCLR_Msk             (1UL << SCB_ICSR_PENDSVCLR_Pos)                /*!< SCB 
+ 343:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 344:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTSET_Pos             26                                             /*!< SCB 
+ 345:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTSET_Msk             (1UL << SCB_ICSR_PENDSTSET_Pos)                /*!< SCB 
+ 346:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 347:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTCLR_Pos             25                                             /*!< SCB 
+ 348:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTCLR_Msk             (1UL << SCB_ICSR_PENDSTCLR_Pos)                /*!< SCB 
+ 349:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 350:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPREEMPT_Pos            23                                             /*!< SCB 
+ 351:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPREEMPT_Msk            (1UL << SCB_ICSR_ISRPREEMPT_Pos)               /*!< SCB 
+ 352:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 353:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPENDING_Pos            22                                             /*!< SCB 
+ 354:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPENDING_Msk            (1UL << SCB_ICSR_ISRPENDING_Pos)               /*!< SCB 
+ 355:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 356:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTPENDING_Pos           12                                             /*!< SCB 
+ 357:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTPENDING_Msk           (0x1FFUL << SCB_ICSR_VECTPENDING_Pos)          /*!< SCB 
+ 358:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 359:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTACTIVE_Pos             0                                             /*!< SCB 
+ 360:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL << SCB_ICSR_VECTACTIVE_Pos)           /*!< SCB 
+ 361:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 362:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Application Interrupt and Reset Control Register Definitions */
+ 363:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEY_Pos              16                                             /*!< SCB 
+ 364:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEY_Msk              (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)            /*!< SCB 
+ 365:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 366:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEYSTAT_Pos          16                                             /*!< SCB 
+ 367:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEYSTAT_Msk          (0xFFFFUL << SCB_AIRCR_VECTKEYSTAT_Pos)        /*!< SCB 
+ 368:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 369:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_ENDIANESS_Pos            15                                             /*!< SCB 
+ 370:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_ENDIANESS_Msk            (1UL << SCB_AIRCR_ENDIANESS_Pos)               /*!< SCB 
+ 371:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 372:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_SYSRESETREQ_Pos           2                                             /*!< SCB 
+ 373:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_SYSRESETREQ_Msk          (1UL << SCB_AIRCR_SYSRESETREQ_Pos)             /*!< SCB 
+ 374:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 375:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTCLRACTIVE_Pos         1                                             /*!< SCB 
+ 376:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTCLRACTIVE_Msk        (1UL << SCB_AIRCR_VECTCLRACTIVE_Pos)           /*!< SCB 
+ 377:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 378:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SCB System Control Register Definitions */
+ 379:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SEVONPEND_Pos               4                                             /*!< SCB 
+ 380:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SEVONPEND_Msk              (1UL << SCB_SCR_SEVONPEND_Pos)                 /*!< SCB 
+ 381:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 382:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPDEEP_Pos               2                                             /*!< SCB 
+ 383:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPDEEP_Msk              (1UL << SCB_SCR_SLEEPDEEP_Pos)                 /*!< SCB 
+ 384:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 385:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPONEXIT_Pos             1                                             /*!< SCB 
+ 386:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPONEXIT_Msk            (1UL << SCB_SCR_SLEEPONEXIT_Pos)               /*!< SCB 
+ 387:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 388:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Configuration Control Register Definitions */
+ 389:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_STKALIGN_Pos                9                                             /*!< SCB 
+ 390:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_STKALIGN_Msk               (1UL << SCB_CCR_STKALIGN_Pos)                  /*!< SCB 
+ 391:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 392:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_UNALIGN_TRP_Pos             3                                             /*!< SCB 
+ 393:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_UNALIGN_TRP_Msk            (1UL << SCB_CCR_UNALIGN_TRP_Pos)               /*!< SCB 
+ 394:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 395:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SCB System Handler Control and State Register Definitions */
+ 396:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SHCSR_SVCALLPENDED_Pos         15                                             /*!< SCB 
+ 397:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SHCSR_SVCALLPENDED_Msk         (1UL << SCB_SHCSR_SVCALLPENDED_Pos)            /*!< SCB 
+ 398:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 399:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_SCB */
+ 400:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 401:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 402:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 403:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_SysTick     System Tick Timer (SysTick)
+ 404:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the System Timer Registers.
+ 405:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 406:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 407:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 408:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the System Timer (SysTick).
+ 409:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 410:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 411:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 412:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t CTRL;                    /*!< Offset: 0x000 (R/W)  SysTick Control and Status Regis
+ 413:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t LOAD;                    /*!< Offset: 0x004 (R/W)  SysTick Reload Value Register   
+ 414:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t VAL;                     /*!< Offset: 0x008 (R/W)  SysTick Current Value Register  
+ 415:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __I  uint32_t CALIB;                   /*!< Offset: 0x00C (R/ )  SysTick Calibration Register    
+ 416:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** } SysTick_Type;
+ 417:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 418:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Control / Status Register Definitions */
+ 419:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_COUNTFLAG_Pos         16                                             /*!< SysT
+ 420:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_COUNTFLAG_Msk         (1UL << SysTick_CTRL_COUNTFLAG_Pos)            /*!< SysT
+ 421:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 422:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_CLKSOURCE_Pos          2                                             /*!< SysT
+ 423:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_CLKSOURCE_Msk         (1UL << SysTick_CTRL_CLKSOURCE_Pos)            /*!< SysT
+ 424:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 425:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_TICKINT_Pos            1                                             /*!< SysT
+ 426:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_TICKINT_Msk           (1UL << SysTick_CTRL_TICKINT_Pos)              /*!< SysT
+ 427:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 428:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_ENABLE_Pos             0                                             /*!< SysT
+ 429:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_ENABLE_Msk            (1UL << SysTick_CTRL_ENABLE_Pos)               /*!< SysT
+ 430:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 431:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Reload Register Definitions */
+ 432:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_LOAD_RELOAD_Pos             0                                             /*!< SysT
+ 433:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_LOAD_RELOAD_Msk            (0xFFFFFFUL << SysTick_LOAD_RELOAD_Pos)        /*!< SysT
+ 434:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 435:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Current Register Definitions */
+ 436:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_VAL_CURRENT_Pos             0                                             /*!< SysT
+ 437:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_VAL_CURRENT_Msk            (0xFFFFFFUL << SysTick_VAL_CURRENT_Pos)        /*!< SysT
+ 438:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 439:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Calibration Register Definitions */
+ 440:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_NOREF_Pos            31                                             /*!< SysT
+ 441:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_NOREF_Msk            (1UL << SysTick_CALIB_NOREF_Pos)               /*!< SysT
+ 442:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 443:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_SKEW_Pos             30                                             /*!< SysT
+ 444:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_SKEW_Msk             (1UL << SysTick_CALIB_SKEW_Pos)                /*!< SysT
+ 445:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 446:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_TENMS_Pos             0                                             /*!< SysT
+ 447:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_TENMS_Msk            (0xFFFFFFUL << SysTick_VAL_CURRENT_Pos)        /*!< SysT
+ 448:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 449:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_SysTick */
+ 450:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 451:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 452:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 453:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_CoreDebug       Core Debug Registers (CoreDebug)
+ 454:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Cortex-M0 Core Debug Registers (DCB registers, SHCSR, and DFSR)
+ 455:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****                 are only accessible over DAP and not via processor. Therefore
+ 456:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****                 they are not covered by the Cortex-M0 header file.
+ 457:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 458:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 459:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_CoreDebug */
+ 460:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 461:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 462:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 463:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_core_base     Core Definitions
+ 464:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Definitions for base addresses, unions, and structures.
+ 465:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 466:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 467:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 468:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* Memory mapping of Cortex-M0 Hardware */
+ 469:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCS_BASE            (0xE000E000UL)                            /*!< System Control Space Bas
+ 470:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_BASE        (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address    
+ 471:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define NVIC_BASE           (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address       
+ 472:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Bas
+ 473:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 474:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct
+ 475:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration st
+ 476:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struc
+ 477:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 478:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 479:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} */
+ 480:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 481:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 482:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 483:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+ 484:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  *                Hardware Abstraction Layer
+ 485:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   Core Function Interface contains:
+ 486:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   - Core NVIC Functions
+ 487:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   - Core SysTick Functions
+ 488:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   - Core Register Access Functions
+ 489:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+ 490:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \defgroup CMSIS_Core_FunctionInterface Functions and Instructions Reference
+ 491:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** */
+ 492:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 493:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 494:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 495:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* ##########################   NVIC functions  #################################### */
+ 496:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 497:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_Core_NVICFunctions NVIC Functions
+ 498:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Functions that manage interrupts and exceptions via the NVIC.
+ 499:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     @{
+ 500:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 501:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 502:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* Interrupt Priorities are WORD accessible only under ARMv6M                   */
+ 503:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* The following MACROS handle generation of the register offset and byte masks */
+ 504:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define _BIT_SHIFT(IRQn)         (  (((uint32_t)(IRQn)       )    &  0x03) * 8 )
+ 505:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define _SHP_IDX(IRQn)           ( ((((uint32_t)(IRQn) & 0x0F)-8) >>    2)     )
+ 506:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #define _IP_IDX(IRQn)            (   ((uint32_t)(IRQn)            >>    2)     )
+ 507:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 508:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 509:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Enable External Interrupt
+ 510:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 511:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function enables a device-specific interrupt in the NVIC interrupt controller.
+ 512:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 513:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 514:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 515:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
+ 516:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 517:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ISER[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 518:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 519:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 520:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 521:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Disable External Interrupt
+ 522:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 523:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function disables a device-specific interrupt in the NVIC interrupt controller.
+ 524:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 525:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 526:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 527:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_DisableIRQ(IRQn_Type IRQn)
+ 528:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 529:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ICER[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 530:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 531:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 532:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 533:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Get Pending Interrupt
+ 534:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 535:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function reads the pending register in the NVIC and returns the pending bit
+ 536:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     for the specified interrupt.
+ 537:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 538:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number.
+ 539:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 540:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \return             0  Interrupt status is not pending.
+ 541:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \return             1  Interrupt status is pending.
+ 542:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 543:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t NVIC_GetPendingIRQ(IRQn_Type IRQn)
+ 544:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 545:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   return((uint32_t) ((NVIC->ISPR[0] & (1 << ((uint32_t)(IRQn) & 0x1F)))?1:0));
+ 546:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 547:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 548:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 549:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Set Pending Interrupt
+ 550:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 551:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function sets the pending bit of an external interrupt.
+ 552:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 553:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number. Value cannot be negative.
+ 554:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 555:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SetPendingIRQ(IRQn_Type IRQn)
+ 556:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 557:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ISPR[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 558:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 559:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 560:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 561:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Clear Pending Interrupt
+ 562:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 563:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function clears the pending bit of an external interrupt.
+ 564:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 565:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 566:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 567:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
+ 568:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 569:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ICPR[0] = (1 << ((uint32_t)(IRQn) & 0x1F)); /* Clear pending interrupt */
+ 570:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 571:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 572:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 573:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Set Interrupt Priority
+ 574:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 575:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function sets the priority of an interrupt.
+ 576:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 577:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \note The priority cannot be set for every core interrupt.
+ 578:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 579:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number.
+ 580:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]  priority  Priority to set.
+ 581:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 582:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+ 583:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 584:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   if(IRQn < 0) {
+ 585:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 586:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****         (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+ 587:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   else {
+ 588:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     NVIC->IP[_IP_IDX(IRQn)] = (NVIC->IP[_IP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 589:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****         (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+ 590:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 591:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 592:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 593:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Get Interrupt Priority
+ 594:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 595:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function reads the priority of an interrupt. The interrupt
+ 596:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     number can be positive to specify an external (device specific)
+ 597:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     interrupt, or negative to specify an internal (core) interrupt.
+ 598:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 599:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 600:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]   IRQn  Interrupt number.
+ 601:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \return             Interrupt Priority. Value is aligned automatically to the implemented
+ 602:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****                         priority bits of the microcontroller.
+ 603:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 604:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
+ 605:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 606:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 607:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   if(IRQn < 0) {
+ 608:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     return((uint32_t)(((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) & 0xFF) >> (8 - __NVIC_PRIO_
+ 609:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   else {
+ 610:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     return((uint32_t)(((NVIC->IP[ _IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) & 0xFF) >> (8 - __NVIC_PRIO_
+ 611:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 612:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 613:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 614:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  System Reset
+ 615:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 616:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function initiates a system reset request to reset the MCU.
+ 617:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 618:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SystemReset(void)
+ 619:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 620:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __DSB();                                                     /* Ensure all outstanding memory acc
+ 621:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****                                                                   buffered write are completed befo
+ 622:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
+ 623:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****                  SCB_AIRCR_SYSRESETREQ_Msk);
+ 624:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   __DSB();                                                     /* Ensure completion of memory acces
+ 625:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   while(1);                                                    /* wait until reset */
+ 626:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** }
+ 627:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 628:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of CMSIS_Core_NVICFunctions */
+ 629:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 630:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 631:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 632:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /* ##################################    SysTick function  ########################################
+ 633:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 634:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_Core_SysTickFunctions SysTick Functions
+ 635:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Functions that configure the System.
+ 636:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 637:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 638:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 639:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** #if (__Vendor_SysTickConfig == 0)
+ 640:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 641:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  System Tick Configuration
+ 642:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 643:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     The function initializes the System Timer and its interrupt, and starts the System Tick Timer.
+ 644:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     Counter is in free running mode to generate periodic interrupts.
+ 645:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 646:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]  ticks  Number of ticks between two interrupts.
+ 647:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 648:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \return          0  Function succeeded.
+ 649:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \return          1  Function failed.
+ 650:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 651:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     \note     When the variable <b>__Vendor_SysTickConfig</b> is set to 1, then the
+ 652:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+ 653:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     must contain a vendor-specific implementation of this function.
+ 654:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 655:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 656:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
+ 657:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** {
+ 658:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   if ((ticks - 1) > SysTick_LOAD_RELOAD_Msk)  return (1);      /* Reload value impossible */
+ 911              		.loc 2 658 0
+ 912 018e 214B     		ldr	r3, .L30+32
+ 913 0190 0138     		sub	r0, r0, #1
+ 914 0192 9842     		cmp	r0, r3
+ 915 0194 0CD8     		bhi	.L26
+ 659:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h **** 
+ 660:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->LOAD  = ticks - 1;                                  /* set reload register */
+ 916              		.loc 2 660 0
+ 917 0196 204B     		ldr	r3, .L30+36
+ 918              	.LBB32:
+ 919              	.LBB33:
+ 585:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 920              		.loc 2 585 0
+ 921 0198 204A     		ldr	r2, .L30+40
+ 922              	.LBE33:
+ 923              	.LBE32:
+ 924              		.loc 2 660 0
+ 925 019a 5860     		str	r0, [r3, #4]
+ 926              	.LVL72:
+ 927              	.LBB35:
+ 928              	.LBB34:
+ 585:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 929              		.loc 2 585 0
+ 930 019c 106A     		ldr	r0, [r2, #32]
+ 931 019e C021     		mov	r1, #192
+ 932 01a0 0002     		lsl	r0, r0, #8
+ 933 01a2 000A     		lsr	r0, r0, #8
+ 934 01a4 0906     		lsl	r1, r1, #24
+ 935 01a6 0143     		orr	r1, r0
+ 936 01a8 1162     		str	r1, [r2, #32]
+ 937              	.LBE34:
+ 938              	.LBE35:
+ 661:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Systick Interrup
+ 662:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+ 663:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
+ 939              		.loc 2 663 0
+ 940 01aa 0722     		mov	r2, #7
+ 662:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+ 941              		.loc 2 662 0
+ 942 01ac 9E60     		str	r6, [r3, #8]
+ 943              		.loc 2 663 0
+ 944 01ae 1A60     		str	r2, [r3]
+ 945              	.LVL73:
+ 946              	.L26:
+ 947              	.LBE31:
+ 948              	.LBE30:
+ 220:../scr/main.c **** 	xdev_out(SerialPutChar);
+ 949              		.loc 1 220 0
+ 950 01b0 1B4A     		ldr	r2, .L30+44
+ 951 01b2 1C4B     		ldr	r3, .L30+48
+ 221:../scr/main.c **** 	xprintf("cam hub demo\r\n");
+ 952              		.loc 1 221 0
+ 953 01b4 1C48     		ldr	r0, .L30+52
+ 220:../scr/main.c **** 	xdev_out(SerialPutChar);
+ 954              		.loc 1 220 0
+ 955 01b6 1A60     		str	r2, [r3]
+ 221:../scr/main.c **** 	xprintf("cam hub demo\r\n");
+ 956              		.loc 1 221 0
+ 957 01b8 FFF7FEFF 		bl	xprintf
+ 958              	.LVL74:
+ 222:../scr/main.c **** 	GPIO_ResetBits(GPIOB, GPIO_Pin_9);
+ 959              		.loc 1 222 0
+ 960 01bc 8021     		mov	r1, #128
+ 961 01be 1348     		ldr	r0, .L30+24
+ 962 01c0 8900     		lsl	r1, r1, #2
+ 963 01c2 FFF7FEFF 		bl	GPIO_ResetBits
+ 964              	.LVL75:
+ 965              	.L28:
+ 224:../scr/main.c **** 		if (check_time < ulMiliCount) {
+ 966              		.loc 1 224 0
+ 967 01c6 194B     		ldr	r3, .L30+56
+ 968 01c8 194C     		ldr	r4, .L30+60
+ 969 01ca 1A68     		ldr	r2, [r3]
+ 970              	.L27:
+ 971 01cc 2368     		ldr	r3, [r4]
+ 972 01ce 9A42     		cmp	r2, r3
+ 973 01d0 FCD2     		bcs	.L27
+ 226:../scr/main.c **** 					!GPIO_ReadOutputDataBit(GPIOB, GPIO_Pin_8));
+ 974              		.loc 1 226 0
+ 975 01d2 8021     		mov	r1, #128
+ 976 01d4 4900     		lsl	r1, r1, #1
+ 977 01d6 0D48     		ldr	r0, .L30+24
+ 978 01d8 FFF7FEFF 		bl	GPIO_ReadOutputDataBit
+ 979              	.LVL76:
+ 225:../scr/main.c **** 			GPIO_WriteBit(GPIOB, GPIO_Pin_8,
+ 980              		.loc 1 225 0
+ 981 01dc 8021     		mov	r1, #128
+ 982 01de 4242     		neg	r2, r0
+ 983 01e0 4241     		adc	r2, r2, r0
+ 984 01e2 4900     		lsl	r1, r1, #1
+ 985 01e4 0948     		ldr	r0, .L30+24
+ 986 01e6 FFF7FEFF 		bl	GPIO_WriteBit
+ 987              	.LVL77:
+ 227:../scr/main.c **** 			check_time = ulMiliCount + 100;
+ 988              		.loc 1 227 0
+ 989 01ea 2268     		ldr	r2, [r4]
+ 990 01ec 0F4B     		ldr	r3, .L30+56
+ 991 01ee 6432     		add	r2, r2, #100
+ 992 01f0 1A60     		str	r2, [r3]
+ 993 01f2 E8E7     		b	.L28
+ 994              	.L31:
+ 995              		.align	2
+ 996              	.L30:
+ 997 01f4 E0400000 		.word	16608
+ 998 01f8 05010500 		.word	327941
+ 999 01fc 00440040 		.word	1073759232
+ 1000 0200 00380140 		.word	1073821696
+ 1001 0204 D80C0000 		.word	3288
+ 1002 0208 00080048 		.word	1207961600
+ 1003 020c 00040048 		.word	1207960576
+ 1004 0210 00000000 		.word	SystemCoreClock
+ 1005 0214 FFFFFF00 		.word	16777215
+ 1006 0218 10E000E0 		.word	-536813552
+ 1007 021c 00ED00E0 		.word	-536810240
+ 1008 0220 00000000 		.word	SerialPutChar
+ 1009 0224 00000000 		.word	xfunc_out
+ 1010 0228 00000000 		.word	.LC3
+ 1011 022c 00000000 		.word	.LANCHOR0
+ 1012 0230 00000000 		.word	.LANCHOR1
+ 1013              		.cfi_endproc
+ 1014              	.LFE42:
+ 1016              		.global	check_time
+ 1017              		.global	ulTick100
+ 1018              		.global	ulMiliCount
+ 1019              		.global	ulTickCount
+ 1020              		.global	ulSecCount
+ 1021              		.section	.bss.check_time,"aw",%nobits
+ 1022              		.align	2
+ 1023              		.set	.LANCHOR0,. + 0
+ 1026              	check_time:
+ 1027 0000 00000000 		.space	4
+ 1028              		.section	.bss.ulTickCount,"aw",%nobits
+ 1029              		.align	2
+ 1032              	ulTickCount:
+ 1033 0000 00000000 		.space	4
+ 1034              		.section	.bss.ulMiliCount,"aw",%nobits
+ 1035              		.align	2
+ 1036              		.set	.LANCHOR1,. + 0
+ 1039              	ulMiliCount:
+ 1040 0000 00000000 		.space	4
+ 1041              		.section	.bss.ulTick100,"aw",%nobits
+ 1042              		.align	2
+ 1045              	ulTick100:
+ 1046 0000 00000000 		.space	4
+ 1047              		.section	.bss.ulSecCount,"aw",%nobits
+ 1048              		.align	2
+ 1051              	ulSecCount:
+ 1052 0000 00000000 		.space	4
+ 1053              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 1054              	.LC3:
+ 1055 0000 63616D20 		.ascii	"cam hub demo\015\012\000"
+ 1055      68756220 
+ 1055      64656D6F 
+ 1055      0D0A00
+ 1056              		.text
+ 1057              	.Letext0:
+ 1058              		.file 3 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 1059              		.file 4 "D:\\EclipseIndigo\\workspace\\cam_hub\\scr/stm32f0xx.h"
+ 1060              		.file 5 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32f0
+ 1061              		.file 6 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32f0
+ 1062              		.file 7 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32f0
+ 1063              		.file 8 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\CMSIS\\Device\\ST\\STM32F0xx\\Include/s
+ 1064              		.file 9 "../scr/xprintf.h"
+ 1065              		.file 10 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32f
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:18     .text.PC_USART_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:23     .text.PC_USART_Init:00000000 PC_USART_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:82     .text.PC_USART_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:88     .text.USART2_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:93     .text.USART2_Init:00000000 USART2_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:151    .text.USART2_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:157    .text.USART3_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:162    .text.USART3_Init:00000000 USART3_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:220    .text.USART3_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:226    .text.USART4_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:231    .text.USART4_Init:00000000 USART4_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:289    .text.USART4_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:295    .text.USART5_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:300    .text.USART5_Init:00000000 USART5_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:358    .text.USART5_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:364    .text.USART6_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:369    .text.USART6_Init:00000000 USART6_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:427    .text.USART6_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:433    .text.USART7_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:438    .text.USART7_Init:00000000 USART7_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:496    .text.USART7_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:502    .text.USART8_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:507    .text.USART8_Init:00000000 USART8_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:565    .text.USART8_Init:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:572    .text.startup.main:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:577    .text.startup.main:00000000 main
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:997    .text.startup.main:000001f4 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1026   .bss.check_time:00000000 check_time
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1045   .bss.ulTick100:00000000 ulTick100
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1039   .bss.ulMiliCount:00000000 ulMiliCount
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1032   .bss.ulTickCount:00000000 ulTickCount
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1051   .bss.ulSecCount:00000000 ulSecCount
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1022   .bss.check_time:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1029   .bss.ulTickCount:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1035   .bss.ulMiliCount:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1042   .bss.ulTick100:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccnVQu7L.s:1048   .bss.ulSecCount:00000000 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.90b54cb79624a05a6a75538133d4ee2f
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.stm32f0xx.h.54.2936c65ea497e2b9f6697d244f204f4f
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.491.56b995fdd6b34ccece7fa7ee90a03d09
+                           .group:00000000 wm4.stm32f0xx_adc.h.85.55aeb589c2c2703602e5f964c35b0c48
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.ff204b27217b5926452ab2f52b527ff3
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.02fa02b24c01ae505c73e46ccbb612cf
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.config.h.3.0d63d2ebb3a9ab9baf69287178146586
+                           .group:00000000 wm4.alarm.h.33.20c9833bec31b55a8db7b876e9cb205d
+                           .group:00000000 wm4.xprintf.h.6.d201a07af5ece6e00f55504afb5b0533
+
+UNDEFINED SYMBOLS
+USART_Init
+USART_ITConfig
+USART_Cmd
+__aeabi_uidiv
+RCC_DeInit
+RCC_AHBPeriphClockCmd
+RCC_APB2PeriphClockCmd
+RCC_APB1PeriphClockCmd
+NVIC_Init
+GPIO_PinAFConfig
+GPIO_Init
+SysTick_CLKSourceConfig
+xprintf
+GPIO_ResetBits
+GPIO_ReadOutputDataBit
+GPIO_WriteBit
+SystemCoreClock
+SerialPutChar
+xfunc_out

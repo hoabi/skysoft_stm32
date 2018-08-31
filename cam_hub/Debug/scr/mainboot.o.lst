@@ -1,0 +1,559 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"mainboot.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.SerialPutChar,"ax",%progbits
+  18              		.align	1
+  19              		.global	SerialPutChar
+  20              		.code	16
+  21              		.thumb_func
+  23              	SerialPutChar:
+  24              	.LFB33:
+  25              		.file 1 "../scr/mainboot.c"
+   1:../scr/mainboot.c **** /*
+   2:../scr/mainboot.c ****  * mainboot.c
+   3:../scr/mainboot.c ****  *
+   4:../scr/mainboot.c ****  *  Created on: Aug 15, 2012
+   5:../scr/mainboot.c ****  *      Author: Admin
+   6:../scr/mainboot.c ****  */
+   7:../scr/mainboot.c **** 
+   8:../scr/mainboot.c **** /* Includes ------------------------------------------------------------------*/
+   9:../scr/mainboot.c **** #include "main.h"
+  10:../scr/mainboot.c **** #include "stm32f0xx_crc.h"
+  11:../scr/mainboot.c **** #include "alarm.h"
+  12:../scr/mainboot.c **** #include "command.h"
+  13:../scr/mainboot.c **** #include "xprintf.h"
+  14:../scr/mainboot.c **** #include "config.h"
+  15:../scr/mainboot.c **** #include "stm32f0xx.h"
+  16:../scr/mainboot.c **** #include "string.h"
+  17:../scr/mainboot.c **** /* Private typedef -----------------------------------------------------------*/
+  18:../scr/mainboot.c **** /* Private define ------------------------------------------------------------*/
+  19:../scr/mainboot.c **** /* Private macro -------------------------------------------------------------*/
+  20:../scr/mainboot.c **** /* Private variables ---------------------------------------------------------*/
+  21:../scr/mainboot.c **** uint32_t BlockNbr = 0, UserMemoryMask1 = 0;
+  22:../scr/mainboot.c **** __IO uint32_t FlashProtection = 0;
+  23:../scr/mainboot.c **** 
+  24:../scr/mainboot.c **** volatile extern uint32_t ulSecCount;
+  25:../scr/mainboot.c **** volatile extern uint32_t ulTickCount;
+  26:../scr/mainboot.c **** volatile extern uint32_t ulMiliCount;
+  27:../scr/mainboot.c **** 
+  28:../scr/mainboot.c **** unsigned long lastSentToTracker = 0;
+  29:../scr/mainboot.c **** 
+  30:../scr/mainboot.c **** extern char buff_cmd[256];
+  31:../scr/mainboot.c **** extern int buff_cmd_idx;
+  32:../scr/mainboot.c **** extern char buff_data[1024];
+  33:../scr/mainboot.c **** extern int buff_data_idx;
+  34:../scr/mainboot.c **** extern int Camera_idx;
+  35:../scr/mainboot.c **** extern int On_handler_cmd_from_deveice;
+  36:../scr/mainboot.c **** extern int last_time_rec_byte_time;
+  37:../scr/mainboot.c **** 
+  38:../scr/mainboot.c **** void SerialPutChar(uint8_t c) {
+  26              		.loc 1 38 0
+  27              		.cfi_startproc
+  28              	.LVL0:
+  29 0000 10B5     		push	{r4, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 4, -8
+  33              		.cfi_offset 14, -4
+  34 0002 041C     		mov	r4, r0
+  35              	.LVL1:
+  36              	.L2:
+  39:../scr/mainboot.c **** 	while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {
+  37              		.loc 1 39 0 discriminator 1
+  38 0004 0548     		ldr	r0, .L7
+  39 0006 8021     		mov	r1, #128
+  40 0008 FFF7FEFF 		bl	USART_GetFlagStatus
+  41              	.LVL2:
+  42 000c 0028     		cmp	r0, #0
+  43 000e F9D0     		beq	.L2
+  40:../scr/mainboot.c **** 	}
+  41:../scr/mainboot.c **** 	USART_SendData(USART1, c);
+  44              		.loc 1 41 0
+  45 0010 0248     		ldr	r0, .L7
+  46 0012 211C     		mov	r1, r4
+  47 0014 FFF7FEFF 		bl	USART_SendData
+  48              	.LVL3:
+  42:../scr/mainboot.c **** }
+  49              		.loc 1 42 0
+  50              		@ sp needed for prologue
+  51 0018 10BD     		pop	{r4, pc}
+  52              	.L8:
+  53 001a C046     		.align	2
+  54              	.L7:
+  55 001c 00380140 		.word	1073821696
+  56              		.cfi_endproc
+  57              	.LFE33:
+  59              		.section	.text.USARTxPutChar,"ax",%progbits
+  60              		.align	1
+  61              		.global	USARTxPutChar
+  62              		.code	16
+  63              		.thumb_func
+  65              	USARTxPutChar:
+  66              	.LFB34:
+  43:../scr/mainboot.c **** void USARTxPutChar(USART_TypeDef * USARTx, uint8_t c) {
+  67              		.loc 1 43 0
+  68              		.cfi_startproc
+  69              	.LVL4:
+  70 0000 38B5     		push	{r3, r4, r5, lr}
+  71              	.LCFI1:
+  72              		.cfi_def_cfa_offset 16
+  73              		.cfi_offset 3, -16
+  74              		.cfi_offset 4, -12
+  75              		.cfi_offset 5, -8
+  76              		.cfi_offset 14, -4
+  77 0002 041C     		mov	r4, r0
+  78 0004 0D1C     		mov	r5, r1
+  79              	.LVL5:
+  80              	.L10:
+  44:../scr/mainboot.c **** 	while (USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET) {
+  81              		.loc 1 44 0 discriminator 1
+  82 0006 201C     		mov	r0, r4
+  83 0008 8021     		mov	r1, #128
+  84 000a FFF7FEFF 		bl	USART_GetFlagStatus
+  85              	.LVL6:
+  86 000e 0028     		cmp	r0, #0
+  87 0010 F9D0     		beq	.L10
+  45:../scr/mainboot.c **** 	}
+  46:../scr/mainboot.c **** 	USART_SendData(USARTx, c);
+  88              		.loc 1 46 0
+  89 0012 291C     		mov	r1, r5
+  90 0014 201C     		mov	r0, r4
+  91 0016 FFF7FEFF 		bl	USART_SendData
+  92              	.LVL7:
+  47:../scr/mainboot.c **** }
+  93              		.loc 1 47 0
+  94              		@ sp needed for prologue
+  95              	.LVL8:
+  96 001a 38BD     		pop	{r3, r4, r5, pc}
+  97              		.cfi_endproc
+  98              	.LFE34:
+ 100              		.section	.text.USARTxPutString,"ax",%progbits
+ 101              		.align	1
+ 102              		.global	USARTxPutString
+ 103              		.code	16
+ 104              		.thumb_func
+ 106              	USARTxPutString:
+ 107              	.LFB35:
+  48:../scr/mainboot.c **** void USARTxPutString(USART_TypeDef * USARTx, unsigned char *s) {
+ 108              		.loc 1 48 0
+ 109              		.cfi_startproc
+ 110              	.LVL9:
+ 111 0000 38B5     		push	{r3, r4, r5, lr}
+ 112              	.LCFI2:
+ 113              		.cfi_def_cfa_offset 16
+ 114              		.cfi_offset 3, -16
+ 115              		.cfi_offset 4, -12
+ 116              		.cfi_offset 5, -8
+ 117              		.cfi_offset 14, -4
+ 118              		.loc 1 48 0
+ 119 0002 051C     		mov	r5, r0
+ 120 0004 0C1C     		mov	r4, r1
+  49:../scr/mainboot.c **** 	while (*s != '\0') {
+ 121              		.loc 1 49 0
+ 122 0006 03E0     		b	.L16
+ 123              	.LVL10:
+ 124              	.L17:
+  50:../scr/mainboot.c **** 		USARTxPutChar(USARTx, *s);
+ 125              		.loc 1 50 0
+ 126 0008 281C     		mov	r0, r5
+ 127 000a FFF7FEFF 		bl	USARTxPutChar
+ 128              	.LVL11:
+  51:../scr/mainboot.c **** 		s++;
+ 129              		.loc 1 51 0
+ 130 000e 0134     		add	r4, r4, #1
+ 131              	.LVL12:
+ 132              	.L16:
+  49:../scr/mainboot.c **** 	while (*s != '\0') {
+ 133              		.loc 1 49 0 discriminator 1
+ 134 0010 2178     		ldrb	r1, [r4]
+ 135 0012 0029     		cmp	r1, #0
+ 136 0014 F8D1     		bne	.L17
+  52:../scr/mainboot.c **** 	}
+  53:../scr/mainboot.c **** }
+ 137              		.loc 1 53 0
+ 138              		@ sp needed for prologue
+ 139              	.LVL13:
+ 140              	.LVL14:
+ 141 0016 38BD     		pop	{r3, r4, r5, pc}
+ 142              		.cfi_endproc
+ 143              	.LFE35:
+ 145              		.section	.text.Serial_PutString,"ax",%progbits
+ 146              		.align	1
+ 147              		.global	Serial_PutString
+ 148              		.code	16
+ 149              		.thumb_func
+ 151              	Serial_PutString:
+ 152              	.LFB36:
+  54:../scr/mainboot.c **** void Serial_PutString(unsigned char *s) {
+ 153              		.loc 1 54 0
+ 154              		.cfi_startproc
+ 155              	.LVL15:
+ 156 0000 10B5     		push	{r4, lr}
+ 157              	.LCFI3:
+ 158              		.cfi_def_cfa_offset 8
+ 159              		.cfi_offset 4, -8
+ 160              		.cfi_offset 14, -4
+ 161              		.loc 1 54 0
+ 162 0002 041C     		mov	r4, r0
+  55:../scr/mainboot.c **** 	while (*s != '\0') {
+ 163              		.loc 1 55 0
+ 164 0004 02E0     		b	.L19
+ 165              	.LVL16:
+ 166              	.L20:
+  56:../scr/mainboot.c **** 		SerialPutChar(*s);
+ 167              		.loc 1 56 0
+ 168 0006 FFF7FEFF 		bl	SerialPutChar
+ 169              	.LVL17:
+  57:../scr/mainboot.c **** 		s++;
+ 170              		.loc 1 57 0
+ 171 000a 0134     		add	r4, r4, #1
+ 172              	.LVL18:
+ 173              	.L19:
+  55:../scr/mainboot.c **** 	while (*s != '\0') {
+ 174              		.loc 1 55 0 discriminator 1
+ 175 000c 2078     		ldrb	r0, [r4]
+ 176 000e 0028     		cmp	r0, #0
+ 177 0010 F9D1     		bne	.L20
+  58:../scr/mainboot.c **** 	}
+  59:../scr/mainboot.c **** }
+ 178              		.loc 1 59 0
+ 179              		@ sp needed for prologue
+ 180              	.LVL19:
+ 181 0012 10BD     		pop	{r4, pc}
+ 182              		.cfi_endproc
+ 183              	.LFE36:
+ 185              		.section	.text.SerialPutString,"ax",%progbits
+ 186              		.align	1
+ 187              		.global	SerialPutString
+ 188              		.code	16
+ 189              		.thumb_func
+ 191              	SerialPutString:
+ 192              	.LFB37:
+  60:../scr/mainboot.c **** void SerialPutString(unsigned char *s) {
+ 193              		.loc 1 60 0
+ 194              		.cfi_startproc
+ 195              	.LVL20:
+ 196 0000 10B5     		push	{r4, lr}
+ 197              	.LCFI4:
+ 198              		.cfi_def_cfa_offset 8
+ 199              		.cfi_offset 4, -8
+ 200              		.cfi_offset 14, -4
+ 201              		.loc 1 60 0
+ 202 0002 041C     		mov	r4, r0
+  61:../scr/mainboot.c **** 	while (*s != '\0') {
+ 203              		.loc 1 61 0
+ 204 0004 02E0     		b	.L22
+ 205              	.LVL21:
+ 206              	.L23:
+  62:../scr/mainboot.c **** 		SerialPutChar(*s);
+ 207              		.loc 1 62 0
+ 208 0006 FFF7FEFF 		bl	SerialPutChar
+ 209              	.LVL22:
+  63:../scr/mainboot.c **** 		s++;
+ 210              		.loc 1 63 0
+ 211 000a 0134     		add	r4, r4, #1
+ 212              	.LVL23:
+ 213              	.L22:
+  61:../scr/mainboot.c **** 	while (*s != '\0') {
+ 214              		.loc 1 61 0 discriminator 1
+ 215 000c 2078     		ldrb	r0, [r4]
+ 216 000e 0028     		cmp	r0, #0
+ 217 0010 F9D1     		bne	.L23
+  64:../scr/mainboot.c **** 	}
+  65:../scr/mainboot.c **** }
+ 218              		.loc 1 65 0
+ 219              		@ sp needed for prologue
+ 220              	.LVL24:
+ 221 0012 10BD     		pop	{r4, pc}
+ 222              		.cfi_endproc
+ 223              	.LFE37:
+ 225              		.section	.text.Process_Command_form_deveice,"ax",%progbits
+ 226              		.align	1
+ 227              		.global	Process_Command_form_deveice
+ 228              		.code	16
+ 229              		.thumb_func
+ 231              	Process_Command_form_deveice:
+ 232              	.LFB38:
+  66:../scr/mainboot.c **** void Process_Command_form_deveice(void) {
+ 233              		.loc 1 66 0
+ 234              		.cfi_startproc
+ 235 0000 38B5     		push	{r3, r4, r5, lr}
+ 236              	.LCFI5:
+ 237              		.cfi_def_cfa_offset 16
+ 238              		.cfi_offset 3, -16
+ 239              		.cfi_offset 4, -12
+ 240              		.cfi_offset 5, -8
+ 241              		.cfi_offset 14, -4
+  67:../scr/mainboot.c **** 	if ((On_handler_cmd_from_deveice == 1)
+ 242              		.loc 1 67 0
+ 243 0002 144B     		ldr	r3, .L38
+ 244 0004 1B68     		ldr	r3, [r3]
+ 245 0006 012B     		cmp	r3, #1
+ 246 0008 06D0     		beq	.L25
+  68:../scr/mainboot.c **** 			|| (last_time_rec_byte_time + 1 < ulMiliCount)) {
+ 247              		.loc 1 68 0
+ 248 000a 134A     		ldr	r2, .L38+4
+ 249 000c 134B     		ldr	r3, .L38+8
+ 250 000e 1268     		ldr	r2, [r2]
+ 251 0010 1B68     		ldr	r3, [r3]
+ 252 0012 0132     		add	r2, r2, #1
+ 253 0014 9A42     		cmp	r2, r3
+ 254 0016 1CD2     		bcs	.L24
+ 255              	.L25:
+  69:../scr/mainboot.c **** 		Camera_idx = buff_cmd[1];
+ 256              		.loc 1 69 0
+ 257 0018 1149     		ldr	r1, .L38+12
+ 258 001a 124B     		ldr	r3, .L38+16
+ 259 001c 4878     		ldrb	r0, [r1, #1]
+ 260 001e 1860     		str	r0, [r3]
+  70:../scr/mainboot.c **** 		switch (buff_cmd[1]) {
+ 261              		.loc 1 70 0
+ 262 0020 0138     		sub	r0, r0, #1
+ 263 0022 0528     		cmp	r0, #5
+ 264 0024 15D8     		bhi	.L24
+ 265 0026 0024     		mov	r4, #0
+ 266 0028 0A4D     		ldr	r5, .L38
+  71:../scr/mainboot.c **** 		case 1:
+  72:../scr/mainboot.c **** 			buff_cmd[1] = 0;
+  73:../scr/mainboot.c **** 			USARTxPutString(USART2, buff_cmd);
+  74:../scr/mainboot.c **** 			On_handler_cmd_from_deveice = 0;
+  75:../scr/mainboot.c **** 			break;
+  76:../scr/mainboot.c **** 		case 2:
+  77:../scr/mainboot.c **** 			buff_cmd[1] = 0;
+  78:../scr/mainboot.c **** 			USARTxPutString(USART3, buff_cmd);
+  79:../scr/mainboot.c **** 			On_handler_cmd_from_deveice = 0;
+  80:../scr/mainboot.c **** 			break;
+  81:../scr/mainboot.c **** 		case 3:
+  82:../scr/mainboot.c **** 			buff_cmd[1] = 0;
+  83:../scr/mainboot.c **** 			USARTxPutString(USART4, buff_cmd);
+  84:../scr/mainboot.c **** 			On_handler_cmd_from_deveice = 0;
+  85:../scr/mainboot.c **** 			break;
+  86:../scr/mainboot.c **** 		case 4:
+  87:../scr/mainboot.c **** 			buff_cmd[1] = 0;
+  88:../scr/mainboot.c **** 			USARTxPutString(USART5, buff_cmd);
+  89:../scr/mainboot.c **** 			On_handler_cmd_from_deveice = 0;
+  90:../scr/mainboot.c **** 			break;
+  91:../scr/mainboot.c **** 		case 5:
+  92:../scr/mainboot.c **** 			buff_cmd[1] = 0;
+  93:../scr/mainboot.c **** 			USARTxPutString(USART6, buff_cmd);
+  94:../scr/mainboot.c **** 			On_handler_cmd_from_deveice = 0;
+  95:../scr/mainboot.c **** 			break;
+  96:../scr/mainboot.c **** 		case 6:
+  97:../scr/mainboot.c **** 			buff_cmd[1] = 0;
+ 267              		.loc 1 97 0
+ 268 002a 4C70     		strb	r4, [r1, #1]
+  70:../scr/mainboot.c **** 		switch (buff_cmd[1]) {
+ 269              		.loc 1 70 0
+ 270 002c FFF7FEFF 		bl	__gnu_thumb1_case_uqi
+ 271              	.L33:
+ 272 0030 03       		.byte	(.L27-.L33)/2
+ 273 0031 05       		.byte	(.L28-.L33)/2
+ 274 0032 07       		.byte	(.L29-.L33)/2
+ 275 0033 09       		.byte	(.L30-.L33)/2
+ 276 0034 0B       		.byte	(.L31-.L33)/2
+ 277 0035 0D       		.byte	(.L32-.L33)/2
+ 278              		.align	1
+ 279              	.L27:
+  73:../scr/mainboot.c **** 			USARTxPutString(USART2, buff_cmd);
+ 280              		.loc 1 73 0
+ 281 0036 0C48     		ldr	r0, .L38+20
+ 282 0038 08E0     		b	.L37
+ 283              	.L28:
+  78:../scr/mainboot.c **** 			USARTxPutString(USART3, buff_cmd);
+ 284              		.loc 1 78 0
+ 285 003a 0C48     		ldr	r0, .L38+24
+ 286 003c 06E0     		b	.L37
+ 287              	.L29:
+  83:../scr/mainboot.c **** 			USARTxPutString(USART4, buff_cmd);
+ 288              		.loc 1 83 0
+ 289 003e 0C48     		ldr	r0, .L38+28
+ 290 0040 04E0     		b	.L37
+ 291              	.L30:
+  88:../scr/mainboot.c **** 			USARTxPutString(USART5, buff_cmd);
+ 292              		.loc 1 88 0
+ 293 0042 0C48     		ldr	r0, .L38+32
+ 294 0044 02E0     		b	.L37
+ 295              	.L31:
+  93:../scr/mainboot.c **** 			USARTxPutString(USART6, buff_cmd);
+ 296              		.loc 1 93 0
+ 297 0046 0C48     		ldr	r0, .L38+36
+ 298 0048 00E0     		b	.L37
+ 299              	.L32:
+  98:../scr/mainboot.c **** 			USARTxPutString(USART7, buff_cmd);
+ 300              		.loc 1 98 0
+ 301 004a 0C48     		ldr	r0, .L38+40
+ 302              	.L37:
+ 303 004c FFF7FEFF 		bl	USARTxPutString
+ 304              	.LVL25:
+  99:../scr/mainboot.c **** 			On_handler_cmd_from_deveice = 0;
+ 305              		.loc 1 99 0
+ 306 0050 2C60     		str	r4, [r5]
+ 307              	.L24:
+ 100:../scr/mainboot.c **** 			break;
+ 101:../scr/mainboot.c **** 		default:
+ 102:../scr/mainboot.c **** 			break;
+ 103:../scr/mainboot.c **** 		}
+ 104:../scr/mainboot.c **** 	}
+ 105:../scr/mainboot.c **** }
+ 308              		.loc 1 105 0
+ 309              		@ sp needed for prologue
+ 310 0052 38BD     		pop	{r3, r4, r5, pc}
+ 311              	.L39:
+ 312              		.align	2
+ 313              	.L38:
+ 314 0054 00000000 		.word	On_handler_cmd_from_deveice
+ 315 0058 00000000 		.word	last_time_rec_byte_time
+ 316 005c 00000000 		.word	ulMiliCount
+ 317 0060 00000000 		.word	buff_cmd
+ 318 0064 00000000 		.word	Camera_idx
+ 319 0068 00440040 		.word	1073759232
+ 320 006c 00480040 		.word	1073760256
+ 321 0070 004C0040 		.word	1073761280
+ 322 0074 00500040 		.word	1073762304
+ 323 0078 00140140 		.word	1073812480
+ 324 007c 00180140 		.word	1073813504
+ 325              		.cfi_endproc
+ 326              	.LFE38:
+ 328              		.section	.text.Main_Menu,"ax",%progbits
+ 329              		.align	1
+ 330              		.global	Main_Menu
+ 331              		.code	16
+ 332              		.thumb_func
+ 334              	Main_Menu:
+ 335              	.LFB39:
+ 106:../scr/mainboot.c **** void Main_Menu(void) {
+ 336              		.loc 1 106 0
+ 337              		.cfi_startproc
+ 338 0000 08B5     		push	{r3, lr}
+ 339              	.LCFI6:
+ 340              		.cfi_def_cfa_offset 8
+ 341              		.cfi_offset 3, -8
+ 342              		.cfi_offset 14, -4
+ 343              	.L41:
+ 107:../scr/mainboot.c **** 	while (1) {
+ 108:../scr/mainboot.c **** 		Process_Command_form_deveice();
+ 344              		.loc 1 108 0 discriminator 1
+ 345 0002 FFF7FEFF 		bl	Process_Command_form_deveice
+ 346              	.LVL26:
+ 347 0006 FCE7     		b	.L41
+ 348              		.cfi_endproc
+ 349              	.LFE39:
+ 351              		.global	lastSentToTracker
+ 352              		.global	FlashProtection
+ 353              		.global	UserMemoryMask1
+ 354              		.global	BlockNbr
+ 355              		.section	.bss.FlashProtection,"aw",%nobits
+ 356              		.align	2
+ 359              	FlashProtection:
+ 360 0000 00000000 		.space	4
+ 361              		.section	.bss.UserMemoryMask1,"aw",%nobits
+ 362              		.align	2
+ 365              	UserMemoryMask1:
+ 366 0000 00000000 		.space	4
+ 367              		.section	.bss.BlockNbr,"aw",%nobits
+ 368              		.align	2
+ 371              	BlockNbr:
+ 372 0000 00000000 		.space	4
+ 373              		.section	.bss.lastSentToTracker,"aw",%nobits
+ 374              		.align	2
+ 377              	lastSentToTracker:
+ 378 0000 00000000 		.space	4
+ 379              		.text
+ 380              	.Letext0:
+ 381              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 382              		.file 3 "D:\\EclipseIndigo\\workspace\\cam_hub\\scr/stm32f0xx.h"
+ 383              		.file 4 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32f0
+DEFINED SYMBOLS
+                            *ABS*:00000000 mainboot.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:18     .text.SerialPutChar:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:23     .text.SerialPutChar:00000000 SerialPutChar
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:55     .text.SerialPutChar:0000001c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:60     .text.USARTxPutChar:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:65     .text.USARTxPutChar:00000000 USARTxPutChar
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:101    .text.USARTxPutString:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:106    .text.USARTxPutString:00000000 USARTxPutString
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:146    .text.Serial_PutString:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:151    .text.Serial_PutString:00000000 Serial_PutString
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:186    .text.SerialPutString:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:191    .text.SerialPutString:00000000 SerialPutString
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:226    .text.Process_Command_form_deveice:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:231    .text.Process_Command_form_deveice:00000000 Process_Command_form_deveice
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:272    .text.Process_Command_form_deveice:00000030 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:278    .text.Process_Command_form_deveice:00000036 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:314    .text.Process_Command_form_deveice:00000054 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:329    .text.Main_Menu:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:334    .text.Main_Menu:00000000 Main_Menu
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:377    .bss.lastSentToTracker:00000000 lastSentToTracker
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:359    .bss.FlashProtection:00000000 FlashProtection
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:365    .bss.UserMemoryMask1:00000000 UserMemoryMask1
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:371    .bss.BlockNbr:00000000 BlockNbr
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:356    .bss.FlashProtection:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:362    .bss.UserMemoryMask1:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:368    .bss.BlockNbr:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccaAHsbb.s:374    .bss.lastSentToTracker:00000000 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.90b54cb79624a05a6a75538133d4ee2f
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.stm32f0xx.h.54.2936c65ea497e2b9f6697d244f204f4f
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.491.56b995fdd6b34ccece7fa7ee90a03d09
+                           .group:00000000 wm4.stm32f0xx_adc.h.85.55aeb589c2c2703602e5f964c35b0c48
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.ff204b27217b5926452ab2f52b527ff3
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.02fa02b24c01ae505c73e46ccbb612cf
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.config.h.3.0d63d2ebb3a9ab9baf69287178146586
+                           .group:00000000 wm4.alarm.h.33.20c9833bec31b55a8db7b876e9cb205d
+                           .group:00000000 wm4.command.h.9.24416aff08501a78dcd3e4f187f8295f
+                           .group:00000000 wm4.xprintf.h.6.d201a07af5ece6e00f55504afb5b0533
+                           .group:00000000 wm4.newlib.h.8.e1d498e57c12962fc6d7be5061a6981a
+                           .group:00000000 wm4.config.h.184.720a0632b4c315f4e8d8f1fee595bb41
+                           .group:00000000 wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04
+                           .group:00000000 wm4._default_types.h.6.1dbd2e581fd590860c7c17f21d147e91
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4.stddef.h.349.31f4c5baff3fa2689010b32028da9c47
+                           .group:00000000 wm4.reent.h.16.fbf96e140479440ec10fa8cd451b198e
+                           .group:00000000 wm4.stddef.h.187.9e651b6b8b16e149c1353259404973ea
+
+UNDEFINED SYMBOLS
+USART_GetFlagStatus
+USART_SendData
+__gnu_thumb1_case_uqi
+On_handler_cmd_from_deveice
+last_time_rec_byte_time
+ulMiliCount
+buff_cmd
+Camera_idx

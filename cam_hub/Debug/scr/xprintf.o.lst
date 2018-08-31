@@ -1,0 +1,1263 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"xprintf.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.xputc,"ax",%progbits
+  18              		.align	1
+  19              		.global	xputc
+  20              		.code	16
+  21              		.thumb_func
+  23              	xputc:
+  24              	.LFB0:
+  25              		.file 1 "../scr/xprintf.c"
+   1:../scr/xprintf.c **** /*------------------------------------------------------------------------/
+   2:../scr/xprintf.c **** /  Universal string handler for user console interface
+   3:../scr/xprintf.c **** /-------------------------------------------------------------------------/
+   4:../scr/xprintf.c **** /
+   5:../scr/xprintf.c **** /  Copyright (C) 2011, ChaN, all right reserved.
+   6:../scr/xprintf.c **** /
+   7:../scr/xprintf.c **** / * This software is a free software and there is NO WARRANTY.
+   8:../scr/xprintf.c **** / * No restriction on use. You can use, modify and redistribute it for
+   9:../scr/xprintf.c **** /   personal, non-profit or commercial products UNDER YOUR RESPONSIBILITY.
+  10:../scr/xprintf.c **** / * Redistributions of source code must retain the above copyright notice.
+  11:../scr/xprintf.c **** /
+  12:../scr/xprintf.c **** /-------------------------------------------------------------------------*/
+  13:../scr/xprintf.c **** 
+  14:../scr/xprintf.c **** #include "xprintf.h"
+  15:../scr/xprintf.c **** 
+  16:../scr/xprintf.c **** 
+  17:../scr/xprintf.c **** #if _USE_XFUNC_OUT
+  18:../scr/xprintf.c **** #include <stdarg.h>
+  19:../scr/xprintf.c **** void (*xfunc_out)(unsigned char);	/* Pointer to the output stream */
+  20:../scr/xprintf.c **** static char *outptr;
+  21:../scr/xprintf.c **** 
+  22:../scr/xprintf.c **** /*----------------------------------------------*/
+  23:../scr/xprintf.c **** /* Put a character                              */
+  24:../scr/xprintf.c **** /*----------------------------------------------*/
+  25:../scr/xprintf.c **** 
+  26:../scr/xprintf.c **** void xputc (char c)
+  27:../scr/xprintf.c **** {
+  26              		.loc 1 27 0
+  27              		.cfi_startproc
+  28              	.LVL0:
+  28:../scr/xprintf.c **** 	if (_CR_CRLF && c == '\n') xputc('\r');		/* CR -> CRLF */
+  29:../scr/xprintf.c **** 
+  30:../scr/xprintf.c **** 	if (outptr) {
+  29              		.loc 1 30 0
+  30 0000 074A     		ldr	r2, .L7
+  27:../scr/xprintf.c **** {
+  31              		.loc 1 27 0
+  32 0002 08B5     		push	{r3, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  37              		.loc 1 30 0
+  38 0004 1368     		ldr	r3, [r2]
+  39 0006 002B     		cmp	r3, #0
+  40 0008 03D0     		beq	.L2
+  31:../scr/xprintf.c **** 		*outptr++ = (unsigned char)c;
+  41              		.loc 1 31 0
+  42 000a 1870     		strb	r0, [r3]
+  43 000c 0133     		add	r3, r3, #1
+  44 000e 1360     		str	r3, [r2]
+  32:../scr/xprintf.c **** 		return;
+  45              		.loc 1 32 0
+  46 0010 04E0     		b	.L1
+  47              	.L2:
+  48              	.LVL1:
+  49              	.LBB4:
+  50              	.LBB5:
+  33:../scr/xprintf.c **** 	}
+  34:../scr/xprintf.c **** 
+  35:../scr/xprintf.c **** 	if (xfunc_out) xfunc_out((unsigned char)c);
+  51              		.loc 1 35 0
+  52 0012 044B     		ldr	r3, .L7+4
+  53 0014 1B68     		ldr	r3, [r3]
+  54 0016 002B     		cmp	r3, #0
+  55 0018 00D0     		beq	.L1
+  56 001a 9847     		blx	r3
+  57              	.LVL2:
+  58              	.L1:
+  59              	.LBE5:
+  60              	.LBE4:
+  36:../scr/xprintf.c **** }
+  61              		.loc 1 36 0
+  62              		@ sp needed for prologue
+  63 001c 08BD     		pop	{r3, pc}
+  64              	.L8:
+  65 001e C046     		.align	2
+  66              	.L7:
+  67 0020 00000000 		.word	.LANCHOR0
+  68 0024 00000000 		.word	xfunc_out
+  69              		.cfi_endproc
+  70              	.LFE0:
+  72              		.section	.text.xputs,"ax",%progbits
+  73              		.align	1
+  74              		.global	xputs
+  75              		.code	16
+  76              		.thumb_func
+  78              	xputs:
+  79              	.LFB1:
+  37:../scr/xprintf.c **** 
+  38:../scr/xprintf.c **** 
+  39:../scr/xprintf.c **** 
+  40:../scr/xprintf.c **** /*----------------------------------------------*/
+  41:../scr/xprintf.c **** /* Put a null-terminated string                 */
+  42:../scr/xprintf.c **** /*----------------------------------------------*/
+  43:../scr/xprintf.c **** 
+  44:../scr/xprintf.c **** void xputs (					/* Put a string to the default device */
+  45:../scr/xprintf.c **** 	const char* str				/* Pointer to the string */
+  46:../scr/xprintf.c **** )
+  47:../scr/xprintf.c **** {
+  80              		.loc 1 47 0
+  81              		.cfi_startproc
+  82              	.LVL3:
+  83 0000 10B5     		push	{r4, lr}
+  84              	.LCFI1:
+  85              		.cfi_def_cfa_offset 8
+  86              		.cfi_offset 4, -8
+  87              		.cfi_offset 14, -4
+  88              		.loc 1 47 0
+  89 0002 041C     		mov	r4, r0
+  48:../scr/xprintf.c **** 	while (*str)
+  90              		.loc 1 48 0
+  91 0004 02E0     		b	.L10
+  92              	.LVL4:
+  93              	.L11:
+  49:../scr/xprintf.c **** 		xputc(*str++);
+  94              		.loc 1 49 0
+  95 0006 0134     		add	r4, r4, #1
+  96              	.LVL5:
+  97 0008 FFF7FEFF 		bl	xputc
+  98              	.LVL6:
+  99              	.L10:
+  48:../scr/xprintf.c **** 	while (*str)
+ 100              		.loc 1 48 0 discriminator 1
+ 101 000c 2078     		ldrb	r0, [r4]
+ 102 000e 0028     		cmp	r0, #0
+ 103 0010 F9D1     		bne	.L11
+  50:../scr/xprintf.c **** }
+ 104              		.loc 1 50 0
+ 105              		@ sp needed for prologue
+ 106              	.LVL7:
+ 107 0012 10BD     		pop	{r4, pc}
+ 108              		.cfi_endproc
+ 109              	.LFE1:
+ 111              		.global	__aeabi_uidivmod
+ 112              		.global	__aeabi_uidiv
+ 113              		.section	.text.xvprintf,"ax",%progbits
+ 114              		.align	1
+ 115              		.code	16
+ 116              		.thumb_func
+ 118              	xvprintf:
+ 119              	.LFB3:
+  51:../scr/xprintf.c **** 
+  52:../scr/xprintf.c **** 
+  53:../scr/xprintf.c **** void xfputs (					/* Put a string to the specified device */
+  54:../scr/xprintf.c **** 	void(*func)(unsigned char),	/* Pointer to the output function */
+  55:../scr/xprintf.c **** 	const char*	str				/* Pointer to the string */
+  56:../scr/xprintf.c **** )
+  57:../scr/xprintf.c **** {
+  58:../scr/xprintf.c **** 	void (*pf)(unsigned char);
+  59:../scr/xprintf.c **** 
+  60:../scr/xprintf.c **** 
+  61:../scr/xprintf.c **** 	pf = xfunc_out;		/* Save current output device */
+  62:../scr/xprintf.c **** 	xfunc_out = func;	/* Switch output to specified device */
+  63:../scr/xprintf.c **** 	while (*str)		/* Put the string */
+  64:../scr/xprintf.c **** 		xputc(*str++);
+  65:../scr/xprintf.c **** 	xfunc_out = pf;		/* Restore output device */
+  66:../scr/xprintf.c **** }
+  67:../scr/xprintf.c **** 
+  68:../scr/xprintf.c **** 
+  69:../scr/xprintf.c **** 
+  70:../scr/xprintf.c **** /*----------------------------------------------*/
+  71:../scr/xprintf.c **** /* Formatted string output                      */
+  72:../scr/xprintf.c **** /*----------------------------------------------*/
+  73:../scr/xprintf.c **** /*  xprintf("%d", 1234);			"1234"
+  74:../scr/xprintf.c ****     xprintf("%6d,%3d%%", -200, 5);	"  -200,  5%"
+  75:../scr/xprintf.c ****     xprintf("%-6u", 100);			"100   "
+  76:../scr/xprintf.c ****     xprintf("%ld", 12345678L);		"12345678"
+  77:../scr/xprintf.c ****     xprintf("%04x", 0xA3);			"00a3"
+  78:../scr/xprintf.c ****     xprintf("%08LX", 0x123ABC);		"00123ABC"
+  79:../scr/xprintf.c ****     xprintf("%016b", 0x550F);		"0101010100001111"
+  80:../scr/xprintf.c ****     xprintf("%s", "String");		"String"
+  81:../scr/xprintf.c ****     xprintf("%-4s", "abc");			"abc "
+  82:../scr/xprintf.c ****     xprintf("%4s", "abc");			" abc"
+  83:../scr/xprintf.c ****     xprintf("%c", 'a');				"a"
+  84:../scr/xprintf.c ****     xprintf("%f", 10.0);            <xprintf lacks floating point support>
+  85:../scr/xprintf.c **** */
+  86:../scr/xprintf.c **** 
+  87:../scr/xprintf.c **** static
+  88:../scr/xprintf.c **** void xvprintf (
+  89:../scr/xprintf.c **** 	const char*	fmt,	/* Pointer to the format string */
+  90:../scr/xprintf.c **** 	va_list arp			/* Pointer to arguments */
+  91:../scr/xprintf.c **** )
+  92:../scr/xprintf.c **** {
+ 120              		.loc 1 92 0
+ 121              		.cfi_startproc
+ 122              	.LVL8:
+ 123 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 124              	.LCFI2:
+ 125              		.cfi_def_cfa_offset 20
+ 126              		.cfi_offset 4, -20
+ 127              		.cfi_offset 5, -16
+ 128              		.cfi_offset 6, -12
+ 129              		.cfi_offset 7, -8
+ 130              		.cfi_offset 14, -4
+ 131 0002 071C     		mov	r7, r0
+ 132 0004 8BB0     		sub	sp, sp, #44
+ 133              	.LCFI3:
+ 134              		.cfi_def_cfa_offset 64
+ 135              		.loc 1 92 0
+ 136 0006 0C1C     		mov	r4, r1
+ 137              	.LVL9:
+ 138 0008 00E0     		b	.L13
+ 139              	.LVL10:
+ 140              	.L16:
+  93:../scr/xprintf.c **** 	unsigned int r, i, j, w, f;
+  94:../scr/xprintf.c **** 	unsigned long v;
+  95:../scr/xprintf.c **** 	char s[16], c, d, *p;
+  96:../scr/xprintf.c **** 
+  97:../scr/xprintf.c **** 
+  98:../scr/xprintf.c **** 	for (;;) {
+  99:../scr/xprintf.c **** 		c = *fmt++;					/* Get a char */
+ 100:../scr/xprintf.c **** 		if (!c) break;				/* End of format? */
+ 101:../scr/xprintf.c **** 		if (c != '%') {				/* Pass through it if not a % sequense */
+ 102:../scr/xprintf.c **** 			xputc(c); continue;
+ 103:../scr/xprintf.c **** 		}
+ 104:../scr/xprintf.c **** 		f = 0;
+ 105:../scr/xprintf.c **** 		c = *fmt++;					/* Get first char of the sequense */
+ 106:../scr/xprintf.c **** 		if (c == '0') {				/* Flag: '0' padded */
+ 107:../scr/xprintf.c **** 			f = 1; c = *fmt++;
+ 108:../scr/xprintf.c **** 		} else {
+ 109:../scr/xprintf.c **** 			if (c == '-') {			/* Flag: left justified */
+ 110:../scr/xprintf.c **** 				f = 2; c = *fmt++;
+ 111:../scr/xprintf.c **** 			}
+ 112:../scr/xprintf.c **** 		}
+ 113:../scr/xprintf.c **** 		for (w = 0; c >= '0' && c <= '9'; c = *fmt++)	/* Minimum width */
+ 114:../scr/xprintf.c **** 			w = w * 10 + c - '0';
+ 115:../scr/xprintf.c **** 		if (c == 'l' || c == 'L') {	/* Prefix: Size is long int */
+ 116:../scr/xprintf.c **** 			f |= 4; c = *fmt++;
+ 117:../scr/xprintf.c **** 		}
+ 118:../scr/xprintf.c **** 		if (!c) break;				/* End of format? */
+ 119:../scr/xprintf.c **** 		d = c;
+ 120:../scr/xprintf.c **** 		if (d >= 'a') d -= 0x20;
+ 121:../scr/xprintf.c **** 		switch (d) {				/* Type is... */
+ 122:../scr/xprintf.c **** 		case 'S' :					/* String */
+ 123:../scr/xprintf.c **** 			p = va_arg(arp, char*);
+ 124:../scr/xprintf.c **** 			for (j = 0; p[j]; j++) ;
+ 125:../scr/xprintf.c **** 			while (!(f & 2) && j++ < w) xputc(' ');
+ 126:../scr/xprintf.c **** 			xputs(p);
+ 127:../scr/xprintf.c **** 			while (j++ < w) xputc(' ');
+ 128:../scr/xprintf.c **** 			continue;
+ 129:../scr/xprintf.c **** 		case 'C' :					/* Character */
+ 130:../scr/xprintf.c **** 			xputc((char)va_arg(arp, int)); continue;
+ 131:../scr/xprintf.c **** 		case 'B' :					/* Binary */
+ 132:../scr/xprintf.c **** 			r = 2; break;
+ 133:../scr/xprintf.c **** 		case 'O' :					/* Octal */
+ 134:../scr/xprintf.c **** 			r = 8; break;
+ 135:../scr/xprintf.c **** 		case 'D' :					/* Signed decimal */
+ 136:../scr/xprintf.c **** 		case 'U' :					/* Unsigned decimal */
+ 137:../scr/xprintf.c **** 			r = 10; break;
+ 138:../scr/xprintf.c **** 		case 'X' :					/* Hexdecimal */
+ 139:../scr/xprintf.c **** 			r = 16; break;
+ 140:../scr/xprintf.c **** 		default:					/* Unknown type (passthrough) */
+ 141:../scr/xprintf.c **** 			xputc(c); continue;
+ 141              		.loc 1 141 0
+ 142 000a 029C     		ldr	r4, [sp, #8]
+ 143              	.LVL11:
+ 144              	.L13:
+  99:../scr/xprintf.c **** 		c = *fmt++;					/* Get a char */
+ 145              		.loc 1 99 0
+ 146 000c 3878     		ldrb	r0, [r7]
+ 147              	.LVL12:
+ 100:../scr/xprintf.c **** 		if (!c) break;				/* End of format? */
+ 148              		.loc 1 100 0
+ 149 000e 0028     		cmp	r0, #0
+ 150 0010 00D1     		bne	.LCB126
+ 151 0012 D5E0     		b	.L12	@long jump
+ 152              	.LCB126:
+ 101:../scr/xprintf.c **** 		if (c != '%') {				/* Pass through it if not a % sequense */
+ 153              		.loc 1 101 0
+ 154 0014 2528     		cmp	r0, #37
+ 155 0016 01D0     		beq	.L15
+  99:../scr/xprintf.c **** 		c = *fmt++;					/* Get a char */
+ 156              		.loc 1 99 0
+ 157 0018 0137     		add	r7, r7, #1
+ 158              	.LVL13:
+ 159 001a 6DE0     		b	.L92
+ 160              	.LVL14:
+ 161              	.L15:
+ 105:../scr/xprintf.c **** 		c = *fmt++;					/* Get first char of the sequense */
+ 162              		.loc 1 105 0
+ 163 001c 7D78     		ldrb	r5, [r7, #1]
+ 164              	.LVL15:
+ 106:../scr/xprintf.c **** 		if (c == '0') {				/* Flag: '0' padded */
+ 165              		.loc 1 106 0
+ 166 001e 302D     		cmp	r5, #48
+ 167 0020 03D1     		bne	.L17
+ 168              	.LVL16:
+ 107:../scr/xprintf.c **** 			f = 1; c = *fmt++;
+ 169              		.loc 1 107 0
+ 170 0022 BD78     		ldrb	r5, [r7, #2]
+ 171              	.LVL17:
+ 172 0024 0126     		mov	r6, #1
+ 173 0026 0337     		add	r7, r7, #3
+ 174              	.LVL18:
+ 175 0028 07E0     		b	.L18
+ 176              	.LVL19:
+ 177              	.L17:
+ 109:../scr/xprintf.c **** 			if (c == '-') {			/* Flag: left justified */
+ 178              		.loc 1 109 0
+ 179 002a 2D2D     		cmp	r5, #45
+ 180 002c 02D0     		beq	.L19
+ 105:../scr/xprintf.c **** 		c = *fmt++;					/* Get first char of the sequense */
+ 181              		.loc 1 105 0
+ 182 002e 0237     		add	r7, r7, #2
+ 183              	.LVL20:
+ 104:../scr/xprintf.c **** 		f = 0;
+ 184              		.loc 1 104 0
+ 185 0030 0026     		mov	r6, #0
+ 186 0032 02E0     		b	.L18
+ 187              	.LVL21:
+ 188              	.L19:
+ 110:../scr/xprintf.c **** 				f = 2; c = *fmt++;
+ 189              		.loc 1 110 0
+ 190 0034 BD78     		ldrb	r5, [r7, #2]
+ 191              	.LVL22:
+ 192 0036 0226     		mov	r6, #2
+ 193 0038 0337     		add	r7, r7, #3
+ 194              	.LVL23:
+ 195              	.L18:
+ 113:../scr/xprintf.c **** 		for (w = 0; c >= '0' && c <= '9'; c = *fmt++)	/* Minimum width */
+ 196              		.loc 1 113 0
+ 197 003a 0021     		mov	r1, #0
+ 198              	.LVL24:
+ 199 003c 0391     		str	r1, [sp, #12]
+ 114:../scr/xprintf.c **** 			w = w * 10 + c - '0';
+ 200              		.loc 1 114 0
+ 201 003e 0A22     		mov	r2, #10
+ 113:../scr/xprintf.c **** 		for (w = 0; c >= '0' && c <= '9'; c = *fmt++)	/* Minimum width */
+ 202              		.loc 1 113 0
+ 203 0040 06E0     		b	.L20
+ 204              	.LVL25:
+ 205              	.L21:
+ 114:../scr/xprintf.c **** 			w = w * 10 + c - '0';
+ 206              		.loc 1 114 0 discriminator 2
+ 207 0042 039B     		ldr	r3, [sp, #12]
+ 208 0044 5343     		mul	r3, r2
+ 209 0046 5D19     		add	r5, r3, r5
+ 210              	.LVL26:
+ 211 0048 303D     		sub	r5, r5, #48
+ 212 004a 0395     		str	r5, [sp, #12]
+ 213              	.LVL27:
+ 113:../scr/xprintf.c **** 		for (w = 0; c >= '0' && c <= '9'; c = *fmt++)	/* Minimum width */
+ 214              		.loc 1 113 0 discriminator 2
+ 215 004c 3D78     		ldrb	r5, [r7]
+ 216              	.LVL28:
+ 217 004e 0137     		add	r7, r7, #1
+ 218              	.LVL29:
+ 219              	.L20:
+ 113:../scr/xprintf.c **** 		for (w = 0; c >= '0' && c <= '9'; c = *fmt++)	/* Minimum width */
+ 220              		.loc 1 113 0 is_stmt 0 discriminator 1
+ 221 0050 2B1C     		mov	r3, r5
+ 222 0052 303B     		sub	r3, r3, #48
+ 223 0054 092B     		cmp	r3, #9
+ 224 0056 F4D9     		bls	.L21
+ 115:../scr/xprintf.c **** 		if (c == 'l' || c == 'L') {	/* Prefix: Size is long int */
+ 225              		.loc 1 115 0 is_stmt 1
+ 226 0058 2023     		mov	r3, #32
+ 227 005a 2A1C     		mov	r2, r5
+ 228 005c 9A43     		bic	r2, r3
+ 229 005e 4C2A     		cmp	r2, #76
+ 230 0060 03D1     		bne	.L22
+ 116:../scr/xprintf.c **** 			f |= 4; c = *fmt++;
+ 231              		.loc 1 116 0
+ 232 0062 0423     		mov	r3, #4
+ 233 0064 3D78     		ldrb	r5, [r7]
+ 234              	.LVL30:
+ 235 0066 1E43     		orr	r6, r3
+ 236              	.LVL31:
+ 237 0068 0137     		add	r7, r7, #1
+ 238              	.LVL32:
+ 239              	.L22:
+ 118:../scr/xprintf.c **** 		if (!c) break;				/* End of format? */
+ 240              		.loc 1 118 0
+ 241 006a 002D     		cmp	r5, #0
+ 242 006c 00D1     		bne	.LCB257
+ 243 006e A7E0     		b	.L12	@long jump
+ 244              	.LCB257:
+ 245              	.LVL33:
+ 120:../scr/xprintf.c **** 		if (d >= 'a') d -= 0x20;
+ 246              		.loc 1 120 0
+ 247 0070 2B1C     		mov	r3, r5
+ 248 0072 602D     		cmp	r5, #96
+ 249 0074 01D9     		bls	.L23
+ 120:../scr/xprintf.c **** 		if (d >= 'a') d -= 0x20;
+ 250              		.loc 1 120 0 is_stmt 0 discriminator 1
+ 251 0076 203B     		sub	r3, r3, #32
+ 252 0078 DBB2     		uxtb	r3, r3
+ 253              	.LVL34:
+ 254              	.L23:
+ 121:../scr/xprintf.c **** 		switch (d) {				/* Type is... */
+ 255              		.loc 1 121 0 is_stmt 1
+ 256 007a 4F2B     		cmp	r3, #79
+ 257 007c 43D0     		beq	.L55
+ 258 007e 06D8     		bhi	.L31
+ 259 0080 432B     		cmp	r3, #67
+ 260 0082 30D0     		beq	.L26
+ 261 0084 442B     		cmp	r3, #68
+ 262 0086 09D0     		beq	.L27
+ 263 0088 422B     		cmp	r3, #66
+ 264 008a 34D1     		bne	.L24
+ 265 008c 38E0     		b	.L25
+ 266              	.L31:
+ 267 008e 552B     		cmp	r3, #85
+ 268 0090 04D0     		beq	.L27
+ 269 0092 582B     		cmp	r3, #88
+ 270 0094 2DD0     		beq	.L30
+ 271 0096 532B     		cmp	r3, #83
+ 272 0098 2DD1     		bne	.L24
+ 273 009a 01E0     		b	.L29
+ 274              	.L27:
+ 137:../scr/xprintf.c **** 			r = 10; break;
+ 275              		.loc 1 137 0
+ 276 009c 0A21     		mov	r1, #10
+ 277 009e 33E0     		b	.L93
+ 278              	.L29:
+ 123:../scr/xprintf.c **** 			p = va_arg(arp, char*);
+ 279              		.loc 1 123 0
+ 280 00a0 2568     		ldr	r5, [r4]
+ 281              	.LVL35:
+ 282 00a2 221D     		add	r2, r4, #4
+ 283 00a4 0292     		str	r2, [sp, #8]
+ 284              	.LVL36:
+ 124:../scr/xprintf.c **** 			for (j = 0; p[j]; j++) ;
+ 285              		.loc 1 124 0
+ 286 00a6 2B1C     		mov	r3, r5
+ 287              	.LVL37:
+ 288              	.L32:
+  88:../scr/xprintf.c **** void xvprintf (
+ 289              		.loc 1 88 0 discriminator 1
+ 290 00a8 5C1B     		sub	r4, r3, r5
+ 291              	.LVL38:
+ 292 00aa 0133     		add	r3, r3, #1
+ 293 00ac 5A1E     		sub	r2, r3, #1
+ 124:../scr/xprintf.c **** 			for (j = 0; p[j]; j++) ;
+ 294              		.loc 1 124 0 discriminator 1
+ 295 00ae 1278     		ldrb	r2, [r2]
+ 296 00b0 002A     		cmp	r2, #0
+ 297 00b2 F9D1     		bne	.L32
+ 298 00b4 04E0     		b	.L88
+ 299              	.LVL39:
+ 300              	.L35:
+ 125:../scr/xprintf.c **** 			while (!(f & 2) && j++ < w) xputc(' ');
+ 301              		.loc 1 125 0 discriminator 1
+ 302 00b6 2020     		mov	r0, #32
+ 303 00b8 FFF7FEFF 		bl	xputc
+ 304              	.LVL40:
+ 305 00bc 341C     		mov	r4, r6
+ 306 00be 01E0     		b	.L89
+ 307              	.LVL41:
+ 308              	.L88:
+ 309 00c0 B307     		lsl	r3, r6, #30
+ 310 00c2 04D4     		bmi	.L34
+ 311              	.LVL42:
+ 312              	.L89:
+ 125:../scr/xprintf.c **** 			while (!(f & 2) && j++ < w) xputc(' ');
+ 313              		.loc 1 125 0 is_stmt 0 discriminator 2
+ 314 00c4 0399     		ldr	r1, [sp, #12]
+ 315 00c6 661C     		add	r6, r4, #1
+ 316              	.LVL43:
+ 317 00c8 8C42     		cmp	r4, r1
+ 318 00ca F4D3     		bcc	.L35
+ 125:../scr/xprintf.c **** 			while (!(f & 2) && j++ < w) xputc(' ');
+ 319              		.loc 1 125 0
+ 320 00cc 341C     		mov	r4, r6
+ 321              	.LVL44:
+ 322              	.L34:
+ 126:../scr/xprintf.c **** 			xputs(p);
+ 323              		.loc 1 126 0 is_stmt 1
+ 324 00ce 281C     		mov	r0, r5
+ 325 00d0 FFF7FEFF 		bl	xputs
+ 326              	.LVL45:
+ 127:../scr/xprintf.c **** 			while (j++ < w) xputc(' ');
+ 327              		.loc 1 127 0
+ 328 00d4 03E0     		b	.L36
+ 329              	.LVL46:
+ 330              	.L37:
+ 127:../scr/xprintf.c **** 			while (j++ < w) xputc(' ');
+ 331              		.loc 1 127 0 is_stmt 0 discriminator 2
+ 332 00d6 2020     		mov	r0, #32
+ 333 00d8 FFF7FEFF 		bl	xputc
+ 334              	.LVL47:
+ 335 00dc 0134     		add	r4, r4, #1
+ 336              	.L36:
+ 127:../scr/xprintf.c **** 			while (j++ < w) xputc(' ');
+ 337              		.loc 1 127 0 discriminator 1
+ 338 00de 039A     		ldr	r2, [sp, #12]
+ 339 00e0 9442     		cmp	r4, r2
+ 340 00e2 F8D3     		bcc	.L37
+ 341 00e4 91E7     		b	.L16
+ 342              	.LVL48:
+ 343              	.L26:
+ 130:../scr/xprintf.c **** 			xputc((char)va_arg(arp, int)); continue;
+ 344              		.loc 1 130 0 is_stmt 1
+ 345 00e6 231D     		add	r3, r4, #4
+ 346              	.LVL49:
+ 347 00e8 2078     		ldrb	r0, [r4]
+ 348 00ea 0293     		str	r3, [sp, #8]
+ 349              	.LVL50:
+ 350 00ec FFF7FEFF 		bl	xputc
+ 351              	.LVL51:
+ 352 00f0 8BE7     		b	.L16
+ 353              	.LVL52:
+ 354              	.L30:
+ 139:../scr/xprintf.c **** 			r = 16; break;
+ 355              		.loc 1 139 0
+ 356 00f2 1021     		mov	r1, #16
+ 357 00f4 08E0     		b	.L93
+ 358              	.LVL53:
+ 359              	.L24:
+ 360              		.loc 1 141 0
+ 361 00f6 281C     		mov	r0, r5
+ 362              	.LVL54:
+ 363              	.L92:
+ 364 00f8 FFF7FEFF 		bl	xputc
+ 365              	.LVL55:
+ 366 00fc 0294     		str	r4, [sp, #8]
+ 367 00fe 84E7     		b	.L16
+ 368              	.LVL56:
+ 369              	.L25:
+ 132:../scr/xprintf.c **** 			r = 2; break;
+ 370              		.loc 1 132 0
+ 371 0100 0222     		mov	r2, #2
+ 372 0102 0492     		str	r2, [sp, #16]
+ 373 0104 01E0     		b	.L28
+ 374              	.L55:
+ 134:../scr/xprintf.c **** 			r = 8; break;
+ 375              		.loc 1 134 0
+ 376 0106 0821     		mov	r1, #8
+ 377              	.L93:
+ 378 0108 0491     		str	r1, [sp, #16]
+ 379              	.L28:
+ 380              	.LVL57:
+ 381 010a 221D     		add	r2, r4, #4
+ 142:../scr/xprintf.c **** 		}
+ 143:../scr/xprintf.c **** 
+ 144:../scr/xprintf.c **** 		/* Get an argument and put it in numeral */
+ 145:../scr/xprintf.c **** 		v = (f & 4) ? va_arg(arp, long) : ((d == 'D') ? (long)va_arg(arp, int) : (long)va_arg(arp, unsign
+ 382              		.loc 1 145 0
+ 383 010c 0292     		str	r2, [sp, #8]
+ 384              	.LVL58:
+ 385 010e 2468     		ldr	r4, [r4]
+ 386 0110 0194     		str	r4, [sp, #4]
+ 387              	.LVL59:
+ 146:../scr/xprintf.c **** 		if (d == 'D' && (v & 0x80000000)) {
+ 388              		.loc 1 146 0
+ 389 0112 019A     		ldr	r2, [sp, #4]
+ 390 0114 002A     		cmp	r2, #0
+ 391 0116 05DA     		bge	.L41
+ 392              		.loc 1 146 0 is_stmt 0 discriminator 6
+ 393 0118 442B     		cmp	r3, #68
+ 394 011a 03D1     		bne	.L41
+ 147:../scr/xprintf.c **** 			v = 0 - v;
+ 395              		.loc 1 147 0 is_stmt 1
+ 396 011c 5242     		neg	r2, r2
+ 148:../scr/xprintf.c **** 			f |= 8;
+ 397              		.loc 1 148 0
+ 398 011e 0823     		mov	r3, #8
+ 399              	.LVL60:
+ 147:../scr/xprintf.c **** 			v = 0 - v;
+ 400              		.loc 1 147 0
+ 401 0120 0192     		str	r2, [sp, #4]
+ 402              	.LVL61:
+ 403              		.loc 1 148 0
+ 404 0122 1E43     		orr	r6, r3
+ 405              	.LVL62:
+ 406              	.L41:
+ 149:../scr/xprintf.c **** 		}
+ 150:../scr/xprintf.c **** 		i = 0;
+ 407              		.loc 1 150 0
+ 408 0124 0023     		mov	r3, #0
+ 409 0126 0593     		str	r3, [sp, #20]
+ 410 0128 00E0     		b	.L44
+ 411              	.LVL63:
+ 412              	.L57:
+ 151:../scr/xprintf.c **** 		do {
+ 152:../scr/xprintf.c **** 			d = (char)(v % r); v /= r;
+ 153:../scr/xprintf.c **** 			if (d > 9) d += (c == 'x') ? 0x27 : 0x07;
+ 154:../scr/xprintf.c **** 			s[i++] = d + '0';
+ 413              		.loc 1 154 0
+ 414 012a 0594     		str	r4, [sp, #20]
+ 415              	.LVL64:
+ 416              	.L44:
+ 152:../scr/xprintf.c **** 			d = (char)(v % r); v /= r;
+ 417              		.loc 1 152 0
+ 418 012c 0198     		ldr	r0, [sp, #4]
+ 419 012e 0499     		ldr	r1, [sp, #16]
+ 420 0130 FFF7FEFF 		bl	__aeabi_uidivmod
+ 421              	.LVL65:
+ 422 0134 0198     		ldr	r0, [sp, #4]
+ 423 0136 CCB2     		uxtb	r4, r1
+ 424              	.LVL66:
+ 425 0138 0499     		ldr	r1, [sp, #16]
+ 426              	.LVL67:
+ 427 013a FFF7FEFF 		bl	__aeabi_uidiv
+ 428              	.LVL68:
+ 429 013e 0190     		str	r0, [sp, #4]
+ 430              	.LVL69:
+ 153:../scr/xprintf.c **** 			if (d > 9) d += (c == 'x') ? 0x27 : 0x07;
+ 431              		.loc 1 153 0
+ 432 0140 092C     		cmp	r4, #9
+ 433 0142 05D9     		bls	.L42
+ 153:../scr/xprintf.c **** 			if (d > 9) d += (c == 'x') ? 0x27 : 0x07;
+ 434              		.loc 1 153 0 is_stmt 0 discriminator 1
+ 435 0144 0723     		mov	r3, #7
+ 436 0146 782D     		cmp	r5, #120
+ 437 0148 00D1     		bne	.L43
+ 153:../scr/xprintf.c **** 			if (d > 9) d += (c == 'x') ? 0x27 : 0x07;
+ 438              		.loc 1 153 0
+ 439 014a 2723     		mov	r3, #39
+ 440              	.L43:
+ 153:../scr/xprintf.c **** 			if (d > 9) d += (c == 'x') ? 0x27 : 0x07;
+ 441              		.loc 1 153 0 discriminator 3
+ 442 014c 1C19     		add	r4, r3, r4
+ 443              	.LVL70:
+ 444 014e E4B2     		uxtb	r4, r4
+ 445              	.LVL71:
+ 446              	.L42:
+ 447              		.loc 1 154 0 is_stmt 1
+ 448 0150 059A     		ldr	r2, [sp, #20]
+ 449 0152 3034     		add	r4, r4, #48
+ 450              	.LVL72:
+ 451 0154 06A9     		add	r1, sp, #24
+ 452 0156 5454     		strb	r4, [r2, r1]
+ 453 0158 141C     		mov	r4, r2
+ 454              	.LVL73:
+ 455 015a 0134     		add	r4, r4, #1
+ 456              	.LVL74:
+ 155:../scr/xprintf.c **** 		} while (v && i < sizeof(s));
+ 457              		.loc 1 155 0
+ 458 015c 0F23     		mov	r3, #15
+ 459 015e A342     		cmp	r3, r4
+ 460 0160 02D3     		bcc	.L59
+ 461 0162 0199     		ldr	r1, [sp, #4]
+ 462 0164 0029     		cmp	r1, #0
+ 463 0166 E0D1     		bne	.L57
+ 464              	.L59:
+ 156:../scr/xprintf.c **** 		if (f & 8) s[i++] = '-';
+ 465              		.loc 1 156 0
+ 466 0168 3207     		lsl	r2, r6, #28
+ 467 016a 04D5     		bpl	.L46
+ 468              		.loc 1 156 0 is_stmt 0 discriminator 1
+ 469 016c 2D23     		mov	r3, #45
+ 470 016e 06A9     		add	r1, sp, #24
+ 471 0170 0B55     		strb	r3, [r1, r4]
+ 472 0172 059C     		ldr	r4, [sp, #20]
+ 473              	.LVL75:
+ 474 0174 0234     		add	r4, r4, #2
+ 475              	.LVL76:
+ 476              	.L46:
+ 157:../scr/xprintf.c **** 		j = i; d = (f & 1) ? '0' : ' ';
+ 477              		.loc 1 157 0 is_stmt 1
+ 478 0176 2022     		mov	r2, #32
+ 479 0178 0192     		str	r2, [sp, #4]
+ 480 017a F307     		lsl	r3, r6, #31
+ 481 017c 01D5     		bpl	.L47
+ 482 017e 3021     		mov	r1, #48
+ 483 0180 0191     		str	r1, [sp, #4]
+ 484              	.L47:
+ 485              	.LVL77:
+ 486              		.loc 1 157 0 is_stmt 0 discriminator 3
+ 487 0182 251C     		mov	r5, r4
+ 488              	.LVL78:
+ 158:../scr/xprintf.c **** 		while (!(f & 2) && j++ < w) xputc(d);
+ 489              		.loc 1 158 0 is_stmt 1 discriminator 3
+ 490 0184 B207     		lsl	r2, r6, #30
+ 491 0186 04D5     		bpl	.L90
+ 492 0188 08E0     		b	.L76
+ 493              	.LVL79:
+ 494              	.L50:
+ 495              		.loc 1 158 0 is_stmt 0 discriminator 1
+ 496 018a 0198     		ldr	r0, [sp, #4]
+ 497 018c FFF7FEFF 		bl	xputc
+ 498              	.LVL80:
+ 499 0190 351C     		mov	r5, r6
+ 500              	.LVL81:
+ 501              	.L90:
+ 502              		.loc 1 158 0 discriminator 2
+ 503 0192 039B     		ldr	r3, [sp, #12]
+ 504 0194 6E1C     		add	r6, r5, #1
+ 505              	.LVL82:
+ 506 0196 9D42     		cmp	r5, r3
+ 507 0198 F7D3     		bcc	.L50
+ 508              		.loc 1 158 0
+ 509 019a 351C     		mov	r5, r6
+ 510              	.LVL83:
+ 511              	.L76:
+ 159:../scr/xprintf.c **** 		do xputc(s[--i]); while(i);
+ 512              		.loc 1 159 0 is_stmt 1 discriminator 1
+ 513 019c 013C     		sub	r4, r4, #1
+ 514              	.LVL84:
+ 515 019e 1821     		mov	r1, #24
+ 516 01a0 0919     		add	r1, r1, r4
+ 517 01a2 6A46     		mov	r2, sp
+ 518 01a4 885C     		ldrb	r0, [r1, r2]
+ 519 01a6 FFF7FEFF 		bl	xputc
+ 520              	.LVL85:
+ 521 01aa 002C     		cmp	r4, #0
+ 522 01ac F6D1     		bne	.L76
+ 523 01ae 03E0     		b	.L91
+ 524              	.LVL86:
+ 525              	.L53:
+ 160:../scr/xprintf.c **** 		while (j++ < w) xputc(' ');
+ 526              		.loc 1 160 0 discriminator 2
+ 527 01b0 2020     		mov	r0, #32
+ 528 01b2 FFF7FEFF 		bl	xputc
+ 529              	.LVL87:
+ 530 01b6 0135     		add	r5, r5, #1
+ 531              	.L91:
+ 532              		.loc 1 160 0 is_stmt 0 discriminator 1
+ 533 01b8 039B     		ldr	r3, [sp, #12]
+ 534 01ba 9D42     		cmp	r5, r3
+ 535 01bc F8D3     		bcc	.L53
+ 536 01be 24E7     		b	.L16
+ 537              	.LVL88:
+ 538              	.L12:
+ 161:../scr/xprintf.c **** 	}
+ 162:../scr/xprintf.c **** }
+ 539              		.loc 1 162 0 is_stmt 1
+ 540 01c0 0BB0     		add	sp, sp, #44
+ 541              		@ sp needed for prologue
+ 542              	.LVL89:
+ 543 01c2 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 544              		.cfi_endproc
+ 545              	.LFE3:
+ 547              		.section	.text.xfputs,"ax",%progbits
+ 548              		.align	1
+ 549              		.global	xfputs
+ 550              		.code	16
+ 551              		.thumb_func
+ 553              	xfputs:
+ 554              	.LFB2:
+  57:../scr/xprintf.c **** {
+ 555              		.loc 1 57 0
+ 556              		.cfi_startproc
+ 557              	.LVL90:
+  61:../scr/xprintf.c **** 	pf = xfunc_out;		/* Save current output device */
+ 558              		.loc 1 61 0
+ 559 0000 074B     		ldr	r3, .L97
+  57:../scr/xprintf.c **** {
+ 560              		.loc 1 57 0
+ 561 0002 70B5     		push	{r4, r5, r6, lr}
+ 562              	.LCFI4:
+ 563              		.cfi_def_cfa_offset 16
+ 564              		.cfi_offset 4, -16
+ 565              		.cfi_offset 5, -12
+ 566              		.cfi_offset 6, -8
+ 567              		.cfi_offset 14, -4
+  61:../scr/xprintf.c **** 	pf = xfunc_out;		/* Save current output device */
+ 568              		.loc 1 61 0
+ 569 0004 1D68     		ldr	r5, [r3]
+ 570              	.LVL91:
+  57:../scr/xprintf.c **** {
+ 571              		.loc 1 57 0
+ 572 0006 0C1C     		mov	r4, r1
+  62:../scr/xprintf.c **** 	xfunc_out = func;	/* Switch output to specified device */
+ 573              		.loc 1 62 0
+ 574 0008 1860     		str	r0, [r3]
+ 575 000a 1E1C     		mov	r6, r3
+  63:../scr/xprintf.c **** 	while (*str)		/* Put the string */
+ 576              		.loc 1 63 0
+ 577 000c 02E0     		b	.L95
+ 578              	.LVL92:
+ 579              	.L96:
+  64:../scr/xprintf.c **** 		xputc(*str++);
+ 580              		.loc 1 64 0
+ 581 000e 0134     		add	r4, r4, #1
+ 582              	.LVL93:
+ 583 0010 FFF7FEFF 		bl	xputc
+ 584              	.LVL94:
+ 585              	.L95:
+  63:../scr/xprintf.c **** 	while (*str)		/* Put the string */
+ 586              		.loc 1 63 0 discriminator 1
+ 587 0014 2078     		ldrb	r0, [r4]
+ 588 0016 0028     		cmp	r0, #0
+ 589 0018 F9D1     		bne	.L96
+  65:../scr/xprintf.c **** 	xfunc_out = pf;		/* Restore output device */
+ 590              		.loc 1 65 0
+ 591 001a 3560     		str	r5, [r6]
+  66:../scr/xprintf.c **** }
+ 592              		.loc 1 66 0
+ 593              		@ sp needed for prologue
+ 594              	.LVL95:
+ 595              	.LVL96:
+ 596 001c 70BD     		pop	{r4, r5, r6, pc}
+ 597              	.L98:
+ 598 001e C046     		.align	2
+ 599              	.L97:
+ 600 0020 00000000 		.word	xfunc_out
+ 601              		.cfi_endproc
+ 602              	.LFE2:
+ 604              		.section	.text.xprintf,"ax",%progbits
+ 605              		.align	1
+ 606              		.global	xprintf
+ 607              		.code	16
+ 608              		.thumb_func
+ 610              	xprintf:
+ 611              	.LFB4:
+ 163:../scr/xprintf.c **** 
+ 164:../scr/xprintf.c **** 
+ 165:../scr/xprintf.c **** void xprintf (			/* Put a formatted string to the default device */
+ 166:../scr/xprintf.c **** 	const char*	fmt,	/* Pointer to the format string */
+ 167:../scr/xprintf.c **** 	...					/* Optional arguments */
+ 168:../scr/xprintf.c **** )
+ 169:../scr/xprintf.c **** {
+ 612              		.loc 1 169 0
+ 613              		.cfi_startproc
+ 614              	.LVL97:
+ 615 0000 0FB4     		push	{r0, r1, r2, r3}
+ 616              	.LCFI5:
+ 617              		.cfi_def_cfa_offset 16
+ 618 0002 07B5     		push	{r0, r1, r2, lr}
+ 619              	.LCFI6:
+ 620              		.cfi_def_cfa_offset 32
+ 621              		.cfi_offset 0, -32
+ 622              		.cfi_offset 1, -28
+ 623              		.cfi_offset 2, -24
+ 624              		.cfi_offset 14, -20
+ 625              		.loc 1 169 0
+ 626 0004 04A9     		add	r1, sp, #16
+ 627 0006 08C9     		ldmia	r1!, {r3}
+ 170:../scr/xprintf.c **** 	va_list arp;
+ 171:../scr/xprintf.c **** 
+ 172:../scr/xprintf.c **** 
+ 173:../scr/xprintf.c **** 	va_start(arp, fmt);
+ 174:../scr/xprintf.c **** 	xvprintf(fmt, arp);
+ 628              		.loc 1 174 0
+ 629 0008 181C     		mov	r0, r3
+ 173:../scr/xprintf.c **** 	va_start(arp, fmt);
+ 630              		.loc 1 173 0
+ 631 000a 0191     		str	r1, [sp, #4]
+ 632              		.loc 1 174 0
+ 633 000c FFF7FEFF 		bl	xvprintf
+ 634              	.LVL98:
+ 175:../scr/xprintf.c **** 	va_end(arp);
+ 176:../scr/xprintf.c **** }
+ 635              		.loc 1 176 0
+ 636 0010 03B0     		add	sp, sp, #12
+ 637              		@ sp needed for prologue
+ 638 0012 08BC     		pop	{r3}
+ 639 0014 04B0     		add	sp, sp, #16
+ 640 0016 1847     		bx	r3
+ 641              		.cfi_endproc
+ 642              	.LFE4:
+ 644              		.section	.text.xsprintf,"ax",%progbits
+ 645              		.align	1
+ 646              		.global	xsprintf
+ 647              		.code	16
+ 648              		.thumb_func
+ 650              	xsprintf:
+ 651              	.LFB5:
+ 177:../scr/xprintf.c **** 
+ 178:../scr/xprintf.c **** 
+ 179:../scr/xprintf.c **** void xsprintf (			/* Put a formatted string to the memory */
+ 180:../scr/xprintf.c **** 	char* buff,			/* Pointer to the output buffer */
+ 181:../scr/xprintf.c **** 	const char*	fmt,	/* Pointer to the format string */
+ 182:../scr/xprintf.c **** 	...					/* Optional arguments */
+ 183:../scr/xprintf.c **** )
+ 184:../scr/xprintf.c **** {
+ 652              		.loc 1 184 0
+ 653              		.cfi_startproc
+ 654              	.LVL99:
+ 655 0000 0EB4     		push	{r1, r2, r3}
+ 656              	.LCFI7:
+ 657              		.cfi_def_cfa_offset 12
+ 658 0002 17B5     		push	{r0, r1, r2, r4, lr}
+ 659              	.LCFI8:
+ 660              		.cfi_def_cfa_offset 32
+ 661              		.cfi_offset 0, -32
+ 662              		.cfi_offset 1, -28
+ 663              		.cfi_offset 2, -24
+ 664              		.cfi_offset 4, -20
+ 665              		.cfi_offset 14, -16
+ 666              		.loc 1 184 0
+ 667 0004 05A9     		add	r1, sp, #20
+ 668 0006 04C9     		ldmia	r1!, {r2}
+ 185:../scr/xprintf.c **** 	va_list arp;
+ 186:../scr/xprintf.c **** 
+ 187:../scr/xprintf.c **** 
+ 188:../scr/xprintf.c **** 	outptr = buff;		/* Switch destination for memory */
+ 669              		.loc 1 188 0
+ 670 0008 064C     		ldr	r4, .L101
+ 189:../scr/xprintf.c **** 
+ 190:../scr/xprintf.c **** 	va_start(arp, fmt);
+ 671              		.loc 1 190 0
+ 672 000a 0191     		str	r1, [sp, #4]
+ 188:../scr/xprintf.c **** 	outptr = buff;		/* Switch destination for memory */
+ 673              		.loc 1 188 0
+ 674 000c 2060     		str	r0, [r4]
+ 191:../scr/xprintf.c **** 	xvprintf(fmt, arp);
+ 675              		.loc 1 191 0
+ 676 000e 101C     		mov	r0, r2
+ 677              	.LVL100:
+ 678 0010 FFF7FEFF 		bl	xvprintf
+ 679              	.LVL101:
+ 192:../scr/xprintf.c **** 	va_end(arp);
+ 193:../scr/xprintf.c **** 
+ 194:../scr/xprintf.c **** 	*outptr = 0;		/* Terminate output string with a \0 */
+ 680              		.loc 1 194 0
+ 681 0014 2268     		ldr	r2, [r4]
+ 682 0016 0023     		mov	r3, #0
+ 683 0018 1370     		strb	r3, [r2]
+ 195:../scr/xprintf.c **** 	outptr = 0;			/* Switch destination for device */
+ 684              		.loc 1 195 0
+ 685 001a 2360     		str	r3, [r4]
+ 196:../scr/xprintf.c **** }
+ 686              		.loc 1 196 0
+ 687              		@ sp needed for prologue
+ 688 001c 17BC     		pop	{r0, r1, r2, r4}
+ 689 001e 08BC     		pop	{r3}
+ 690 0020 03B0     		add	sp, sp, #12
+ 691 0022 1847     		bx	r3
+ 692              	.L102:
+ 693              		.align	2
+ 694              	.L101:
+ 695 0024 00000000 		.word	.LANCHOR0
+ 696              		.cfi_endproc
+ 697              	.LFE5:
+ 699              		.section	.text.xfprintf,"ax",%progbits
+ 700              		.align	1
+ 701              		.global	xfprintf
+ 702              		.code	16
+ 703              		.thumb_func
+ 705              	xfprintf:
+ 706              	.LFB6:
+ 197:../scr/xprintf.c **** 
+ 198:../scr/xprintf.c **** 
+ 199:../scr/xprintf.c **** void xfprintf (					/* Put a formatted string to the specified device */
+ 200:../scr/xprintf.c **** 	void(*func)(unsigned char),	/* Pointer to the output function */
+ 201:../scr/xprintf.c **** 	const char*	fmt,			/* Pointer to the format string */
+ 202:../scr/xprintf.c **** 	...							/* Optional arguments */
+ 203:../scr/xprintf.c **** )
+ 204:../scr/xprintf.c **** {
+ 707              		.loc 1 204 0
+ 708              		.cfi_startproc
+ 709              	.LVL102:
+ 710 0000 0EB4     		push	{r1, r2, r3}
+ 711              	.LCFI9:
+ 712              		.cfi_def_cfa_offset 12
+ 713 0002 33B5     		push	{r0, r1, r4, r5, lr}
+ 714              	.LCFI10:
+ 715              		.cfi_def_cfa_offset 32
+ 716              		.cfi_offset 0, -32
+ 717              		.cfi_offset 1, -28
+ 718              		.cfi_offset 4, -24
+ 719              		.cfi_offset 5, -20
+ 720              		.cfi_offset 14, -16
+ 205:../scr/xprintf.c **** 	va_list arp;
+ 206:../scr/xprintf.c **** 	void (*pf)(unsigned char);
+ 207:../scr/xprintf.c **** 
+ 208:../scr/xprintf.c **** 
+ 209:../scr/xprintf.c **** 	pf = xfunc_out;		/* Save current output device */
+ 721              		.loc 1 209 0
+ 722 0004 064C     		ldr	r4, .L104
+ 204:../scr/xprintf.c **** {
+ 723              		.loc 1 204 0
+ 724 0006 05A9     		add	r1, sp, #20
+ 725 0008 08C9     		ldmia	r1!, {r3}
+ 726              		.loc 1 209 0
+ 727 000a 2568     		ldr	r5, [r4]
+ 728              	.LVL103:
+ 210:../scr/xprintf.c **** 	xfunc_out = func;	/* Switch output to specified device */
+ 729              		.loc 1 210 0
+ 730 000c 2060     		str	r0, [r4]
+ 211:../scr/xprintf.c **** 
+ 212:../scr/xprintf.c **** 	va_start(arp, fmt);
+ 213:../scr/xprintf.c **** 	xvprintf(fmt, arp);
+ 731              		.loc 1 213 0
+ 732 000e 181C     		mov	r0, r3
+ 733              	.LVL104:
+ 212:../scr/xprintf.c **** 	va_start(arp, fmt);
+ 734              		.loc 1 212 0
+ 735 0010 0191     		str	r1, [sp, #4]
+ 214:../scr/xprintf.c **** 	va_end(arp);
+ 215:../scr/xprintf.c **** 
+ 216:../scr/xprintf.c **** 	xfunc_out = pf;		/* Restore output device */
+ 217:../scr/xprintf.c **** }
+ 736              		.loc 1 217 0
+ 737              		@ sp needed for prologue
+ 213:../scr/xprintf.c **** 	xvprintf(fmt, arp);
+ 738              		.loc 1 213 0
+ 739 0012 FFF7FEFF 		bl	xvprintf
+ 740              	.LVL105:
+ 216:../scr/xprintf.c **** 	xfunc_out = pf;		/* Restore output device */
+ 741              		.loc 1 216 0
+ 742 0016 2560     		str	r5, [r4]
+ 743              	.LVL106:
+ 744              		.loc 1 217 0
+ 745 0018 33BC     		pop	{r0, r1, r4, r5}
+ 746 001a 08BC     		pop	{r3}
+ 747 001c 03B0     		add	sp, sp, #12
+ 748 001e 1847     		bx	r3
+ 749              	.L105:
+ 750              		.align	2
+ 751              	.L104:
+ 752 0020 00000000 		.word	xfunc_out
+ 753              		.cfi_endproc
+ 754              	.LFE6:
+ 756              		.section	.text.put_dump,"ax",%progbits
+ 757              		.align	1
+ 758              		.global	put_dump
+ 759              		.code	16
+ 760              		.thumb_func
+ 762              	put_dump:
+ 763              	.LFB7:
+ 218:../scr/xprintf.c **** 
+ 219:../scr/xprintf.c **** 
+ 220:../scr/xprintf.c **** 
+ 221:../scr/xprintf.c **** /*----------------------------------------------*/
+ 222:../scr/xprintf.c **** /* Dump a line of binary dump                   */
+ 223:../scr/xprintf.c **** /*----------------------------------------------*/
+ 224:../scr/xprintf.c **** 
+ 225:../scr/xprintf.c **** void put_dump (
+ 226:../scr/xprintf.c **** 	const void* buff,		/* Pointer to the array to be dumped */
+ 227:../scr/xprintf.c **** 	unsigned long addr,		/* Heading address value */
+ 228:../scr/xprintf.c **** 	int len,				/* Number of items to be dumped */
+ 229:../scr/xprintf.c **** 	int width				/* Size of the items (DF_CHAR, DF_SHORT, DF_LONG) */
+ 230:../scr/xprintf.c **** )
+ 231:../scr/xprintf.c **** {
+ 764              		.loc 1 231 0
+ 765              		.cfi_startproc
+ 766              	.LVL107:
+ 767 0000 70B5     		push	{r4, r5, r6, lr}
+ 768              	.LCFI11:
+ 769              		.cfi_def_cfa_offset 16
+ 770              		.cfi_offset 4, -16
+ 771              		.cfi_offset 5, -12
+ 772              		.cfi_offset 6, -8
+ 773              		.cfi_offset 14, -4
+ 774              		.loc 1 231 0
+ 775 0002 051C     		mov	r5, r0
+ 232:../scr/xprintf.c **** 	int i;
+ 233:../scr/xprintf.c **** 	const unsigned char *bp;
+ 234:../scr/xprintf.c **** 	const unsigned short *sp;
+ 235:../scr/xprintf.c **** 	const unsigned long *lp;
+ 236:../scr/xprintf.c **** 
+ 237:../scr/xprintf.c **** 
+ 238:../scr/xprintf.c **** 	xprintf("%08lX ", addr);		/* address */
+ 776              		.loc 1 238 0
+ 777 0004 1D48     		ldr	r0, .L121
+ 778              	.LVL108:
+ 231:../scr/xprintf.c **** {
+ 779              		.loc 1 231 0
+ 780 0006 1E1C     		mov	r6, r3
+ 781 0008 141C     		mov	r4, r2
+ 782              		.loc 1 238 0
+ 783 000a FFF7FEFF 		bl	xprintf
+ 784              	.LVL109:
+ 239:../scr/xprintf.c **** 
+ 240:../scr/xprintf.c **** 	switch (width) {
+ 785              		.loc 1 240 0
+ 786 000e 022E     		cmp	r6, #2
+ 787 0010 1FD0     		beq	.L116
+ 788 0012 042E     		cmp	r6, #4
+ 789 0014 26D0     		beq	.L118
+ 790 0016 012E     		cmp	r6, #1
+ 791 0018 2BD1     		bne	.L107
+ 792 001a 2E1C     		mov	r6, r5
+ 793              	.LVL110:
+ 794 001c 04E0     		b	.L111
+ 795              	.L112:
+ 241:../scr/xprintf.c **** 	case DW_CHAR:
+ 242:../scr/xprintf.c **** 		bp = buff;
+ 243:../scr/xprintf.c **** 		for (i = 0; i < len; i++)		/* Hexdecimal dump */
+ 244:../scr/xprintf.c **** 			xprintf(" %02X", bp[i]);
+ 796              		.loc 1 244 0 discriminator 2
+ 797 001e 3178     		ldrb	r1, [r6]
+ 798 0020 1748     		ldr	r0, .L121+4
+ 799 0022 FFF7FEFF 		bl	xprintf
+ 800              	.LVL111:
+ 801 0026 0136     		add	r6, r6, #1
+ 802              	.L111:
+ 225:../scr/xprintf.c **** void put_dump (
+ 803              		.loc 1 225 0 discriminator 1
+ 804 0028 731B     		sub	r3, r6, r5
+ 243:../scr/xprintf.c **** 		for (i = 0; i < len; i++)		/* Hexdecimal dump */
+ 805              		.loc 1 243 0 discriminator 1
+ 806 002a A342     		cmp	r3, r4
+ 807 002c F7DB     		blt	.L112
+ 245:../scr/xprintf.c **** 		xputc(' ');
+ 808              		.loc 1 245 0
+ 809 002e 2020     		mov	r0, #32
+ 810 0030 FFF7FEFF 		bl	xputc
+ 811              	.LVL112:
+ 246:../scr/xprintf.c **** 		for (i = 0; i < len; i++)		/* ASCII dump */
+ 812              		.loc 1 246 0
+ 813 0034 2E1C     		mov	r6, r5
+ 814 0036 08E0     		b	.L113
+ 815              	.LVL113:
+ 816              	.L115:
+ 247:../scr/xprintf.c **** 			xputc((bp[i] >= ' ' && bp[i] <= '~') ? bp[i] : '.');
+ 817              		.loc 1 247 0
+ 818 0038 3078     		ldrb	r0, [r6]
+ 819 003a 031C     		mov	r3, r0
+ 820 003c 203B     		sub	r3, r3, #32
+ 821 003e 5E2B     		cmp	r3, #94
+ 822 0040 00D9     		bls	.L114
+ 823 0042 2E20     		mov	r0, #46
+ 824              	.L114:
+ 825              		.loc 1 247 0 is_stmt 0 discriminator 3
+ 826 0044 FFF7FEFF 		bl	xputc
+ 827              	.LVL114:
+ 828 0048 0136     		add	r6, r6, #1
+ 829              	.L113:
+ 225:../scr/xprintf.c **** void put_dump (
+ 830              		.loc 1 225 0 is_stmt 1 discriminator 1
+ 831 004a 731B     		sub	r3, r6, r5
+ 246:../scr/xprintf.c **** 		for (i = 0; i < len; i++)		/* ASCII dump */
+ 832              		.loc 1 246 0 discriminator 1
+ 833 004c A342     		cmp	r3, r4
+ 834 004e F3DB     		blt	.L115
+ 835 0050 0FE0     		b	.L107
+ 836              	.LVL115:
+ 837              	.L116:
+ 248:../scr/xprintf.c **** 		break;
+ 249:../scr/xprintf.c **** 	case DW_SHORT:
+ 250:../scr/xprintf.c **** 		sp = buff;
+ 251:../scr/xprintf.c **** 		do								/* Hexdecimal dump */
+ 252:../scr/xprintf.c **** 			xprintf(" %04X", *sp++);
+ 838              		.loc 1 252 0 discriminator 1
+ 839 0052 2988     		ldrh	r1, [r5]
+ 840 0054 0B48     		ldr	r0, .L121+8
+ 253:../scr/xprintf.c **** 		while (--len);
+ 841              		.loc 1 253 0 discriminator 1
+ 842 0056 013C     		sub	r4, r4, #1
+ 843              	.LVL116:
+ 252:../scr/xprintf.c **** 			xprintf(" %04X", *sp++);
+ 844              		.loc 1 252 0 discriminator 1
+ 845 0058 0235     		add	r5, r5, #2
+ 846              	.LVL117:
+ 847 005a FFF7FEFF 		bl	xprintf
+ 848              	.LVL118:
+ 849              		.loc 1 253 0 discriminator 1
+ 850 005e 002C     		cmp	r4, #0
+ 851 0060 F7D1     		bne	.L116
+ 852 0062 06E0     		b	.L107
+ 853              	.LVL119:
+ 854              	.L118:
+ 254:../scr/xprintf.c **** 		break;
+ 255:../scr/xprintf.c **** 	case DW_LONG:
+ 256:../scr/xprintf.c **** 		lp = buff;
+ 257:../scr/xprintf.c **** 		do								/* Hexdecimal dump */
+ 258:../scr/xprintf.c **** 			xprintf(" %08LX", *lp++);
+ 855              		.loc 1 258 0 discriminator 1
+ 856 0064 02CD     		ldmia	r5!, {r1}
+ 857              	.LVL120:
+ 858 0066 0848     		ldr	r0, .L121+12
+ 259:../scr/xprintf.c **** 		while (--len);
+ 859              		.loc 1 259 0 discriminator 1
+ 860 0068 013C     		sub	r4, r4, #1
+ 861              	.LVL121:
+ 258:../scr/xprintf.c **** 			xprintf(" %08LX", *lp++);
+ 862              		.loc 1 258 0 discriminator 1
+ 863 006a FFF7FEFF 		bl	xprintf
+ 864              	.LVL122:
+ 865              		.loc 1 259 0 discriminator 1
+ 866 006e 002C     		cmp	r4, #0
+ 867 0070 F8D1     		bne	.L118
+ 868              	.LVL123:
+ 869              	.L107:
+ 260:../scr/xprintf.c **** 		break;
+ 261:../scr/xprintf.c **** 	}
+ 262:../scr/xprintf.c **** 
+ 263:../scr/xprintf.c **** 	xputc('\n');
+ 870              		.loc 1 263 0
+ 871 0072 0A20     		mov	r0, #10
+ 872 0074 FFF7FEFF 		bl	xputc
+ 873              	.LVL124:
+ 264:../scr/xprintf.c **** }
+ 874              		.loc 1 264 0
+ 875              		@ sp needed for prologue
+ 876              	.LVL125:
+ 877 0078 70BD     		pop	{r4, r5, r6, pc}
+ 878              	.L122:
+ 879 007a C046     		.align	2
+ 880              	.L121:
+ 881 007c 00000000 		.word	.LC9
+ 882 0080 07000000 		.word	.LC11
+ 883 0084 0D000000 		.word	.LC13
+ 884 0088 13000000 		.word	.LC15
+ 885              		.cfi_endproc
+ 886              	.LFE7:
+ 888              		.comm	xfunc_out,4,4
+ 889              		.section	.bss.outptr,"aw",%nobits
+ 890              		.align	2
+ 891              		.set	.LANCHOR0,. + 0
+ 894              	outptr:
+ 895 0000 00000000 		.space	4
+ 896              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 897              	.LC9:
+ 898 0000 2530386C 		.ascii	"%08lX \000"
+ 898      582000
+ 899              	.LC11:
+ 900 0007 20253032 		.ascii	" %02X\000"
+ 900      5800
+ 901              	.LC13:
+ 902 000d 20253034 		.ascii	" %04X\000"
+ 902      5800
+ 903              	.LC15:
+ 904 0013 20253038 		.ascii	" %08LX\000"
+ 904      4C5800
+ 905              		.text
+ 906              	.Letext0:
+ 907              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 908              		.file 3 "<built-in>"
+DEFINED SYMBOLS
+                            *ABS*:00000000 xprintf.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:18     .text.xputc:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:23     .text.xputc:00000000 xputc
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:67     .text.xputc:00000020 $d
+                            *COM*:00000004 xfunc_out
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:73     .text.xputs:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:78     .text.xputs:00000000 xputs
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:114    .text.xvprintf:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:118    .text.xvprintf:00000000 xvprintf
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:548    .text.xfputs:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:553    .text.xfputs:00000000 xfputs
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:600    .text.xfputs:00000020 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:605    .text.xprintf:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:610    .text.xprintf:00000000 xprintf
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:645    .text.xsprintf:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:650    .text.xsprintf:00000000 xsprintf
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:695    .text.xsprintf:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:700    .text.xfprintf:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:705    .text.xfprintf:00000000 xfprintf
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:752    .text.xfprintf:00000020 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:757    .text.put_dump:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:762    .text.put_dump:00000000 put_dump
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:881    .text.put_dump:0000007c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:890    .bss.outptr:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccs0yJwm.s:894    .bss.outptr:00000000 outptr
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.90b54cb79624a05a6a75538133d4ee2f
+                           .group:00000000 wm4.xprintf.h.6.d201a07af5ece6e00f55504afb5b0533
+                           .group:00000000 wm4.stdarg.h.31.b70f21342353634f7b44d85f85f13832
+
+UNDEFINED SYMBOLS
+__aeabi_uidivmod
+__aeabi_uidiv

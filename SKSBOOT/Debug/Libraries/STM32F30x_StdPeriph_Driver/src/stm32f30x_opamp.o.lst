@@ -1,0 +1,370 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f30x_opamp.c"
+  15              		.section	.text.OPAMP_DeInit,"ax",%progbits
+  16              		.align	1
+  17              		.global	OPAMP_DeInit
+  18              		.thumb
+  19              		.thumb_func
+  21              	OPAMP_DeInit:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		@ link register save eliminated.
+  25 0000 014B     		ldr	r3, .L2
+  26 0002 0022     		movs	r2, #0
+  27 0004 C250     		str	r2, [r0, r3]
+  28 0006 7047     		bx	lr
+  29              	.L3:
+  30              		.align	2
+  31              	.L2:
+  32 0008 38000140 		.word	1073807416
+  34              		.section	.text.OPAMP_Init,"ax",%progbits
+  35              		.align	1
+  36              		.global	OPAMP_Init
+  37              		.thumb
+  38              		.thumb_func
+  40              	OPAMP_Init:
+  41              		@ args = 0, pretend = 0, frame = 0
+  42              		@ frame_needed = 0, uses_anonymous_args = 0
+  43 0000 054B     		ldr	r3, .L5
+  44 0002 30B5     		push	{r4, r5, lr}
+  45 0004 91E82400 		ldmia	r1, {r2, r5}
+  46 0008 C458     		ldr	r4, [r0, r3]
+  47 000a 2A43     		orrs	r2, r2, r5
+  48 000c 24F06C04 		bic	r4, r4, #108
+  49 0010 2243     		orrs	r2, r2, r4
+  50 0012 C250     		str	r2, [r0, r3]
+  51 0014 30BD     		pop	{r4, r5, pc}
+  52              	.L6:
+  53 0016 00BF     		.align	2
+  54              	.L5:
+  55 0018 38000140 		.word	1073807416
+  57              		.section	.text.OPAMP_StructInit,"ax",%progbits
+  58              		.align	1
+  59              		.global	OPAMP_StructInit
+  60              		.thumb
+  61              		.thumb_func
+  63              	OPAMP_StructInit:
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66              		@ link register save eliminated.
+  67 0000 0023     		movs	r3, #0
+  68 0002 4360     		str	r3, [r0, #4]
+  69 0004 0360     		str	r3, [r0, #0]
+  70 0006 7047     		bx	lr
+  72              		.section	.text.OPAMP_PGAConfig,"ax",%progbits
+  73              		.align	1
+  74              		.global	OPAMP_PGAConfig
+  75              		.thumb
+  76              		.thumb_func
+  78              	OPAMP_PGAConfig:
+  79              		@ args = 0, pretend = 0, frame = 0
+  80              		@ frame_needed = 0, uses_anonymous_args = 0
+  81 0000 054B     		ldr	r3, .L9
+  82 0002 10B5     		push	{r4, lr}
+  83 0004 C458     		ldr	r4, [r0, r3]
+  84 0006 24F47034 		bic	r4, r4, #245760
+  85 000a C450     		str	r4, [r0, r3]
+  86 000c C458     		ldr	r4, [r0, r3]
+  87 000e 0A43     		orrs	r2, r2, r1
+  88 0010 1443     		orrs	r4, r4, r2
+  89 0012 C450     		str	r4, [r0, r3]
+  90 0014 10BD     		pop	{r4, pc}
+  91              	.L10:
+  92 0016 00BF     		.align	2
+  93              	.L9:
+  94 0018 38000140 		.word	1073807416
+  96              		.section	.text.OPAMP_VrefConfig,"ax",%progbits
+  97              		.align	1
+  98              		.global	OPAMP_VrefConfig
+  99              		.thumb
+ 100              		.thumb_func
+ 102              	OPAMP_VrefConfig:
+ 103              		@ args = 0, pretend = 0, frame = 0
+ 104              		@ frame_needed = 0, uses_anonymous_args = 0
+ 105              		@ link register save eliminated.
+ 106 0000 034B     		ldr	r3, .L12
+ 107 0002 C258     		ldr	r2, [r0, r3]
+ 108 0004 22F44052 		bic	r2, r2, #12288
+ 109 0008 1143     		orrs	r1, r1, r2
+ 110 000a C150     		str	r1, [r0, r3]
+ 111 000c 7047     		bx	lr
+ 112              	.L13:
+ 113 000e 00BF     		.align	2
+ 114              	.L12:
+ 115 0010 38000140 		.word	1073807416
+ 117              		.section	.text.OPAMP_VrefConnectNonInvertingInput,"ax",%progbits
+ 118              		.align	1
+ 119              		.global	OPAMP_VrefConnectNonInvertingInput
+ 120              		.thumb
+ 121              		.thumb_func
+ 123              	OPAMP_VrefConnectNonInvertingInput:
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126              		@ link register save eliminated.
+ 127 0000 044B     		ldr	r3, .L18
+ 128 0002 C258     		ldr	r2, [r0, r3]
+ 129 0004 11B1     		cbz	r1, .L15
+ 130 0006 42F00202 		orr	r2, r2, #2
+ 131 000a 01E0     		b	.L17
+ 132              	.L15:
+ 133 000c 22F00202 		bic	r2, r2, #2
+ 134              	.L17:
+ 135 0010 C250     		str	r2, [r0, r3]
+ 136 0012 7047     		bx	lr
+ 137              	.L19:
+ 138              		.align	2
+ 139              	.L18:
+ 140 0014 38000140 		.word	1073807416
+ 142              		.section	.text.OPAMP_VrefConnectADCCmd,"ax",%progbits
+ 143              		.align	1
+ 144              		.global	OPAMP_VrefConnectADCCmd
+ 145              		.thumb
+ 146              		.thumb_func
+ 148              	OPAMP_VrefConnectADCCmd:
+ 149              		@ args = 0, pretend = 0, frame = 0
+ 150              		@ frame_needed = 0, uses_anonymous_args = 0
+ 151              		@ link register save eliminated.
+ 152 0000 044B     		ldr	r3, .L24
+ 153 0002 C258     		ldr	r2, [r0, r3]
+ 154 0004 11B1     		cbz	r1, .L21
+ 155 0006 42F00052 		orr	r2, r2, #536870912
+ 156 000a 01E0     		b	.L23
+ 157              	.L21:
+ 158 000c 22F00052 		bic	r2, r2, #536870912
+ 159              	.L23:
+ 160 0010 C250     		str	r2, [r0, r3]
+ 161 0012 7047     		bx	lr
+ 162              	.L25:
+ 163              		.align	2
+ 164              	.L24:
+ 165 0014 38000140 		.word	1073807416
+ 167              		.section	.text.OPAMP_TimerControlledMuxConfig,"ax",%progbits
+ 168              		.align	1
+ 169              		.global	OPAMP_TimerControlledMuxConfig
+ 170              		.thumb
+ 171              		.thumb_func
+ 173              	OPAMP_TimerControlledMuxConfig:
+ 174              		@ args = 0, pretend = 0, frame = 0
+ 175              		@ frame_needed = 0, uses_anonymous_args = 0
+ 176 0000 30B5     		push	{r4, r5, lr}
+ 177 0002 064B     		ldr	r3, .L27
+ 178 0004 91E82400 		ldmia	r1, {r2, r5}
+ 179 0008 C458     		ldr	r4, [r0, r3]
+ 180 000a D200     		lsls	r2, r2, #3
+ 181 000c 24F4E064 		bic	r4, r4, #1792
+ 182 0010 42EAC512 		orr	r2, r2, r5, lsl #7
+ 183 0014 2243     		orrs	r2, r2, r4
+ 184 0016 C250     		str	r2, [r0, r3]
+ 185 0018 30BD     		pop	{r4, r5, pc}
+ 186              	.L28:
+ 187 001a 00BF     		.align	2
+ 188              	.L27:
+ 189 001c 38000140 		.word	1073807416
+ 191              		.section	.text.OPAMP_TimerControlledMuxCmd,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	OPAMP_TimerControlledMuxCmd
+ 194              		.thumb
+ 195              		.thumb_func
+ 197              	OPAMP_TimerControlledMuxCmd:
+ 198              		@ args = 0, pretend = 0, frame = 0
+ 199              		@ frame_needed = 0, uses_anonymous_args = 0
+ 200              		@ link register save eliminated.
+ 201 0000 044B     		ldr	r3, .L33
+ 202 0002 C258     		ldr	r2, [r0, r3]
+ 203 0004 11B1     		cbz	r1, .L30
+ 204 0006 42F08002 		orr	r2, r2, #128
+ 205 000a 01E0     		b	.L32
+ 206              	.L30:
+ 207 000c 22F08002 		bic	r2, r2, #128
+ 208              	.L32:
+ 209 0010 C250     		str	r2, [r0, r3]
+ 210 0012 7047     		bx	lr
+ 211              	.L34:
+ 212              		.align	2
+ 213              	.L33:
+ 214 0014 38000140 		.word	1073807416
+ 216              		.section	.text.OPAMP_Cmd,"ax",%progbits
+ 217              		.align	1
+ 218              		.global	OPAMP_Cmd
+ 219              		.thumb
+ 220              		.thumb_func
+ 222              	OPAMP_Cmd:
+ 223              		@ args = 0, pretend = 0, frame = 0
+ 224              		@ frame_needed = 0, uses_anonymous_args = 0
+ 225              		@ link register save eliminated.
+ 226 0000 044B     		ldr	r3, .L39
+ 227 0002 C258     		ldr	r2, [r0, r3]
+ 228 0004 11B1     		cbz	r1, .L36
+ 229 0006 42F00102 		orr	r2, r2, #1
+ 230 000a 01E0     		b	.L38
+ 231              	.L36:
+ 232 000c 22F00102 		bic	r2, r2, #1
+ 233              	.L38:
+ 234 0010 C250     		str	r2, [r0, r3]
+ 235 0012 7047     		bx	lr
+ 236              	.L40:
+ 237              		.align	2
+ 238              	.L39:
+ 239 0014 38000140 		.word	1073807416
+ 241              		.section	.text.OPAMP_GetOutputLevel,"ax",%progbits
+ 242              		.align	1
+ 243              		.global	OPAMP_GetOutputLevel
+ 244              		.thumb
+ 245              		.thumb_func
+ 247              	OPAMP_GetOutputLevel:
+ 248              		@ args = 0, pretend = 0, frame = 0
+ 249              		@ frame_needed = 0, uses_anonymous_args = 0
+ 250              		@ link register save eliminated.
+ 251 0000 024B     		ldr	r3, .L44
+ 252 0002 C058     		ldr	r0, [r0, r3]
+ 253 0004 00F08040 		and	r0, r0, #1073741824
+ 254 0008 7047     		bx	lr
+ 255              	.L45:
+ 256 000a 00BF     		.align	2
+ 257              	.L44:
+ 258 000c 38000140 		.word	1073807416
+ 260              		.section	.text.OPAMP_OffsetTrimModeSelect,"ax",%progbits
+ 261              		.align	1
+ 262              		.global	OPAMP_OffsetTrimModeSelect
+ 263              		.thumb
+ 264              		.thumb_func
+ 266              	OPAMP_OffsetTrimModeSelect:
+ 267              		@ args = 0, pretend = 0, frame = 0
+ 268              		@ frame_needed = 0, uses_anonymous_args = 0
+ 269              		@ link register save eliminated.
+ 270 0000 044B     		ldr	r3, .L47
+ 271 0002 C258     		ldr	r2, [r0, r3]
+ 272 0004 22F48022 		bic	r2, r2, #262144
+ 273 0008 C250     		str	r2, [r0, r3]
+ 274 000a C258     		ldr	r2, [r0, r3]
+ 275 000c 1143     		orrs	r1, r1, r2
+ 276 000e C150     		str	r1, [r0, r3]
+ 277 0010 7047     		bx	lr
+ 278              	.L48:
+ 279 0012 00BF     		.align	2
+ 280              	.L47:
+ 281 0014 38000140 		.word	1073807416
+ 283              		.section	.text.OPAMP_OffsetTrimConfig,"ax",%progbits
+ 284              		.align	1
+ 285              		.global	OPAMP_OffsetTrimConfig
+ 286              		.thumb
+ 287              		.thumb_func
+ 289              	OPAMP_OffsetTrimConfig:
+ 290              		@ args = 0, pretend = 0, frame = 0
+ 291              		@ frame_needed = 0, uses_anonymous_args = 0
+ 292 0000 064B     		ldr	r3, .L50
+ 293 0002 30B5     		push	{r4, r5, lr}
+ 294 0004 C558     		ldr	r5, [r0, r3]
+ 295 0006 1F24     		movs	r4, #31
+ 296 0008 04FA01F4 		lsl	r4, r4, r1
+ 297 000c 25EA0404 		bic	r4, r5, r4
+ 298 0010 02FA01F2 		lsl	r2, r2, r1
+ 299 0014 1443     		orrs	r4, r4, r2
+ 300 0016 C450     		str	r4, [r0, r3]
+ 301 0018 30BD     		pop	{r4, r5, pc}
+ 302              	.L51:
+ 303 001a 00BF     		.align	2
+ 304              	.L50:
+ 305 001c 38000140 		.word	1073807416
+ 307              		.section	.text.OPAMP_StartCalibration,"ax",%progbits
+ 308              		.align	1
+ 309              		.global	OPAMP_StartCalibration
+ 310              		.thumb
+ 311              		.thumb_func
+ 313              	OPAMP_StartCalibration:
+ 314              		@ args = 0, pretend = 0, frame = 0
+ 315              		@ frame_needed = 0, uses_anonymous_args = 0
+ 316              		@ link register save eliminated.
+ 317 0000 044B     		ldr	r3, .L56
+ 318 0002 C258     		ldr	r2, [r0, r3]
+ 319 0004 11B1     		cbz	r1, .L53
+ 320 0006 42F40062 		orr	r2, r2, #2048
+ 321 000a 01E0     		b	.L55
+ 322              	.L53:
+ 323 000c 22F40062 		bic	r2, r2, #2048
+ 324              	.L55:
+ 325 0010 C250     		str	r2, [r0, r3]
+ 326 0012 7047     		bx	lr
+ 327              	.L57:
+ 328              		.align	2
+ 329              	.L56:
+ 330 0014 38000140 		.word	1073807416
+ 332              		.section	.text.OPAMP_LockConfig,"ax",%progbits
+ 333              		.align	1
+ 334              		.global	OPAMP_LockConfig
+ 335              		.thumb
+ 336              		.thumb_func
+ 338              	OPAMP_LockConfig:
+ 339              		@ args = 0, pretend = 0, frame = 0
+ 340              		@ frame_needed = 0, uses_anonymous_args = 0
+ 341              		@ link register save eliminated.
+ 342 0000 024B     		ldr	r3, .L59
+ 343 0002 C258     		ldr	r2, [r0, r3]
+ 344 0004 42F00042 		orr	r2, r2, #-2147483648
+ 345 0008 C250     		str	r2, [r0, r3]
+ 346 000a 7047     		bx	lr
+ 347              	.L60:
+ 348              		.align	2
+ 349              	.L59:
+ 350 000c 38000140 		.word	1073807416
+ 352              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f30x_opamp.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:16     .text.OPAMP_DeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:21     .text.OPAMP_DeInit:00000000 OPAMP_DeInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:32     .text.OPAMP_DeInit:00000008 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:35     .text.OPAMP_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:40     .text.OPAMP_Init:00000000 OPAMP_Init
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:55     .text.OPAMP_Init:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:58     .text.OPAMP_StructInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:63     .text.OPAMP_StructInit:00000000 OPAMP_StructInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:73     .text.OPAMP_PGAConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:78     .text.OPAMP_PGAConfig:00000000 OPAMP_PGAConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:94     .text.OPAMP_PGAConfig:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:97     .text.OPAMP_VrefConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:102    .text.OPAMP_VrefConfig:00000000 OPAMP_VrefConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:115    .text.OPAMP_VrefConfig:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:118    .text.OPAMP_VrefConnectNonInvertingInput:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:123    .text.OPAMP_VrefConnectNonInvertingInput:00000000 OPAMP_VrefConnectNonInvertingInput
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:140    .text.OPAMP_VrefConnectNonInvertingInput:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:143    .text.OPAMP_VrefConnectADCCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:148    .text.OPAMP_VrefConnectADCCmd:00000000 OPAMP_VrefConnectADCCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:165    .text.OPAMP_VrefConnectADCCmd:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:168    .text.OPAMP_TimerControlledMuxConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:173    .text.OPAMP_TimerControlledMuxConfig:00000000 OPAMP_TimerControlledMuxConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:189    .text.OPAMP_TimerControlledMuxConfig:0000001c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:192    .text.OPAMP_TimerControlledMuxCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:197    .text.OPAMP_TimerControlledMuxCmd:00000000 OPAMP_TimerControlledMuxCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:214    .text.OPAMP_TimerControlledMuxCmd:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:217    .text.OPAMP_Cmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:222    .text.OPAMP_Cmd:00000000 OPAMP_Cmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:239    .text.OPAMP_Cmd:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:242    .text.OPAMP_GetOutputLevel:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:247    .text.OPAMP_GetOutputLevel:00000000 OPAMP_GetOutputLevel
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:258    .text.OPAMP_GetOutputLevel:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:261    .text.OPAMP_OffsetTrimModeSelect:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:266    .text.OPAMP_OffsetTrimModeSelect:00000000 OPAMP_OffsetTrimModeSelect
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:281    .text.OPAMP_OffsetTrimModeSelect:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:284    .text.OPAMP_OffsetTrimConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:289    .text.OPAMP_OffsetTrimConfig:00000000 OPAMP_OffsetTrimConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:305    .text.OPAMP_OffsetTrimConfig:0000001c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:308    .text.OPAMP_StartCalibration:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:313    .text.OPAMP_StartCalibration:00000000 OPAMP_StartCalibration
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:330    .text.OPAMP_StartCalibration:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:333    .text.OPAMP_LockConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:338    .text.OPAMP_LockConfig:00000000 OPAMP_LockConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccgO9TdO.s:350    .text.OPAMP_LockConfig:0000000c $d
+
+NO UNDEFINED SYMBOLS

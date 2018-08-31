@@ -1,0 +1,405 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f30x_syscfg.c"
+  15              		.section	.text.SYSCFG_DeInit,"ax",%progbits
+  16              		.align	1
+  17              		.global	SYSCFG_DeInit
+  18              		.thumb
+  19              		.thumb_func
+  21              	SYSCFG_DeInit:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		@ link register save eliminated.
+  25 0000 094B     		ldr	r3, .L2
+  26 0002 1A68     		ldr	r2, [r3, #0]
+  27 0004 02F00702 		and	r2, r2, #7
+  28 0008 1A60     		str	r2, [r3, #0]
+  29 000a 1A68     		ldr	r2, [r3, #0]
+  30 000c 42F0F842 		orr	r2, r2, #2080374784
+  31 0010 1A60     		str	r2, [r3, #0]
+  32 0012 0022     		movs	r2, #0
+  33 0014 5A60     		str	r2, [r3, #4]
+  34 0016 9A60     		str	r2, [r3, #8]
+  35 0018 DA60     		str	r2, [r3, #12]
+  36 001a 1A61     		str	r2, [r3, #16]
+  37 001c 5A61     		str	r2, [r3, #20]
+  38 001e 9A61     		str	r2, [r3, #24]
+  39 0020 1A65     		str	r2, [r3, #80]
+  40 0022 9A64     		str	r2, [r3, #72]
+  41 0024 7047     		bx	lr
+  42              	.L3:
+  43 0026 00BF     		.align	2
+  44              	.L2:
+  45 0028 00000140 		.word	1073807360
+  47              		.section	.text.SYSCFG_MemoryRemapConfig,"ax",%progbits
+  48              		.align	1
+  49              		.global	SYSCFG_MemoryRemapConfig
+  50              		.thumb
+  51              		.thumb_func
+  53              	SYSCFG_MemoryRemapConfig:
+  54              		@ args = 0, pretend = 0, frame = 0
+  55              		@ frame_needed = 0, uses_anonymous_args = 0
+  56              		@ link register save eliminated.
+  57 0000 034B     		ldr	r3, .L5
+  58 0002 1A68     		ldr	r2, [r3, #0]
+  59 0004 22F00702 		bic	r2, r2, #7
+  60 0008 1043     		orrs	r0, r0, r2
+  61 000a 1860     		str	r0, [r3, #0]
+  62 000c 7047     		bx	lr
+  63              	.L6:
+  64 000e 00BF     		.align	2
+  65              	.L5:
+  66 0010 00000140 		.word	1073807360
+  68              		.section	.text.SYSCFG_DMAChannelRemapConfig,"ax",%progbits
+  69              		.align	1
+  70              		.global	SYSCFG_DMAChannelRemapConfig
+  71              		.thumb
+  72              		.thumb_func
+  74              	SYSCFG_DMAChannelRemapConfig:
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 0, uses_anonymous_args = 0
+  77              		@ link register save eliminated.
+  78 0000 0028     		cmp	r0, #0
+  79 0002 094B     		ldr	r3, .L14
+  80 0004 07DB     		blt	.L8
+  81 0006 1A68     		ldr	r2, [r3, #0]
+  82 0008 09B1     		cbz	r1, .L9
+  83 000a 1043     		orrs	r0, r0, r2
+  84 000c 01E0     		b	.L12
+  85              	.L9:
+  86 000e 22EA0000 		bic	r0, r2, r0
+  87              	.L12:
+  88 0012 1860     		str	r0, [r3, #0]
+  89 0014 7047     		bx	lr
+  90              	.L8:
+  91 0016 1A6D     		ldr	r2, [r3, #80]
+  92 0018 09B1     		cbz	r1, .L11
+  93 001a 1043     		orrs	r0, r0, r2
+  94 001c 01E0     		b	.L13
+  95              	.L11:
+  96 001e 22EA0000 		bic	r0, r2, r0
+  97              	.L13:
+  98 0022 1865     		str	r0, [r3, #80]
+  99 0024 7047     		bx	lr
+ 100              	.L15:
+ 101 0026 00BF     		.align	2
+ 102              	.L14:
+ 103 0028 00000140 		.word	1073807360
+ 105              		.section	.text.SYSCFG_TriggerRemapConfig,"ax",%progbits
+ 106              		.align	1
+ 107              		.global	SYSCFG_TriggerRemapConfig
+ 108              		.thumb
+ 109              		.thumb_func
+ 111              	SYSCFG_TriggerRemapConfig:
+ 112              		@ args = 0, pretend = 0, frame = 0
+ 113              		@ frame_needed = 0, uses_anonymous_args = 0
+ 114              		@ link register save eliminated.
+ 115 0000 0028     		cmp	r0, #0
+ 116 0002 094B     		ldr	r3, .L23
+ 117 0004 07DB     		blt	.L17
+ 118 0006 1A68     		ldr	r2, [r3, #0]
+ 119 0008 09B1     		cbz	r1, .L18
+ 120 000a 1043     		orrs	r0, r0, r2
+ 121 000c 01E0     		b	.L21
+ 122              	.L18:
+ 123 000e 22EA0000 		bic	r0, r2, r0
+ 124              	.L21:
+ 125 0012 1860     		str	r0, [r3, #0]
+ 126 0014 7047     		bx	lr
+ 127              	.L17:
+ 128 0016 1A6D     		ldr	r2, [r3, #80]
+ 129 0018 09B1     		cbz	r1, .L20
+ 130 001a 1043     		orrs	r0, r0, r2
+ 131 001c 01E0     		b	.L22
+ 132              	.L20:
+ 133 001e 22EA0000 		bic	r0, r2, r0
+ 134              	.L22:
+ 135 0022 1865     		str	r0, [r3, #80]
+ 136 0024 7047     		bx	lr
+ 137              	.L24:
+ 138 0026 00BF     		.align	2
+ 139              	.L23:
+ 140 0028 00000140 		.word	1073807360
+ 142              		.section	.text.SYSCFG_EncoderRemapConfig,"ax",%progbits
+ 143              		.align	1
+ 144              		.global	SYSCFG_EncoderRemapConfig
+ 145              		.thumb
+ 146              		.thumb_func
+ 148              	SYSCFG_EncoderRemapConfig:
+ 149              		@ args = 0, pretend = 0, frame = 0
+ 150              		@ frame_needed = 0, uses_anonymous_args = 0
+ 151              		@ link register save eliminated.
+ 152 0000 044B     		ldr	r3, .L26
+ 153 0002 1A68     		ldr	r2, [r3, #0]
+ 154 0004 22F44002 		bic	r2, r2, #12582912
+ 155 0008 1A60     		str	r2, [r3, #0]
+ 156 000a 1A68     		ldr	r2, [r3, #0]
+ 157 000c 1043     		orrs	r0, r0, r2
+ 158 000e 1860     		str	r0, [r3, #0]
+ 159 0010 7047     		bx	lr
+ 160              	.L27:
+ 161 0012 00BF     		.align	2
+ 162              	.L26:
+ 163 0014 00000140 		.word	1073807360
+ 165              		.section	.text.SYSCFG_USBInterruptLineRemapCmd,"ax",%progbits
+ 166              		.align	1
+ 167              		.global	SYSCFG_USBInterruptLineRemapCmd
+ 168              		.thumb
+ 169              		.thumb_func
+ 171              	SYSCFG_USBInterruptLineRemapCmd:
+ 172              		@ args = 0, pretend = 0, frame = 0
+ 173              		@ frame_needed = 0, uses_anonymous_args = 0
+ 174              		@ link register save eliminated.
+ 175 0000 014B     		ldr	r3, .L29
+ 176 0002 1860     		str	r0, [r3, #0]
+ 177 0004 7047     		bx	lr
+ 178              	.L30:
+ 179 0006 00BF     		.align	2
+ 180              	.L29:
+ 181 0008 14002042 		.word	1109393428
+ 183              		.section	.text.SYSCFG_I2CFastModePlusConfig,"ax",%progbits
+ 184              		.align	1
+ 185              		.global	SYSCFG_I2CFastModePlusConfig
+ 186              		.thumb
+ 187              		.thumb_func
+ 189              	SYSCFG_I2CFastModePlusConfig:
+ 190              		@ args = 0, pretend = 0, frame = 0
+ 191              		@ frame_needed = 0, uses_anonymous_args = 0
+ 192              		@ link register save eliminated.
+ 193 0000 044B     		ldr	r3, .L35
+ 194 0002 1A68     		ldr	r2, [r3, #0]
+ 195 0004 09B1     		cbz	r1, .L32
+ 196 0006 1043     		orrs	r0, r0, r2
+ 197 0008 01E0     		b	.L34
+ 198              	.L32:
+ 199 000a 22EA0000 		bic	r0, r2, r0
+ 200              	.L34:
+ 201 000e 1860     		str	r0, [r3, #0]
+ 202 0010 7047     		bx	lr
+ 203              	.L36:
+ 204 0012 00BF     		.align	2
+ 205              	.L35:
+ 206 0014 00000140 		.word	1073807360
+ 208              		.section	.text.SYSCFG_ITConfig,"ax",%progbits
+ 209              		.align	1
+ 210              		.global	SYSCFG_ITConfig
+ 211              		.thumb
+ 212              		.thumb_func
+ 214              	SYSCFG_ITConfig:
+ 215              		@ args = 0, pretend = 0, frame = 0
+ 216              		@ frame_needed = 0, uses_anonymous_args = 0
+ 217              		@ link register save eliminated.
+ 218 0000 044B     		ldr	r3, .L41
+ 219 0002 1A68     		ldr	r2, [r3, #0]
+ 220 0004 09B1     		cbz	r1, .L38
+ 221 0006 1043     		orrs	r0, r0, r2
+ 222 0008 01E0     		b	.L40
+ 223              	.L38:
+ 224 000a 22EA0000 		bic	r0, r2, r0
+ 225              	.L40:
+ 226 000e 1860     		str	r0, [r3, #0]
+ 227 0010 7047     		bx	lr
+ 228              	.L42:
+ 229 0012 00BF     		.align	2
+ 230              	.L41:
+ 231 0014 00000140 		.word	1073807360
+ 233              		.section	.text.SYSCFG_EXTILineConfig,"ax",%progbits
+ 234              		.align	1
+ 235              		.global	SYSCFG_EXTILineConfig
+ 236              		.thumb
+ 237              		.thumb_func
+ 239              	SYSCFG_EXTILineConfig:
+ 240              		@ args = 0, pretend = 0, frame = 0
+ 241              		@ frame_needed = 0, uses_anonymous_args = 0
+ 242 0000 01F00302 		and	r2, r1, #3
+ 243 0004 8908     		lsrs	r1, r1, #2
+ 244 0006 0A4B     		ldr	r3, .L44
+ 245 0008 0231     		adds	r1, r1, #2
+ 246 000a 30B5     		push	{r4, r5, lr}
+ 247 000c 9200     		lsls	r2, r2, #2
+ 248 000e 53F82150 		ldr	r5, [r3, r1, lsl #2]
+ 249 0012 0F24     		movs	r4, #15
+ 250 0014 04FA02F4 		lsl	r4, r4, r2
+ 251 0018 25EA0404 		bic	r4, r5, r4
+ 252 001c 43F82140 		str	r4, [r3, r1, lsl #2]
+ 253 0020 53F82140 		ldr	r4, [r3, r1, lsl #2]
+ 254 0024 00FA02F0 		lsl	r0, r0, r2
+ 255 0028 0443     		orrs	r4, r4, r0
+ 256 002a 43F82140 		str	r4, [r3, r1, lsl #2]
+ 257 002e 30BD     		pop	{r4, r5, pc}
+ 258              	.L45:
+ 259              		.align	2
+ 260              	.L44:
+ 261 0030 00000140 		.word	1073807360
+ 263              		.section	.text.SYSCFG_BreakConfig,"ax",%progbits
+ 264              		.align	1
+ 265              		.global	SYSCFG_BreakConfig
+ 266              		.thumb
+ 267              		.thumb_func
+ 269              	SYSCFG_BreakConfig:
+ 270              		@ args = 0, pretend = 0, frame = 0
+ 271              		@ frame_needed = 0, uses_anonymous_args = 0
+ 272              		@ link register save eliminated.
+ 273 0000 024B     		ldr	r3, .L47
+ 274 0002 9A69     		ldr	r2, [r3, #24]
+ 275 0004 1043     		orrs	r0, r0, r2
+ 276 0006 9861     		str	r0, [r3, #24]
+ 277 0008 7047     		bx	lr
+ 278              	.L48:
+ 279 000a 00BF     		.align	2
+ 280              	.L47:
+ 281 000c 00000140 		.word	1073807360
+ 283              		.section	.text.SYSCFG_BypassParityCheckDisable,"ax",%progbits
+ 284              		.align	1
+ 285              		.global	SYSCFG_BypassParityCheckDisable
+ 286              		.thumb
+ 287              		.thumb_func
+ 289              	SYSCFG_BypassParityCheckDisable:
+ 290              		@ args = 0, pretend = 0, frame = 0
+ 291              		@ frame_needed = 0, uses_anonymous_args = 0
+ 292              		@ link register save eliminated.
+ 293 0000 014B     		ldr	r3, .L50
+ 294 0002 0122     		movs	r2, #1
+ 295 0004 1A60     		str	r2, [r3, #0]
+ 296 0006 7047     		bx	lr
+ 297              	.L51:
+ 298              		.align	2
+ 299              	.L50:
+ 300 0008 10032042 		.word	1109394192
+ 302              		.section	.text.SYSCFG_ADCTriggerRemapConfig,"ax",%progbits
+ 303              		.align	1
+ 304              		.global	SYSCFG_ADCTriggerRemapConfig
+ 305              		.thumb
+ 306              		.thumb_func
+ 308              	SYSCFG_ADCTriggerRemapConfig:
+ 309              		@ args = 0, pretend = 0, frame = 0
+ 310              		@ frame_needed = 0, uses_anonymous_args = 0
+ 311              		@ link register save eliminated.
+ 312 0000 044B     		ldr	r3, .L56
+ 313 0002 9A6C     		ldr	r2, [r3, #72]
+ 314 0004 09B1     		cbz	r1, .L53
+ 315 0006 1043     		orrs	r0, r0, r2
+ 316 0008 01E0     		b	.L55
+ 317              	.L53:
+ 318 000a 22EA0000 		bic	r0, r2, r0
+ 319              	.L55:
+ 320 000e 9864     		str	r0, [r3, #72]
+ 321 0010 7047     		bx	lr
+ 322              	.L57:
+ 323 0012 00BF     		.align	2
+ 324              	.L56:
+ 325 0014 00000140 		.word	1073807360
+ 327              		.section	.text.SYSCFG_SRAMWRPEnable,"ax",%progbits
+ 328              		.align	1
+ 329              		.global	SYSCFG_SRAMWRPEnable
+ 330              		.thumb
+ 331              		.thumb_func
+ 333              	SYSCFG_SRAMWRPEnable:
+ 334              		@ args = 0, pretend = 0, frame = 0
+ 335              		@ frame_needed = 0, uses_anonymous_args = 0
+ 336              		@ link register save eliminated.
+ 337 0000 024B     		ldr	r3, .L59
+ 338 0002 5A68     		ldr	r2, [r3, #4]
+ 339 0004 1043     		orrs	r0, r0, r2
+ 340 0006 5860     		str	r0, [r3, #4]
+ 341 0008 7047     		bx	lr
+ 342              	.L60:
+ 343 000a 00BF     		.align	2
+ 344              	.L59:
+ 345 000c 00000140 		.word	1073807360
+ 347              		.section	.text.SYSCFG_GetFlagStatus,"ax",%progbits
+ 348              		.align	1
+ 349              		.global	SYSCFG_GetFlagStatus
+ 350              		.thumb
+ 351              		.thumb_func
+ 353              	SYSCFG_GetFlagStatus:
+ 354              		@ args = 0, pretend = 0, frame = 0
+ 355              		@ frame_needed = 0, uses_anonymous_args = 0
+ 356              		@ link register save eliminated.
+ 357 0000 024B     		ldr	r3, .L62
+ 358 0002 9869     		ldr	r0, [r3, #24]
+ 359 0004 C0F30020 		ubfx	r0, r0, #8, #1
+ 360 0008 7047     		bx	lr
+ 361              	.L63:
+ 362 000a 00BF     		.align	2
+ 363              	.L62:
+ 364 000c 00000140 		.word	1073807360
+ 366              		.section	.text.SYSCFG_ClearFlag,"ax",%progbits
+ 367              		.align	1
+ 368              		.global	SYSCFG_ClearFlag
+ 369              		.thumb
+ 370              		.thumb_func
+ 372              	SYSCFG_ClearFlag:
+ 373              		@ args = 0, pretend = 0, frame = 0
+ 374              		@ frame_needed = 0, uses_anonymous_args = 0
+ 375              		@ link register save eliminated.
+ 376 0000 024B     		ldr	r3, .L65
+ 377 0002 9A69     		ldr	r2, [r3, #24]
+ 378 0004 1043     		orrs	r0, r0, r2
+ 379 0006 9861     		str	r0, [r3, #24]
+ 380 0008 7047     		bx	lr
+ 381              	.L66:
+ 382 000a 00BF     		.align	2
+ 383              	.L65:
+ 384 000c 00000140 		.word	1073807360
+ 386              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f30x_syscfg.c
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:16     .text.SYSCFG_DeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:21     .text.SYSCFG_DeInit:00000000 SYSCFG_DeInit
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:45     .text.SYSCFG_DeInit:00000028 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:48     .text.SYSCFG_MemoryRemapConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:53     .text.SYSCFG_MemoryRemapConfig:00000000 SYSCFG_MemoryRemapConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:66     .text.SYSCFG_MemoryRemapConfig:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:69     .text.SYSCFG_DMAChannelRemapConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:74     .text.SYSCFG_DMAChannelRemapConfig:00000000 SYSCFG_DMAChannelRemapConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:103    .text.SYSCFG_DMAChannelRemapConfig:00000028 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:106    .text.SYSCFG_TriggerRemapConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:111    .text.SYSCFG_TriggerRemapConfig:00000000 SYSCFG_TriggerRemapConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:140    .text.SYSCFG_TriggerRemapConfig:00000028 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:143    .text.SYSCFG_EncoderRemapConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:148    .text.SYSCFG_EncoderRemapConfig:00000000 SYSCFG_EncoderRemapConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:163    .text.SYSCFG_EncoderRemapConfig:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:166    .text.SYSCFG_USBInterruptLineRemapCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:171    .text.SYSCFG_USBInterruptLineRemapCmd:00000000 SYSCFG_USBInterruptLineRemapCmd
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:181    .text.SYSCFG_USBInterruptLineRemapCmd:00000008 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:184    .text.SYSCFG_I2CFastModePlusConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:189    .text.SYSCFG_I2CFastModePlusConfig:00000000 SYSCFG_I2CFastModePlusConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:206    .text.SYSCFG_I2CFastModePlusConfig:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:209    .text.SYSCFG_ITConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:214    .text.SYSCFG_ITConfig:00000000 SYSCFG_ITConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:231    .text.SYSCFG_ITConfig:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:234    .text.SYSCFG_EXTILineConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:239    .text.SYSCFG_EXTILineConfig:00000000 SYSCFG_EXTILineConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:261    .text.SYSCFG_EXTILineConfig:00000030 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:264    .text.SYSCFG_BreakConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:269    .text.SYSCFG_BreakConfig:00000000 SYSCFG_BreakConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:281    .text.SYSCFG_BreakConfig:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:284    .text.SYSCFG_BypassParityCheckDisable:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:289    .text.SYSCFG_BypassParityCheckDisable:00000000 SYSCFG_BypassParityCheckDisable
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:300    .text.SYSCFG_BypassParityCheckDisable:00000008 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:303    .text.SYSCFG_ADCTriggerRemapConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:308    .text.SYSCFG_ADCTriggerRemapConfig:00000000 SYSCFG_ADCTriggerRemapConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:325    .text.SYSCFG_ADCTriggerRemapConfig:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:328    .text.SYSCFG_SRAMWRPEnable:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:333    .text.SYSCFG_SRAMWRPEnable:00000000 SYSCFG_SRAMWRPEnable
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:345    .text.SYSCFG_SRAMWRPEnable:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:348    .text.SYSCFG_GetFlagStatus:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:353    .text.SYSCFG_GetFlagStatus:00000000 SYSCFG_GetFlagStatus
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:364    .text.SYSCFG_GetFlagStatus:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:367    .text.SYSCFG_ClearFlag:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:372    .text.SYSCFG_ClearFlag:00000000 SYSCFG_ClearFlag
+C:\Users\THANGN~1\AppData\Local\Temp\cczKqs8f.s:384    .text.SYSCFG_ClearFlag:0000000c $d
+
+NO UNDEFINED SYMBOLS

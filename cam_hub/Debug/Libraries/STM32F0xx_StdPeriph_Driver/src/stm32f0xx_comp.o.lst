@@ -1,0 +1,782 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"stm32f0xx_comp.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.COMP_DeInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	COMP_DeInit
+  20              		.code	16
+  21              		.thumb_func
+  23              	COMP_DeInit:
+  24              	.LFB33:
+  25              		.file 1 "../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c"
+   1:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+   2:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   ******************************************************************************
+   3:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @file    stm32f0xx_comp.c
+   4:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @author  MCD Application Team
+   5:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @version V1.5.0
+   6:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @date    05-December-2014
+   7:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          functionalities of the comparators (COMP1 and COMP2) peripheral
+   9:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          applicable only on STM32F051 and STM32F072 devices: 
+  10:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *           + Comparators configuration
+  11:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *           + Window mode control
+  12:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *
+  13:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *  @verbatim
+  14:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *
+  15:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================
+  16:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                      ##### How to use this driver #####
+  17:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================
+  18:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     [..]           
+  19:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****    
+  20:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          The device integrates two analog comparators COMP1 and COMP2:
+  21:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (+) The non inverting input is set to PA1 for COMP1 and to PA3
+  22:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              for COMP2.
+  23:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  24:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (+) The inverting input can be selected among: DAC1_OUT, DAC2_OUT 
+  25:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              1/4 VREFINT, 1/2 VERFINT, 3/4 VREFINT, VREFINT,
+  26:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              I/O (PA0 for COMP1 and PA2 for COMP2)
+  27:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  28:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (+) The COMP output is internally is available using COMP_GetOutputLevel()
+  29:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              and can be set on GPIO pins: PA0, PA6, PA11 for COMP1
+  30:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              and PA2, PA7, PA12 for COMP2
+  31:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  32:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (+) The COMP output can be redirected to embedded timers (TIM1, TIM2
+  33:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              and TIM3)
+  34:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  35:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (+) The two comparators COMP1 and COMP2 can be combined in window
+  36:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              mode and only COMP1 non inverting (PA1) can be used as non-
+  37:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              inverting input.
+  38:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  39:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (+) The two comparators COMP1 and COMP2 have interrupt capability 
+  40:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              with wake-up from Sleep and Stop modes (through the EXTI controller).
+  41:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              COMP1 and COMP2 outputs are internally connected to EXTI Line 21
+  42:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              and EXTI Line 22 respectively.
+  43:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                    
+  44:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+  45:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                      ##### How to configure the comparator #####
+  46:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================
+  47:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     [..] 
+  48:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****            This driver provides functions to configure and program the Comparators 
+  49:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****            of all STM32F0xx devices.
+  50:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              
+  51:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     [..]   To use the comparator, perform the following steps:
+  52:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  53:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (#) Enable the SYSCFG APB clock to get write access to comparator
+  54:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              register using RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+  55:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  56:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (#) Configure the comparator input in analog mode using GPIO_Init()
+  57:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  58:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (#) Configure the comparator output in alternate function mode
+  59:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              using GPIO_Init() and use GPIO_PinAFConfig() function to map the
+  60:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              comparator output to the GPIO pin
+  61:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  62:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (#) Configure the comparator using COMP_Init() function:
+  63:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                  (++)  Select the inverting input
+  64:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                  (++)  Select the output polarity  
+  65:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                  (++)  Select the output redirection
+  66:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                  (++)  Select the hysteresis level
+  67:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                  (++)  Select the power mode
+  68:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     
+  69:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (#) Enable the comparator using COMP_Cmd() function
+  70:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  71:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****          (#) If required enable the COMP interrupt by configuring and enabling
+  72:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              EXTI line in Interrupt mode and selecting the desired sensitivity
+  73:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              level using EXTI_Init() function. After that enable the comparator
+  74:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****              interrupt vector using NVIC_Init() function.
+  75:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+  76:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****      @endverbatim
+  77:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *    
+  78:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   ******************************************************************************
+  79:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @attention
+  80:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *
+  81:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  82:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *
+  83:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  84:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * You may not use this file except in compliance with the License.
+  85:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * You may obtain a copy of the License at:
+  86:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *
+  87:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  88:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *
+  89:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * Unless required by applicable law or agreed to in writing, software 
+  90:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  91:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  92:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * See the License for the specific language governing permissions and
+  93:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * limitations under the License.
+  94:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *
+  95:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   ******************************************************************************
+  96:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+  97:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+  98:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* Includes ------------------------------------------------------------------*/
+  99:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** #include "stm32f0xx_comp.h"
+ 100:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 101:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /** @addtogroup STM32F0xx_StdPeriph_Driver
+ 102:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @{
+ 103:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 104:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 105:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /** @defgroup COMP 
+ 106:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief COMP driver modules
+ 107:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @{
+ 108:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */ 
+ 109:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 110:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* Private typedef -----------------------------------------------------------*/
+ 111:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* Private define ------------------------------------------------------------*/
+ 112:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* CSR register Mask */
+ 113:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** #define COMP_CSR_CLEAR_MASK              ((uint32_t)0x00003FFE)
+ 114:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 115:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* Private macro -------------------------------------------------------------*/
+ 116:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* Private variables ---------------------------------------------------------*/
+ 117:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* Private function prototypes -----------------------------------------------*/
+ 118:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /* Private functions ---------------------------------------------------------*/
+ 119:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 120:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /** @defgroup COMP_Private_Functions
+ 121:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @{
+ 122:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 123:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 124:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /** @defgroup COMP_Group1 Initialization and Configuration functions
+ 125:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *  @brief   Initialization and Configuration functions 
+ 126:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *
+ 127:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** @verbatim   
+ 128:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================
+ 129:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                ##### Initialization and Configuration functions #####
+ 130:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================  
+ 131:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 132:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** @endverbatim
+ 133:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @{
+ 134:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 135:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****    
+ 136:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 137:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Deinitializes COMP peripheral registers to their default reset values.
+ 138:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   Deinitialization can't be performed if the COMP configuration is locked.
+ 139:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         To unlock the configuration, perform a system reset.
+ 140:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  None
+ 141:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval None
+ 142:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 143:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** void COMP_DeInit(void)
+ 144:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+  26              		.loc 1 144 0
+  27              		.cfi_startproc
+ 145:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP->CSR = ((uint32_t)0x00000000);    /*!< Set COMP_CSR register to reset value */
+  28              		.loc 1 145 0
+  29 0000 014B     		ldr	r3, .L2
+  30 0002 0022     		mov	r2, #0
+  31 0004 1A60     		str	r2, [r3]
+ 146:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+  32              		.loc 1 146 0
+  33              		@ sp needed for prologue
+  34 0006 7047     		bx	lr
+  35              	.L3:
+  36              		.align	2
+  37              	.L2:
+  38 0008 1C000140 		.word	1073807388
+  39              		.cfi_endproc
+  40              	.LFE33:
+  42              		.section	.text.COMP_Init,"ax",%progbits
+  43              		.align	1
+  44              		.global	COMP_Init
+  45              		.code	16
+  46              		.thumb_func
+  48              	COMP_Init:
+  49              	.LFB34:
+ 147:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 148:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 149:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Initializes the COMP peripheral according to the specified parameters
+ 150:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         in COMP_InitStruct
+ 151:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   If the selected comparator is locked, initialization can't be performed.
+ 152:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         To unlock the configuration, perform a system reset.
+ 153:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   By default, PA1 is selected as COMP1 non inverting input.
+ 154:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         To use PA4 as COMP1 non inverting input call COMP_SwitchCmd() after COMP_Init()
+ 155:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  COMP_Selection: the selected comparator. 
+ 156:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          This parameter can be one of the following values:
+ 157:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP1: COMP1 selected
+ 158:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP2: COMP2 selected
+ 159:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  COMP_InitStruct: pointer to an COMP_InitTypeDef structure that contains 
+ 160:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         the configuration information for the specified COMP peripheral.
+ 161:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval None
+ 162:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 163:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** void COMP_Init(uint32_t COMP_Selection, COMP_InitTypeDef* COMP_InitStruct)
+ 164:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+  50              		.loc 1 164 0
+  51              		.cfi_startproc
+  52              	.LVL0:
+ 165:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   uint32_t tmpreg = 0;
+ 166:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 167:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Check the parameters */
+ 168:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_ALL_PERIPH(COMP_Selection));
+ 169:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_INVERTING_INPUT(COMP_InitStruct->COMP_InvertingInput));
+ 170:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_OUTPUT(COMP_InitStruct->COMP_Output));
+ 171:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_OUTPUT_POL(COMP_InitStruct->COMP_OutputPol));
+ 172:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_HYSTERESIS(COMP_InitStruct->COMP_Hysteresis));
+ 173:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_MODE(COMP_InitStruct->COMP_Mode));
+ 174:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 175:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Get the COMP_CSR register value */
+ 176:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   tmpreg = COMP->CSR;
+  53              		.loc 1 176 0
+  54 0000 0A4B     		ldr	r3, .L5
+ 164:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+  55              		.loc 1 164 0
+  56 0002 30B5     		push	{r4, r5, lr}
+  57              	.LCFI0:
+  58              		.cfi_def_cfa_offset 12
+  59              		.cfi_offset 4, -12
+  60              		.cfi_offset 5, -8
+  61              		.cfi_offset 14, -4
+ 177:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 178:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Clear the COMP1SW1, COMPx_IN_SEL, COMPx_OUT_TIM_SEL, COMPx_POL, COMPx_HYST and COMPx_PWR_MOD
+ 179:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   tmpreg &= (uint32_t) ~(COMP_CSR_CLEAR_MASK<<COMP_Selection);
+  62              		.loc 1 179 0
+  63 0004 0A4C     		ldr	r4, .L5+4
+ 176:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   tmpreg = COMP->CSR;
+  64              		.loc 1 176 0
+  65 0006 1A68     		ldr	r2, [r3]
+  66              	.LVL1:
+  67              		.loc 1 179 0
+  68 0008 8440     		lsl	r4, r4, r0
+ 180:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 181:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Configure COMP: inverting input, output redirection, hysteresis value and power mode */
+ 182:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Set COMPxINSEL bits according to COMP_InitStruct->COMP_InvertingInput value */
+ 183:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Set COMPxOUTSEL bits according to COMP_InitStruct->COMP_Output value */
+ 184:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Set COMPxPOL bit according to COMP_InitStruct->COMP_OutputPol value */
+ 185:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Set COMPxHYST bits according to COMP_InitStruct->COMP_Hysteresis value */
+ 186:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Set COMPxMODE bits according to COMP_InitStruct->COMP_Mode value */   
+ 187:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   tmpreg |= (uint32_t)((COMP_InitStruct->COMP_InvertingInput | COMP_InitStruct->COMP_Output |
+  69              		.loc 1 187 0
+  70 000a 4D68     		ldr	r5, [r1, #4]
+ 179:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   tmpreg &= (uint32_t) ~(COMP_CSR_CLEAR_MASK<<COMP_Selection);
+  71              		.loc 1 179 0
+  72 000c A243     		bic	r2, r4
+  73              	.LVL2:
+  74              		.loc 1 187 0
+  75 000e 0C68     		ldr	r4, [r1]
+ 188:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                        COMP_InitStruct->COMP_OutputPol | COMP_InitStruct->COMP_Hysteresis |
+ 189:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                        COMP_InitStruct->COMP_Mode)<<COMP_Selection);
+ 190:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 191:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /*!< Write to COMP_CSR register */
+ 192:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP->CSR = tmpreg;  
+ 193:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+  76              		.loc 1 193 0
+  77              		@ sp needed for prologue
+ 187:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   tmpreg |= (uint32_t)((COMP_InitStruct->COMP_InvertingInput | COMP_InitStruct->COMP_Output |
+  78              		.loc 1 187 0
+  79 0010 2543     		orr	r5, r4
+  80 0012 8C68     		ldr	r4, [r1, #8]
+  81 0014 2543     		orr	r5, r4
+ 188:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                        COMP_InitStruct->COMP_OutputPol | COMP_InitStruct->COMP_Hysteresis |
+  82              		.loc 1 188 0
+  83 0016 CC68     		ldr	r4, [r1, #12]
+  84 0018 2543     		orr	r5, r4
+  85 001a 0C69     		ldr	r4, [r1, #16]
+  86 001c 291C     		mov	r1, r5
+  87              	.LVL3:
+  88 001e 2143     		orr	r1, r4
+ 187:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   tmpreg |= (uint32_t)((COMP_InitStruct->COMP_InvertingInput | COMP_InitStruct->COMP_Output |
+  89              		.loc 1 187 0
+  90 0020 8140     		lsl	r1, r1, r0
+  91 0022 081C     		mov	r0, r1
+  92              	.LVL4:
+  93 0024 1043     		orr	r0, r2
+  94              	.LVL5:
+ 192:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP->CSR = tmpreg;  
+  95              		.loc 1 192 0
+  96 0026 1860     		str	r0, [r3]
+  97              		.loc 1 193 0
+  98 0028 30BD     		pop	{r4, r5, pc}
+  99              	.L6:
+ 100 002a C046     		.align	2
+ 101              	.L5:
+ 102 002c 1C000140 		.word	1073807388
+ 103 0030 FE3F0000 		.word	16382
+ 104              		.cfi_endproc
+ 105              	.LFE34:
+ 107              		.section	.text.COMP_StructInit,"ax",%progbits
+ 108              		.align	1
+ 109              		.global	COMP_StructInit
+ 110              		.code	16
+ 111              		.thumb_func
+ 113              	COMP_StructInit:
+ 114              	.LFB35:
+ 194:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 195:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 196:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Fills each COMP_InitStruct member with its default value.
+ 197:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  COMP_InitStruct: pointer to an COMP_InitTypeDef structure which will 
+ 198:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         be initialized.
+ 199:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval None
+ 200:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 201:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** void COMP_StructInit(COMP_InitTypeDef* COMP_InitStruct)
+ 202:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+ 115              		.loc 1 202 0
+ 116              		.cfi_startproc
+ 117              	.LVL6:
+ 203:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP_InitStruct->COMP_InvertingInput = COMP_InvertingInput_1_4VREFINT;
+ 118              		.loc 1 203 0
+ 119 0000 0023     		mov	r3, #0
+ 120 0002 0360     		str	r3, [r0]
+ 204:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP_InitStruct->COMP_Output = COMP_Output_None;
+ 121              		.loc 1 204 0
+ 122 0004 4360     		str	r3, [r0, #4]
+ 205:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP_InitStruct->COMP_OutputPol = COMP_OutputPol_NonInverted;
+ 123              		.loc 1 205 0
+ 124 0006 8360     		str	r3, [r0, #8]
+ 206:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP_InitStruct->COMP_Hysteresis = COMP_Hysteresis_No;
+ 125              		.loc 1 206 0
+ 126 0008 C360     		str	r3, [r0, #12]
+ 207:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP_InitStruct->COMP_Mode = COMP_Mode_UltraLowPower;
+ 127              		.loc 1 207 0
+ 128 000a 0C23     		mov	r3, #12
+ 129 000c 0361     		str	r3, [r0, #16]
+ 208:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+ 130              		.loc 1 208 0
+ 131              		@ sp needed for prologue
+ 132 000e 7047     		bx	lr
+ 133              		.cfi_endproc
+ 134              	.LFE35:
+ 136              		.section	.text.COMP_Cmd,"ax",%progbits
+ 137              		.align	1
+ 138              		.global	COMP_Cmd
+ 139              		.code	16
+ 140              		.thumb_func
+ 142              	COMP_Cmd:
+ 143              	.LFB36:
+ 209:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 210:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 211:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Enable or disable the COMP peripheral.
+ 212:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   If the selected comparator is locked, enable/disable can't be performed.
+ 213:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         To unlock the configuration, perform a system reset.
+ 214:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  COMP_Selection: the selected comparator.
+ 215:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          This parameter can be one of the following values:
+ 216:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP1: COMP1 selected
+ 217:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP2: COMP2 selected
+ 218:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  NewState: new state of the COMP peripheral.
+ 219:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 220:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   When enabled, the comparator compares the non inverting input with 
+ 221:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         the inverting input and the comparison result is available on comparator output.
+ 222:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   When disabled, the comparator doesn't perform comparison and the 
+ 223:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         output level is low.
+ 224:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval None
+ 225:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 226:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** void COMP_Cmd(uint32_t COMP_Selection, FunctionalState NewState)
+ 227:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+ 144              		.loc 1 227 0
+ 145              		.cfi_startproc
+ 146              	.LVL7:
+ 147 0000 00B5     		push	{lr}
+ 148              	.LCFI1:
+ 149              		.cfi_def_cfa_offset 4
+ 150              		.cfi_offset 14, -4
+ 151 0002 084B     		ldr	r3, .L11
+ 152 0004 0122     		mov	r2, #1
+ 228:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Check the parameters */
+ 229:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_ALL_PERIPH(COMP_Selection));
+ 230:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 231:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 232:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   if (NewState != DISABLE)
+ 153              		.loc 1 232 0
+ 154 0006 0029     		cmp	r1, #0
+ 155 0008 05D0     		beq	.L9
+ 233:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 234:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     /* Enable the selected COMP peripheral */
+ 235:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     COMP->CSR |= (uint32_t) (1<<COMP_Selection);
+ 156              		.loc 1 235 0
+ 157 000a 1968     		ldr	r1, [r3]
+ 158              	.LVL8:
+ 159 000c 8240     		lsl	r2, r2, r0
+ 160 000e 101C     		mov	r0, r2
+ 161              	.LVL9:
+ 162 0010 0843     		orr	r0, r1
+ 163 0012 1860     		str	r0, [r3]
+ 164 0014 05E0     		b	.L8
+ 165              	.LVL10:
+ 166              	.L9:
+ 236:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 237:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   else
+ 238:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 239:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     /* Disable the selected COMP peripheral  */
+ 240:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     COMP->CSR &= (uint32_t)(~((uint32_t)1<<COMP_Selection));
+ 167              		.loc 1 240 0
+ 168 0016 1968     		ldr	r1, [r3]
+ 169              	.LVL11:
+ 170 0018 8240     		lsl	r2, r2, r0
+ 171 001a 101C     		mov	r0, r2
+ 172              	.LVL12:
+ 173 001c 0A1C     		mov	r2, r1
+ 174 001e 8243     		bic	r2, r0
+ 175 0020 1A60     		str	r2, [r3]
+ 176              	.L8:
+ 241:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 242:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+ 177              		.loc 1 242 0
+ 178              		@ sp needed for prologue
+ 179 0022 00BD     		pop	{pc}
+ 180              	.L12:
+ 181              		.align	2
+ 182              	.L11:
+ 183 0024 1C000140 		.word	1073807388
+ 184              		.cfi_endproc
+ 185              	.LFE36:
+ 187              		.section	.text.COMP_SwitchCmd,"ax",%progbits
+ 188              		.align	1
+ 189              		.global	COMP_SwitchCmd
+ 190              		.code	16
+ 191              		.thumb_func
+ 193              	COMP_SwitchCmd:
+ 194              	.LFB37:
+ 243:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 244:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 245:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Close or Open the SW1 switch.
+ 246:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   This switch is solely intended to redirect signals onto high
+ 247:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         impedance input, such as COMP1 non-inverting input (highly resistive switch)
+ 248:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  NewState: New state of the analog switch.
+ 249:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          This parameter can be: ENABLE or DISABLE. 
+ 250:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   When enabled, the SW1 is closed; PA1 is connected to PA4
+ 251:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   When disabled, the SW1 switch is open; PA1 is disconnected from PA4
+ 252:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval None
+ 253:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 254:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** void COMP_SwitchCmd(FunctionalState NewState)
+ 255:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+ 195              		.loc 1 255 0
+ 196              		.cfi_startproc
+ 197              	.LVL13:
+ 198 0000 054B     		ldr	r3, .L17
+ 199 0002 00B5     		push	{lr}
+ 200              	.LCFI2:
+ 201              		.cfi_def_cfa_offset 4
+ 202              		.cfi_offset 14, -4
+ 203 0004 0222     		mov	r2, #2
+ 256:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Check the parameter */
+ 257:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 258:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 259:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   if (NewState != DISABLE)
+ 260:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 261:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     /* Close SW1 switch */
+ 262:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     COMP->CSR |= (uint32_t) (COMP_CSR_COMP1SW1);
+ 204              		.loc 1 262 0
+ 205 0006 1968     		ldr	r1, [r3]
+ 259:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   if (NewState != DISABLE)
+ 206              		.loc 1 259 0
+ 207 0008 0028     		cmp	r0, #0
+ 208 000a 01D0     		beq	.L14
+ 209              		.loc 1 262 0
+ 210 000c 0A43     		orr	r2, r1
+ 211 000e 01E0     		b	.L16
+ 212              	.L14:
+ 263:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 264:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   else
+ 265:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 266:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     /* Open SW1 switch */
+ 267:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     COMP->CSR &= (uint32_t)(~COMP_CSR_COMP1SW1);
+ 213              		.loc 1 267 0
+ 214 0010 9143     		bic	r1, r2
+ 215 0012 0A1C     		mov	r2, r1
+ 216              	.L16:
+ 217 0014 1A60     		str	r2, [r3]
+ 268:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 269:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+ 218              		.loc 1 269 0
+ 219              		@ sp needed for prologue
+ 220 0016 00BD     		pop	{pc}
+ 221              	.L18:
+ 222              		.align	2
+ 223              	.L17:
+ 224 0018 1C000140 		.word	1073807388
+ 225              		.cfi_endproc
+ 226              	.LFE37:
+ 228              		.section	.text.COMP_GetOutputLevel,"ax",%progbits
+ 229              		.align	1
+ 230              		.global	COMP_GetOutputLevel
+ 231              		.code	16
+ 232              		.thumb_func
+ 234              	COMP_GetOutputLevel:
+ 235              	.LFB38:
+ 270:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 271:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 272:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Return the output level (high or low) of the selected comparator. 
+ 273:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   The output level depends on the selected polarity.
+ 274:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   If the polarity is not inverted:
+ 275:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          - Comparator output is low when the non-inverting input is at a lower
+ 276:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            voltage than the inverting input
+ 277:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          - Comparator output is high when the non-inverting input is at a higher
+ 278:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            voltage than the inverting input
+ 279:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   If the polarity is inverted:
+ 280:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          - Comparator output is high when the non-inverting input is at a lower
+ 281:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            voltage than the inverting input
+ 282:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          - Comparator output is low when the non-inverting input is at a higher
+ 283:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            voltage than the inverting input
+ 284:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  COMP_Selection: the selected comparator. 
+ 285:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          This parameter can be one of the following values:
+ 286:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP1: COMP1 selected
+ 287:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP2: COMP2 selected  
+ 288:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval Returns the selected comparator output level: low or high.
+ 289:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *       
+ 290:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 291:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** uint32_t COMP_GetOutputLevel(uint32_t COMP_Selection)
+ 292:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+ 236              		.loc 1 292 0
+ 237              		.cfi_startproc
+ 238              	.LVL14:
+ 293:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   uint32_t compout = 0x0;
+ 294:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 295:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Check the parameters */
+ 296:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_ALL_PERIPH(COMP_Selection));
+ 297:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 298:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Check if selected comparator output is high */
+ 299:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   if ((COMP->CSR & (COMP_CSR_COMP1OUT<<COMP_Selection)) != 0)
+ 239              		.loc 1 299 0
+ 240 0000 054B     		ldr	r3, .L22
+ 241 0002 8022     		mov	r2, #128
+ 242 0004 D201     		lsl	r2, r2, #7
+ 243 0006 1B68     		ldr	r3, [r3]
+ 244 0008 8240     		lsl	r2, r2, r0
+ 245 000a 101C     		mov	r0, r2
+ 246              	.LVL15:
+ 247 000c 1840     		and	r0, r3
+ 300:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 301:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     compout = COMP_OutputLevel_High;
+ 248              		.loc 1 301 0
+ 249 000e 431E     		sub	r3, r0, #1
+ 250 0010 9841     		sbc	r0, r0, r3
+ 251 0012 8003     		lsl	r0, r0, #14
+ 252              	.LVL16:
+ 302:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 303:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   else
+ 304:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 305:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     compout = COMP_OutputLevel_Low;
+ 306:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 307:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 308:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Return the comparator output level */
+ 309:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   return (uint32_t)(compout);
+ 310:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+ 253              		.loc 1 310 0
+ 254              		@ sp needed for prologue
+ 255 0014 7047     		bx	lr
+ 256              	.L23:
+ 257 0016 C046     		.align	2
+ 258              	.L22:
+ 259 0018 1C000140 		.word	1073807388
+ 260              		.cfi_endproc
+ 261              	.LFE38:
+ 263              		.section	.text.COMP_WindowCmd,"ax",%progbits
+ 264              		.align	1
+ 265              		.global	COMP_WindowCmd
+ 266              		.code	16
+ 267              		.thumb_func
+ 269              	COMP_WindowCmd:
+ 270              	.LFB39:
+ 311:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 312:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 313:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @}
+ 314:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 315:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 316:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /** @defgroup COMP_Group2 Window mode control function
+ 317:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *  @brief   Window mode control function 
+ 318:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *
+ 319:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** @verbatim   
+ 320:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================
+ 321:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                      ##### Window mode control function #####
+ 322:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================  
+ 323:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 324:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** @endverbatim
+ 325:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @{
+ 326:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 327:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 328:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 329:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Enables or disables the window mode.
+ 330:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   In window mode, COMP1 and COMP2 non inverting inputs are connected
+ 331:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         together and only COMP1 non inverting input (PA1) can be used.
+ 332:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  NewState: new state of the window mode.
+ 333:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          This parameter can be :
+ 334:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *           @arg ENABLE: COMP1 and COMP2 non inverting inputs are connected together.
+ 335:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *           @arg DISABLE: OMP1 and COMP2 non inverting inputs are disconnected.
+ 336:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval None
+ 337:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 338:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** void COMP_WindowCmd(FunctionalState NewState)
+ 339:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+ 271              		.loc 1 339 0
+ 272              		.cfi_startproc
+ 273              	.LVL17:
+ 274 0000 064B     		ldr	r3, .L28
+ 275 0002 00B5     		push	{lr}
+ 276              	.LCFI3:
+ 277              		.cfi_def_cfa_offset 4
+ 278              		.cfi_offset 14, -4
+ 340:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Check the parameters */
+ 341:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 342:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   
+ 343:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   if (NewState != DISABLE)
+ 344:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 345:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     /* Enable the window mode */
+ 346:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     COMP->CSR |= (uint32_t) COMP_CSR_WNDWEN;
+ 279              		.loc 1 346 0
+ 280 0004 1968     		ldr	r1, [r3]
+ 343:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   if (NewState != DISABLE)
+ 281              		.loc 1 343 0
+ 282 0006 0028     		cmp	r0, #0
+ 283 0008 03D0     		beq	.L25
+ 284              		.loc 1 346 0
+ 285 000a 8022     		mov	r2, #128
+ 286 000c 1204     		lsl	r2, r2, #16
+ 287 000e 0A43     		orr	r2, r1
+ 288 0010 01E0     		b	.L27
+ 289              	.L25:
+ 347:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 348:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   else
+ 349:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   {
+ 350:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     /* Disable the window mode */
+ 351:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****     COMP->CSR &= (uint32_t)(~COMP_CSR_WNDWEN);
+ 290              		.loc 1 351 0
+ 291 0012 034A     		ldr	r2, .L28+4
+ 292 0014 0A40     		and	r2, r1
+ 293              	.L27:
+ 294 0016 1A60     		str	r2, [r3]
+ 352:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   }
+ 353:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+ 295              		.loc 1 353 0
+ 296              		@ sp needed for prologue
+ 297 0018 00BD     		pop	{pc}
+ 298              	.L29:
+ 299 001a C046     		.align	2
+ 300              	.L28:
+ 301 001c 1C000140 		.word	1073807388
+ 302 0020 FFFF7FFF 		.word	-8388609
+ 303              		.cfi_endproc
+ 304              	.LFE39:
+ 306              		.section	.text.COMP_LockConfig,"ax",%progbits
+ 307              		.align	1
+ 308              		.global	COMP_LockConfig
+ 309              		.code	16
+ 310              		.thumb_func
+ 312              	COMP_LockConfig:
+ 313              	.LFB40:
+ 354:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 355:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 356:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @}
+ 357:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 358:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 359:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /** @defgroup COMP_Group3 COMP configuration locking function
+ 360:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *  @brief   COMP1 and COMP2 configuration locking function
+ 361:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *           COMP1 and COMP2 configuration can be locked each separately.
+ 362:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *           Unlocking is performed by system reset.
+ 363:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  *
+ 364:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** @verbatim   
+ 365:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================
+ 366:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****                      ##### Configuration Lock function #####
+ 367:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****  ===============================================================================  
+ 368:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 369:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** @endverbatim
+ 370:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @{
+ 371:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 372:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 373:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** /**
+ 374:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @brief  Lock the selected comparator (COMP1/COMP2) configuration.
+ 375:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @note   Locking the configuration means that all control bits are read-only.
+ 376:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *         To unlock the comparator configuration, perform a system reset.
+ 377:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @param  COMP_Selection: selects the comparator to be locked 
+ 378:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *          This parameter can be a value of the following values:
+ 379:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP1: COMP1 configuration is locked.
+ 380:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   *            @arg COMP_Selection_COMP2: COMP2 configuration is locked.  
+ 381:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   * @retval None
+ 382:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   */
+ 383:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** void COMP_LockConfig(uint32_t COMP_Selection)
+ 384:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** {
+ 314              		.loc 1 384 0
+ 315              		.cfi_startproc
+ 316              	.LVL18:
+ 385:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Check the parameter */
+ 386:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   assert_param(IS_COMP_ALL_PERIPH(COMP_Selection));
+ 387:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** 
+ 388:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   /* Set the lock bit corresponding to selected comparator */
+ 389:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c ****   COMP->CSR |= (uint32_t) (COMP_CSR_COMP1LOCK<<COMP_Selection);
+ 317              		.loc 1 389 0
+ 318 0000 044B     		ldr	r3, .L31
+ 319 0002 8021     		mov	r1, #128
+ 320 0004 0902     		lsl	r1, r1, #8
+ 321 0006 1A68     		ldr	r2, [r3]
+ 322 0008 8140     		lsl	r1, r1, r0
+ 323 000a 081C     		mov	r0, r1
+ 324              	.LVL19:
+ 325 000c 1043     		orr	r0, r2
+ 326 000e 1860     		str	r0, [r3]
+ 390:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_comp.c **** }
+ 327              		.loc 1 390 0
+ 328              		@ sp needed for prologue
+ 329 0010 7047     		bx	lr
+ 330              	.L32:
+ 331 0012 C046     		.align	2
+ 332              	.L31:
+ 333 0014 1C000140 		.word	1073807388
+ 334              		.cfi_endproc
+ 335              	.LFE40:
+ 337              		.text
+ 338              	.Letext0:
+ 339              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 340              		.file 3 "D:\\EclipseIndigo\\workspace\\cam_hub\\scr/stm32f0xx.h"
+ 341              		.file 4 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32f0
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f0xx_comp.c
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:18     .text.COMP_DeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:23     .text.COMP_DeInit:00000000 COMP_DeInit
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:38     .text.COMP_DeInit:00000008 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:43     .text.COMP_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:48     .text.COMP_Init:00000000 COMP_Init
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:102    .text.COMP_Init:0000002c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:108    .text.COMP_StructInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:113    .text.COMP_StructInit:00000000 COMP_StructInit
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:137    .text.COMP_Cmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:142    .text.COMP_Cmd:00000000 COMP_Cmd
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:183    .text.COMP_Cmd:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:188    .text.COMP_SwitchCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:193    .text.COMP_SwitchCmd:00000000 COMP_SwitchCmd
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:224    .text.COMP_SwitchCmd:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:229    .text.COMP_GetOutputLevel:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:234    .text.COMP_GetOutputLevel:00000000 COMP_GetOutputLevel
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:259    .text.COMP_GetOutputLevel:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:264    .text.COMP_WindowCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:269    .text.COMP_WindowCmd:00000000 COMP_WindowCmd
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:301    .text.COMP_WindowCmd:0000001c $d
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:307    .text.COMP_LockConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:312    .text.COMP_LockConfig:00000000 COMP_LockConfig
+C:\Users\THANGN~1\AppData\Local\Temp\cccNsXbN.s:333    .text.COMP_LockConfig:00000014 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.90b54cb79624a05a6a75538133d4ee2f
+                           .group:00000000 wm4.stm32f0xx.h.54.2936c65ea497e2b9f6697d244f204f4f
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.491.56b995fdd6b34ccece7fa7ee90a03d09
+                           .group:00000000 wm4.stm32f0xx_adc.h.31.deffd6417c7f5b0940228cd2f9270807
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.ff204b27217b5926452ab2f52b527ff3
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.02fa02b24c01ae505c73e46ccbb612cf
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.stm32f0xx_comp.h.85.145a5c9c42af053f8c049b5c203e5d06
+
+NO UNDEFINED SYMBOLS

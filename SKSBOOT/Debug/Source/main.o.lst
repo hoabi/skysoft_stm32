@@ -1,0 +1,132 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"main.c"
+  15              		.section	.text.startup.main,"ax",%progbits
+  16              		.align	1
+  17              		.global	main
+  18              		.thumb
+  19              		.thumb_func
+  21              	main:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24 0000 08B5     		push	{r3, lr}
+  25 0002 FFF7FEFF 		bl	SystemInit
+  26 0006 1A4A     		ldr	r2, .L4
+  27 0008 1A4B     		ldr	r3, .L4+4
+  28 000a 0021     		movs	r1, #0
+  29 000c 4FF00060 		mov	r0, #134217728
+  30 0010 1A60     		str	r2, [r3, #0]
+  31 0012 FFF7FEFF 		bl	NVIC_SetVectorTable
+  32 0016 4FF44070 		mov	r0, #768
+  33 001a FFF7FEFF 		bl	NVIC_PriorityGroupConfig
+  34 001e 1648     		ldr	r0, .L4+8
+  35 0020 1649     		ldr	r1, .L4+12
+  36 0022 FFF7FEFF 		bl	strcat
+  37 0026 164B     		ldr	r3, .L4+16
+  38 0028 1A68     		ldr	r2, [r3, #0]
+  39 002a 6423     		movs	r3, #100
+  40 002c B2FBF3F2 		udiv	r2, r2, r3
+  41 0030 013A     		subs	r2, r2, #1
+  42 0032 B2F1807F 		cmp	r2, #16777216
+  43 0036 09D2     		bcs	.L2
+  44 0038 124B     		ldr	r3, .L4+20
+  45 003a 5A60     		str	r2, [r3, #4]
+  46 003c 124A     		ldr	r2, .L4+24
+  47 003e F021     		movs	r1, #240
+  48 0040 82F82310 		strb	r1, [r2, #35]
+  49 0044 0022     		movs	r2, #0
+  50 0046 9A60     		str	r2, [r3, #8]
+  51 0048 0722     		movs	r2, #7
+  52 004a 1A60     		str	r2, [r3, #0]
+  53              	.L2:
+  54 004c FFF7FEFF 		bl	FLASH_Unlock
+  55 0050 FFF7FEFF 		bl	IAP_Init
+  56 0054 0D48     		ldr	r0, .L4+28
+  57 0056 FFF7FEFF 		bl	xprintf
+  58 005a 0D49     		ldr	r1, .L4+32
+  59 005c 0648     		ldr	r0, .L4+8
+  60 005e FFF7FEFF 		bl	strcat
+  61 0062 0C48     		ldr	r0, .L4+36
+  62 0064 FFF7FEFF 		bl	xprintf
+  63 0068 FFF7FEFF 		bl	Main_Menu
+  64              	.L3:
+  65 006c FEE7     		b	.L3
+  66              	.L5:
+  67 006e 00BF     		.align	2
+  68              	.L4:
+  69 0070 00000000 		.word	SerialPutChar
+  70 0074 00000000 		.word	xfunc_out
+  71 0078 00000000 		.word	address
+  72 007c 00000000 		.word	.LC0
+  73 0080 00000000 		.word	SystemCoreClock
+  74 0084 10E000E0 		.word	-536813552
+  75 0088 00ED00E0 		.word	-536810240
+  76 008c 06000000 		.word	.LC1
+  77 0090 11000000 		.word	.LC2
+  78 0094 15000000 		.word	.LC3
+  80              		.global	ulMiliCount
+  81              		.global	ulTickCount
+  82              		.global	ulSecCount
+  83              		.section	.bss.ulTickCount,"aw",%nobits
+  84              		.align	2
+  87              	ulTickCount:
+  88 0000 00000000 		.space	4
+  89              		.section	.bss.ulMiliCount,"aw",%nobits
+  90              		.align	2
+  93              	ulMiliCount:
+  94 0000 00000000 		.space	4
+  95              		.section	.bss.ulSecCount,"aw",%nobits
+  96              		.align	2
+  99              	ulSecCount:
+ 100 0000 00000000 		.space	4
+ 101              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 102              	.LC0:
+ 103 0000 686F742E 		.ascii	"hot.v\000"
+ 103      7600
+ 104              	.LC1:
+ 105 0006 0D0A4C6F 		.ascii	"\015\012Loading \000"
+ 105      6164696E 
+ 105      672000
+ 106              	.LC2:
+ 107 0011 69657400 		.ascii	"iet\000"
+ 108              	.LC3:
+ 109 0015 2E2E2E20 		.ascii	"... \015\012\015\012\000"
+ 109      0D0A0D0A 
+ 109      00
+ 110              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:16     .text.startup.main:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:21     .text.startup.main:00000000 main
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:69     .text.startup.main:00000070 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:93     .bss.ulMiliCount:00000000 ulMiliCount
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:87     .bss.ulTickCount:00000000 ulTickCount
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:99     .bss.ulSecCount:00000000 ulSecCount
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:84     .bss.ulTickCount:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:90     .bss.ulMiliCount:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc6raVMd.s:96     .bss.ulSecCount:00000000 $d
+
+UNDEFINED SYMBOLS
+SystemInit
+NVIC_SetVectorTable
+NVIC_PriorityGroupConfig
+strcat
+FLASH_Unlock
+IAP_Init
+xprintf
+Main_Menu
+SerialPutChar
+xfunc_out
+address
+SystemCoreClock

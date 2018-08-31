@@ -1,0 +1,423 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"ymodem.c"
+  15              		.section	.text.Receive_Byte.constprop.1,"ax",%progbits
+  16              		.align	1
+  17              		.thumb
+  18              		.thumb_func
+  20              	Receive_Byte.constprop.1:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 38B5     		push	{r3, r4, r5, lr}
+  24 0002 0546     		mov	r5, r0
+  25 0004 064C     		ldr	r4, .L6
+  26 0006 04E0     		b	.L2
+  27              	.L4:
+  28 0008 2846     		mov	r0, r5
+  29 000a FFF7FEFF 		bl	SerialKeyPressed
+  30 000e 0128     		cmp	r0, #1
+  31 0010 04D0     		beq	.L5
+  32              	.L2:
+  33 0012 013C     		subs	r4, r4, #1
+  34 0014 F8D1     		bne	.L4
+  35 0016 4FF0FF30 		mov	r0, #-1
+  36 001a 38BD     		pop	{r3, r4, r5, pc}
+  37              	.L5:
+  38 001c 0020     		movs	r0, #0
+  39 001e 38BD     		pop	{r3, r4, r5, pc}
+  40              	.L7:
+  41              		.align	2
+  42              	.L6:
+  43 0020 01001000 		.word	1048577
+  45              		.section	.text.Ymodem_Receive,"ax",%progbits
+  46              		.align	1
+  47              		.global	Ymodem_Receive
+  48              		.thumb
+  49              		.thumb_func
+  51              	Ymodem_Receive:
+  52              		@ args = 0, pretend = 0, frame = 32
+  53              		@ frame_needed = 0, uses_anonymous_args = 0
+  54 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+  55 0004 8A4E     		ldr	r6, .L83
+  56 0006 8B4F     		ldr	r7, .L83+4
+  57 0008 89B0     		sub	sp, sp, #36
+  58 000a 0023     		movs	r3, #0
+  59 000c 0393     		str	r3, [sp, #12]
+  60 000e 9946     		mov	r9, r3
+  61 0010 1C46     		mov	r4, r3
+  62 0012 1D46     		mov	r5, r3
+  63 0014 06F10308 		add	r8, r6, #3
+  64              	.L79:
+  65 0018 0DF10B00 		add	r0, sp, #11
+  66 001c FFF7FEFF 		bl	Receive_Byte.constprop.1
+  67 0020 0028     		cmp	r0, #0
+  68 0022 40F0F080 		bne	.L67
+  69 0026 9DF80B30 		ldrb	r3, [sp, #11]	@ zero_extendqisi2
+  70 002a 042B     		cmp	r3, #4
+  71 002c 4AD0     		beq	.L26
+  72 002e 05D8     		bhi	.L17
+  73 0030 012B     		cmp	r3, #1
+  74 0032 16D0     		beq	.L13
+  75 0034 022B     		cmp	r3, #2
+  76 0036 40F0E680 		bne	.L67
+  77 003a 15E0     		b	.L51
+  78              	.L17:
+  79 003c 412B     		cmp	r3, #65
+  80 003e 32D0     		beq	.L52
+  81 0040 612B     		cmp	r3, #97
+  82 0042 30D0     		beq	.L52
+  83 0044 182B     		cmp	r3, #24
+  84 0046 40F0DE80 		bne	.L67
+  85 004a 0DF10B00 		add	r0, sp, #11
+  86 004e FFF7FEFF 		bl	Receive_Byte.constprop.1
+  87 0052 0028     		cmp	r0, #0
+  88 0054 40F0D780 		bne	.L67
+  89 0058 9DF80B30 		ldrb	r3, [sp, #11]	@ zero_extendqisi2
+  90 005c 182B     		cmp	r3, #24
+  91 005e 2FD0     		beq	.L25
+  92 0060 D1E0     		b	.L67
+  93              	.L13:
+  94 0062 4FF0800A 		mov	sl, #128
+  95 0066 01E0     		b	.L14
+  96              	.L51:
+  97 0068 4FF4806A 		mov	sl, #1024
+  98              	.L14:
+  99 006c 3370     		strb	r3, [r6, #0]
+ 100 006e 4FF0010B 		mov	fp, #1
+ 101 0072 0AF10402 		add	r2, sl, #4
+ 102 0076 0CE0     		b	.L19
+ 103              	.L20:
+ 104 0078 06EB0B00 		add	r0, r6, fp
+ 105 007c 0192     		str	r2, [sp, #4]
+ 106 007e FFF7FEFF 		bl	Receive_Byte.constprop.1
+ 107 0082 019A     		ldr	r2, [sp, #4]
+ 108 0084 0028     		cmp	r0, #0
+ 109 0086 40F0BE80 		bne	.L67
+ 110 008a 0BF1010B 		add	fp, fp, #1
+ 111 008e 1FFA8BFB 		uxth	fp, fp
+ 112              	.L19:
+ 113 0092 5A45     		cmp	r2, fp
+ 114 0094 664B     		ldr	r3, .L83
+ 115 0096 EFDA     		bge	.L20
+ 116 0098 9978     		ldrb	r1, [r3, #2]	@ zero_extendqisi2
+ 117 009a 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 118 009c C943     		mvns	r1, r1
+ 119 009e C9B2     		uxtb	r1, r1
+ 120 00a0 8A42     		cmp	r2, r1
+ 121 00a2 09D0     		beq	.L77
+ 122 00a4 AFE0     		b	.L67
+ 123              	.L52:
+ 124 00a6 1820     		movs	r0, #24
+ 125 00a8 FFF7FEFF 		bl	SerialPutChar
+ 126 00ac 1820     		movs	r0, #24
+ 127 00ae FFF7FEFF 		bl	SerialPutChar
+ 128 00b2 6FF00200 		mvn	r0, #2
+ 129 00b6 B8E0     		b	.L27
+ 130              	.L77:
+ 131 00b8 BAF1000F 		cmp	sl, #0
+ 132 00bc 02D0     		beq	.L26
+ 133 00be 07E0     		b	.L78
+ 134              	.L25:
+ 135 00c0 0620     		movs	r0, #6
+ 136 00c2 AAE0     		b	.L82
+ 137              	.L26:
+ 138 00c4 0620     		movs	r0, #6
+ 139 00c6 0024     		movs	r4, #0
+ 140 00c8 FFF7FEFF 		bl	SerialPutChar
+ 141 00cc 2546     		mov	r5, r4
+ 142 00ce A3E7     		b	.L79
+ 143              	.L78:
+ 144 00d0 E9B2     		uxtb	r1, r5
+ 145 00d2 8A42     		cmp	r2, r1
+ 146 00d4 03D0     		beq	.L29
+ 147 00d6 1520     		movs	r0, #21
+ 148 00d8 FFF7FEFF 		bl	SerialPutChar
+ 149 00dc 91E0     		b	.L81
+ 150              	.L29:
+ 151 00de 002D     		cmp	r5, #0
+ 152 00e0 5DD1     		bne	.L31
+ 153 00e2 F378     		ldrb	r3, [r6, #3]	@ zero_extendqisi2
+ 154 00e4 1BB9     		cbnz	r3, .L54
+ 155 00e6 55E0     		b	.L80
+ 156              	.L35:
+ 157 00e8 C254     		strb	r2, [r0, r3]
+ 158 00ea 0133     		adds	r3, r3, #1
+ 159 00ec 01E0     		b	.L32
+ 160              	.L54:
+ 161 00ee 5248     		ldr	r0, .L83+8
+ 162 00f0 2B46     		mov	r3, r5
+ 163              	.L32:
+ 164 00f2 9A19     		adds	r2, r3, r6
+ 165 00f4 08EB0301 		add	r1, r8, r3
+ 166 00f8 D278     		ldrb	r2, [r2, #3]	@ zero_extendqisi2
+ 167 00fa 12B1     		cbz	r2, .L34
+ 168 00fc B3F5807F 		cmp	r3, #256
+ 169 0100 F2D1     		bne	.L35
+ 170              	.L34:
+ 171 0102 4D48     		ldr	r0, .L83+8
+ 172 0104 0022     		movs	r2, #0
+ 173 0106 C254     		strb	r2, [r0, r3]
+ 174 0108 1346     		mov	r3, r2
+ 175 010a 01E0     		b	.L36
+ 176              	.L38:
+ 177 010c C254     		strb	r2, [r0, r3]
+ 178 010e 0133     		adds	r3, r3, #1
+ 179              	.L36:
+ 180 0110 CA18     		adds	r2, r1, r3
+ 181 0112 04A8     		add	r0, sp, #16
+ 182 0114 5278     		ldrb	r2, [r2, #1]	@ zero_extendqisi2
+ 183 0116 202A     		cmp	r2, #32
+ 184 0118 01D0     		beq	.L37
+ 185 011a 102B     		cmp	r3, #16
+ 186 011c F6D1     		bne	.L38
+ 187              	.L37:
+ 188 011e 08AA     		add	r2, sp, #32
+ 189 0120 D318     		adds	r3, r2, r3
+ 190 0122 0024     		movs	r4, #0
+ 191 0124 03A9     		add	r1, sp, #12
+ 192 0126 03F8104C 		strb	r4, [r3, #-16]
+ 193 012a FFF7FEFF 		bl	Str2Int
+ 194 012e 0398     		ldr	r0, [sp, #12]
+ 195 0130 B0F5002F 		cmp	r0, #524288
+ 196 0134 08DB     		blt	.L39
+ 197 0136 1820     		movs	r0, #24
+ 198 0138 FFF7FEFF 		bl	SerialPutChar
+ 199 013c 1820     		movs	r0, #24
+ 200 013e FFF7FEFF 		bl	SerialPutChar
+ 201 0142 4FF0FF30 		mov	r0, #-1
+ 202 0146 70E0     		b	.L27
+ 203              	.L39:
+ 204 0148 FFF7FEFF 		bl	FLASH_PagesMask
+ 205 014c 3B4B     		ldr	r3, .L83+12
+ 206 014e 3C4A     		ldr	r2, .L83+16
+ 207 0150 1860     		str	r0, [r3, #0]
+ 208 0152 1460     		str	r4, [r2, #0]
+ 209 0154 9A46     		mov	sl, r3
+ 210 0156 1446     		mov	r4, r2
+ 211 0158 DFF8F090 		ldr	r9, .L83+28
+ 212 015c 0AE0     		b	.L40
+ 213              	.L42:
+ 214 015e 394B     		ldr	r3, .L83+20
+ 215 0160 1888     		ldrh	r0, [r3, #0]
+ 216 0162 02FB0070 		mla	r0, r2, r0, r7
+ 217 0166 FFF7FEFF 		bl	FLASH_ErasePage
+ 218 016a 2268     		ldr	r2, [r4, #0]
+ 219 016c 89F80000 		strb	r0, [r9, #0]
+ 220 0170 0132     		adds	r2, r2, #1
+ 221 0172 2260     		str	r2, [r4, #0]
+ 222              	.L40:
+ 223 0174 2268     		ldr	r2, [r4, #0]
+ 224 0176 DAF80010 		ldr	r1, [sl, #0]
+ 225 017a 8A42     		cmp	r2, r1
+ 226 017c 03D2     		bcs	.L41
+ 227 017e 99F80030 		ldrb	r3, [r9, #0]	@ zero_extendqisi2
+ 228 0182 042B     		cmp	r3, #4
+ 229 0184 EBD0     		beq	.L42
+ 230              	.L41:
+ 231 0186 0620     		movs	r0, #6
+ 232 0188 FFF7FEFF 		bl	SerialPutChar
+ 233 018c 4320     		movs	r0, #67
+ 234 018e FFF7FEFF 		bl	SerialPutChar
+ 235 0192 33E0     		b	.L43
+ 236              	.L80:
+ 237 0194 0620     		movs	r0, #6
+ 238 0196 FFF7FEFF 		bl	SerialPutChar
+ 239 019a 0398     		ldr	r0, [sp, #12]
+ 240 019c 45E0     		b	.L27
+ 241              	.L31:
+ 242 019e 2A4A     		ldr	r2, .L83+24
+ 243 01a0 0333     		adds	r3, r3, #3
+ 244 01a2 1360     		str	r3, [r2, #0]
+ 245 01a4 3C46     		mov	r4, r7
+ 246 01a6 9146     		mov	r9, r2
+ 247 01a8 18E0     		b	.L44
+ 248              	.L47:
+ 249 01aa D9F80030 		ldr	r3, [r9, #0]
+ 250 01ae 2046     		mov	r0, r4
+ 251 01b0 1968     		ldr	r1, [r3, #0]
+ 252 01b2 FFF7FEFF 		bl	FLASH_ProgramWord
+ 253 01b6 D9F80030 		ldr	r3, [r9, #0]
+ 254 01ba 54F8041B 		ldr	r1, [r4], #4
+ 255 01be 1A68     		ldr	r2, [r3, #0]
+ 256 01c0 9142     		cmp	r1, r2
+ 257 01c2 08D0     		beq	.L45
+ 258 01c4 1820     		movs	r0, #24
+ 259 01c6 FFF7FEFF 		bl	SerialPutChar
+ 260 01ca 1820     		movs	r0, #24
+ 261 01cc FFF7FEFF 		bl	SerialPutChar
+ 262 01d0 6FF00100 		mvn	r0, #1
+ 263 01d4 29E0     		b	.L27
+ 264              	.L45:
+ 265 01d6 0433     		adds	r3, r3, #4
+ 266 01d8 C9F80030 		str	r3, [r9, #0]
+ 267              	.L44:
+ 268 01dc E31B     		subs	r3, r4, r7
+ 269 01de 5345     		cmp	r3, sl
+ 270 01e0 04DB     		blt	.L46
+ 271              	.L48:
+ 272 01e2 0620     		movs	r0, #6
+ 273 01e4 FFF7FEFF 		bl	SerialPutChar
+ 274 01e8 2746     		mov	r7, r4
+ 275 01ea 07E0     		b	.L43
+ 276              	.L46:
+ 277 01ec 039B     		ldr	r3, [sp, #12]
+ 278 01ee 03F10063 		add	r3, r3, #134217728
+ 279 01f2 03F55C33 		add	r3, r3, #225280
+ 280 01f6 A342     		cmp	r3, r4
+ 281 01f8 D7D8     		bhi	.L47
+ 282 01fa F2E7     		b	.L48
+ 283              	.L43:
+ 284 01fc 0135     		adds	r5, r5, #1
+ 285 01fe 4FF00109 		mov	r9, #1
+ 286              	.L81:
+ 287 0202 0024     		movs	r4, #0
+ 288 0204 08E7     		b	.L79
+ 289              	.L67:
+ 290 0206 B9F1000F 		cmp	r9, #0
+ 291 020a 00D0     		beq	.L49
+ 292 020c 0134     		adds	r4, r4, #1
+ 293              	.L49:
+ 294 020e 052C     		cmp	r4, #5
+ 295 0210 07DD     		ble	.L50
+ 296 0212 1820     		movs	r0, #24
+ 297 0214 FFF7FEFF 		bl	SerialPutChar
+ 298 0218 1820     		movs	r0, #24
+ 299              	.L82:
+ 300 021a FFF7FEFF 		bl	SerialPutChar
+ 301 021e 0020     		movs	r0, #0
+ 302 0220 03E0     		b	.L27
+ 303              	.L50:
+ 304 0222 4320     		movs	r0, #67
+ 305 0224 FFF7FEFF 		bl	SerialPutChar
+ 306 0228 F6E6     		b	.L79
+ 307              	.L27:
+ 308 022a 09B0     		add	sp, sp, #36
+ 309 022c BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, sl, fp, pc}
+ 310              	.L84:
+ 311              		.align	2
+ 312              	.L83:
+ 313 0230 00000000 		.word	packet_data
+ 314 0234 00700308 		.word	134443008
+ 315 0238 00000000 		.word	file_name
+ 316 023c 00000000 		.word	.LANCHOR0
+ 317 0240 00000000 		.word	.LANCHOR1
+ 318 0244 00000000 		.word	.LANCHOR2
+ 319 0248 00000000 		.word	RamSource
+ 320 024c 00000000 		.word	.LANCHOR3
+ 322              		.section	.text.UpdateCRC16,"ax",%progbits
+ 323              		.align	1
+ 324              		.global	UpdateCRC16
+ 325              		.thumb
+ 326              		.thumb_func
+ 328              	UpdateCRC16:
+ 329              		@ args = 0, pretend = 0, frame = 0
+ 330              		@ frame_needed = 0, uses_anonymous_args = 0
+ 331              		@ link register save eliminated.
+ 332 0000 41F48071 		orr	r1, r1, #256
+ 333              	.L88:
+ 334 0004 4900     		lsls	r1, r1, #1
+ 335 0006 4000     		lsls	r0, r0, #1
+ 336 0008 CB05     		lsls	r3, r1, #23
+ 337 000a 48BF     		it	mi
+ 338 000c 0130     		addmi	r0, r0, #1
+ 339 000e C203     		lsls	r2, r0, #15
+ 340 0010 44BF     		itt	mi
+ 341 0012 80F48150 		eormi	r0, r0, #4128
+ 342 0016 80F00100 		eormi	r0, r0, #1
+ 343 001a CB03     		lsls	r3, r1, #15
+ 344 001c F2D5     		bpl	.L88
+ 345 001e 80B2     		uxth	r0, r0
+ 346 0020 7047     		bx	lr
+ 348              		.section	.text.Cal_CRC16,"ax",%progbits
+ 349              		.align	1
+ 350              		.global	Cal_CRC16
+ 351              		.thumb
+ 352              		.thumb_func
+ 354              	Cal_CRC16:
+ 355              		@ args = 0, pretend = 0, frame = 0
+ 356              		@ frame_needed = 0, uses_anonymous_args = 0
+ 357 0000 38B5     		push	{r3, r4, r5, lr}
+ 358 0002 0446     		mov	r4, r0
+ 359 0004 4518     		adds	r5, r0, r1
+ 360 0006 0020     		movs	r0, #0
+ 361 0008 03E0     		b	.L100
+ 362              	.L101:
+ 363 000a 14F8011B 		ldrb	r1, [r4], #1	@ zero_extendqisi2
+ 364 000e FFF7FEFF 		bl	UpdateCRC16
+ 365              	.L100:
+ 366 0012 AC42     		cmp	r4, r5
+ 367 0014 80B2     		uxth	r0, r0
+ 368 0016 F8D3     		bcc	.L101
+ 369 0018 0021     		movs	r1, #0
+ 370 001a FFF7FEFF 		bl	UpdateCRC16
+ 371 001e 0021     		movs	r1, #0
+ 372 0020 BDE83840 		pop	{r3, r4, r5, lr}
+ 373 0024 FFF7FEBF 		b	UpdateCRC16
+ 375              		.comm	packet_data,1029,1
+ 376              		.comm	RamSource,4,4
+ 377              		.global	FLASHStatus
+ 378              		.global	NbrOfPage
+ 379              		.global	EraseCounter
+ 380              		.global	PageSize
+ 381              		.comm	file_name,256,1
+ 382              		.section	.bss.NbrOfPage,"aw",%nobits
+ 383              		.align	2
+ 384              		.set	.LANCHOR0,. + 0
+ 387              	NbrOfPage:
+ 388 0000 00000000 		.space	4
+ 389              		.section	.bss.EraseCounter,"aw",%nobits
+ 390              		.align	2
+ 391              		.set	.LANCHOR1,. + 0
+ 394              	EraseCounter:
+ 395 0000 00000000 		.space	4
+ 396              		.section	.data.FLASHStatus,"aw",%progbits
+ 397              		.set	.LANCHOR3,. + 0
+ 400              	FLASHStatus:
+ 401 0000 04       		.byte	4
+ 402              		.section	.data.PageSize,"aw",%progbits
+ 403              		.align	1
+ 404              		.set	.LANCHOR2,. + 0
+ 407              	PageSize:
+ 408 0000 0008     		.short	2048
+ 409              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 ymodem.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:16     .text.Receive_Byte.constprop.1:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:20     .text.Receive_Byte.constprop.1:00000000 Receive_Byte.constprop.1
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:43     .text.Receive_Byte.constprop.1:00000020 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:46     .text.Ymodem_Receive:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:51     .text.Ymodem_Receive:00000000 Ymodem_Receive
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:313    .text.Ymodem_Receive:00000230 $d
+                            *COM*:00000405 packet_data
+                            *COM*:00000100 file_name
+                            *COM*:00000004 RamSource
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:323    .text.UpdateCRC16:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:328    .text.UpdateCRC16:00000000 UpdateCRC16
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:349    .text.Cal_CRC16:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:354    .text.Cal_CRC16:00000000 Cal_CRC16
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:400    .data.FLASHStatus:00000000 FLASHStatus
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:387    .bss.NbrOfPage:00000000 NbrOfPage
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:394    .bss.EraseCounter:00000000 EraseCounter
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:407    .data.PageSize:00000000 PageSize
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:383    .bss.NbrOfPage:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:390    .bss.EraseCounter:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccz5REJl.s:403    .data.PageSize:00000000 $d
+
+UNDEFINED SYMBOLS
+SerialKeyPressed
+SerialPutChar
+Str2Int
+FLASH_PagesMask
+FLASH_ErasePage
+FLASH_ProgramWord

@@ -1,0 +1,759 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f30x_fmc.c"
+  15              		.section	.text.FMC_NORSRAMDeInit,"ax",%progbits
+  16              		.align	1
+  17              		.global	FMC_NORSRAMDeInit
+  18              		.thumb
+  19              		.thumb_func
+  21              	FMC_NORSRAMDeInit:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		@ link register save eliminated.
+  25 0000 4FF02043 		mov	r3, #-1610612736
+  26 0004 18B9     		cbnz	r0, .L2
+  27 0006 43F2DB02 		movw	r2, #12507
+  28 000a 1A60     		str	r2, [r3, #0]
+  29 000c 03E0     		b	.L3
+  30              	.L2:
+  31 000e 43F2D202 		movw	r2, #12498
+  32 0012 43F82020 		str	r2, [r3, r0, lsl #2]
+  33              	.L3:
+  34 0016 4FF02042 		mov	r2, #-1610612736
+  35 001a 411C     		adds	r1, r0, #1
+  36 001c 6FF07043 		mvn	r3, #-268435456
+  37 0020 42F82130 		str	r3, [r2, r1, lsl #2]
+  38 0024 02F58272 		add	r2, r2, #260
+  39 0028 42F82030 		str	r3, [r2, r0, lsl #2]
+  40 002c 7047     		bx	lr
+  42              		.section	.text.FMC_NORSRAMInit,"ax",%progbits
+  43              		.align	1
+  44              		.global	FMC_NORSRAMInit
+  45              		.thumb
+  46              		.thumb_func
+  48              	FMC_NORSRAMInit:
+  49              		@ args = 0, pretend = 0, frame = 0
+  50              		@ frame_needed = 0, uses_anonymous_args = 0
+  51 0000 70B5     		push	{r4, r5, r6, lr}
+  52 0002 4368     		ldr	r3, [r0, #4]
+  53 0004 8468     		ldr	r4, [r0, #8]
+  54 0006 816A     		ldr	r1, [r0, #40]
+  55 0008 0268     		ldr	r2, [r0, #0]
+  56 000a 44EA0305 		orr	r5, r4, r3
+  57 000e C368     		ldr	r3, [r0, #12]
+  58 0010 1D43     		orrs	r5, r5, r3
+  59 0012 0369     		ldr	r3, [r0, #16]
+  60 0014 1D43     		orrs	r5, r5, r3
+  61 0016 4369     		ldr	r3, [r0, #20]
+  62 0018 1D43     		orrs	r5, r5, r3
+  63 001a 8369     		ldr	r3, [r0, #24]
+  64 001c 1D43     		orrs	r5, r5, r3
+  65 001e C369     		ldr	r3, [r0, #28]
+  66 0020 1D43     		orrs	r5, r5, r3
+  67 0022 036A     		ldr	r3, [r0, #32]
+  68 0024 1D43     		orrs	r5, r5, r3
+  69 0026 436A     		ldr	r3, [r0, #36]
+  70 0028 2B43     		orrs	r3, r3, r5
+  71 002a 43EA0105 		orr	r5, r3, r1
+  72 002e C36A     		ldr	r3, [r0, #44]
+  73 0030 1D43     		orrs	r5, r5, r3
+  74 0032 036B     		ldr	r3, [r0, #48]
+  75 0034 1D43     		orrs	r5, r5, r3
+  76 0036 4FF02043 		mov	r3, #-1610612736
+  77 003a 082C     		cmp	r4, #8
+  78 003c 43F82250 		str	r5, [r3, r2, lsl #2]
+  79 0040 05D1     		bne	.L5
+  80 0042 53F82240 		ldr	r4, [r3, r2, lsl #2]
+  81 0046 44F04004 		orr	r4, r4, #64
+  82 004a 43F82240 		str	r4, [r3, r2, lsl #2]
+  83              	.L5:
+  84 004e 436B     		ldr	r3, [r0, #52]
+  85 0050 1C68     		ldr	r4, [r3, #0]
+  86 0052 9D69     		ldr	r5, [r3, #24]
+  87 0054 2543     		orrs	r5, r5, r4
+  88 0056 5C68     		ldr	r4, [r3, #4]
+  89 0058 45EA0415 		orr	r5, r5, r4, lsl #4
+  90 005c 9C68     		ldr	r4, [r3, #8]
+  91 005e 45EA0425 		orr	r5, r5, r4, lsl #8
+  92 0062 DC68     		ldr	r4, [r3, #12]
+  93 0064 45EA0445 		orr	r5, r5, r4, lsl #16
+  94 0068 1C69     		ldr	r4, [r3, #16]
+  95 006a 5B69     		ldr	r3, [r3, #20]
+  96 006c 013C     		subs	r4, r4, #1
+  97 006e 023B     		subs	r3, r3, #2
+  98 0070 45EA0454 		orr	r4, r5, r4, lsl #20
+  99 0074 561C     		adds	r6, r2, #1
+ 100 0076 44EA0364 		orr	r4, r4, r3, lsl #24
+ 101 007a 4FF02043 		mov	r3, #-1610612736
+ 102 007e B1F5804F 		cmp	r1, #16384
+ 103 0082 3546     		mov	r5, r6
+ 104 0084 43F82640 		str	r4, [r3, r6, lsl #2]
+ 105 0088 12D1     		bne	.L6
+ 106 008a 836B     		ldr	r3, [r0, #56]
+ 107 008c 1968     		ldr	r1, [r3, #0]
+ 108 008e 9869     		ldr	r0, [r3, #24]
+ 109 0090 0843     		orrs	r0, r0, r1
+ 110 0092 5968     		ldr	r1, [r3, #4]
+ 111 0094 40EA0110 		orr	r0, r0, r1, lsl #4
+ 112 0098 9968     		ldr	r1, [r3, #8]
+ 113 009a 40EA0120 		orr	r0, r0, r1, lsl #8
+ 114 009e 1969     		ldr	r1, [r3, #16]
+ 115 00a0 5B69     		ldr	r3, [r3, #20]
+ 116 00a2 0139     		subs	r1, r1, #1
+ 117 00a4 40EA0151 		orr	r1, r0, r1, lsl #20
+ 118 00a8 023B     		subs	r3, r3, #2
+ 119 00aa 41EA0361 		orr	r1, r1, r3, lsl #24
+ 120 00ae 01E0     		b	.L8
+ 121              	.L6:
+ 122 00b0 6FF07041 		mvn	r1, #-268435456
+ 123              	.L8:
+ 124 00b4 014B     		ldr	r3, .L9
+ 125 00b6 43F82210 		str	r1, [r3, r2, lsl #2]
+ 126 00ba 70BD     		pop	{r4, r5, r6, pc}
+ 127              	.L10:
+ 128              		.align	2
+ 129              	.L9:
+ 130 00bc 040100A0 		.word	-1610612476
+ 132              		.section	.text.FMC_NORSRAMStructInit,"ax",%progbits
+ 133              		.align	1
+ 134              		.global	FMC_NORSRAMStructInit
+ 135              		.thumb
+ 136              		.thumb_func
+ 138              	FMC_NORSRAMStructInit:
+ 139              		@ args = 0, pretend = 0, frame = 0
+ 140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141 0000 0222     		movs	r2, #2
+ 142 0002 4260     		str	r2, [r0, #4]
+ 143 0004 4FF48052 		mov	r2, #4096
+ 144 0008 0262     		str	r2, [r0, #32]
+ 145 000a 416B     		ldr	r1, [r0, #52]
+ 146 000c 4FF40052 		mov	r2, #8192
+ 147 0010 30B5     		push	{r4, r5, lr}
+ 148 0012 4262     		str	r2, [r0, #36]
+ 149 0014 0023     		movs	r3, #0
+ 150 0016 0F22     		movs	r2, #15
+ 151 0018 1024     		movs	r4, #16
+ 152 001a FF25     		movs	r5, #255
+ 153 001c 0360     		str	r3, [r0, #0]
+ 154 001e 8360     		str	r3, [r0, #8]
+ 155 0020 C460     		str	r4, [r0, #12]
+ 156 0022 0361     		str	r3, [r0, #16]
+ 157 0024 C362     		str	r3, [r0, #44]
+ 158 0026 4361     		str	r3, [r0, #20]
+ 159 0028 8361     		str	r3, [r0, #24]
+ 160 002a C361     		str	r3, [r0, #28]
+ 161 002c 8362     		str	r3, [r0, #40]
+ 162 002e 0363     		str	r3, [r0, #48]
+ 163 0030 0A60     		str	r2, [r1, #0]
+ 164 0032 4A60     		str	r2, [r1, #4]
+ 165 0034 CA60     		str	r2, [r1, #12]
+ 166 0036 0A61     		str	r2, [r1, #16]
+ 167 0038 4A61     		str	r2, [r1, #20]
+ 168 003a 8D60     		str	r5, [r1, #8]
+ 169 003c 8B61     		str	r3, [r1, #24]
+ 170 003e 816B     		ldr	r1, [r0, #56]
+ 171 0040 0A60     		str	r2, [r1, #0]
+ 172 0042 4A60     		str	r2, [r1, #4]
+ 173 0044 CA60     		str	r2, [r1, #12]
+ 174 0046 1122     		movs	r2, #17
+ 175 0048 8D60     		str	r5, [r1, #8]
+ 176 004a 0C61     		str	r4, [r1, #16]
+ 177 004c 4A61     		str	r2, [r1, #20]
+ 178 004e 8B61     		str	r3, [r1, #24]
+ 179 0050 30BD     		pop	{r4, r5, pc}
+ 181              		.section	.text.FMC_NORSRAMCmd,"ax",%progbits
+ 182              		.align	1
+ 183              		.global	FMC_NORSRAMCmd
+ 184              		.thumb
+ 185              		.thumb_func
+ 187              	FMC_NORSRAMCmd:
+ 188              		@ args = 0, pretend = 0, frame = 0
+ 189              		@ frame_needed = 0, uses_anonymous_args = 0
+ 190              		@ link register save eliminated.
+ 191 0000 4FF02043 		mov	r3, #-1610612736
+ 192 0004 21B1     		cbz	r1, .L13
+ 193 0006 53F82020 		ldr	r2, [r3, r0, lsl #2]
+ 194 000a 42F00102 		orr	r2, r2, #1
+ 195 000e 03E0     		b	.L15
+ 196              	.L13:
+ 197 0010 53F82010 		ldr	r1, [r3, r0, lsl #2]
+ 198 0014 024A     		ldr	r2, .L16
+ 199 0016 0A40     		ands	r2, r2, r1
+ 200              	.L15:
+ 201 0018 43F82020 		str	r2, [r3, r0, lsl #2]
+ 202 001c 7047     		bx	lr
+ 203              	.L17:
+ 204 001e 00BF     		.align	2
+ 205              	.L16:
+ 206 0020 FEFF0F00 		.word	1048574
+ 208              		.section	.text.FMC_NANDDeInit,"ax",%progbits
+ 209              		.align	1
+ 210              		.global	FMC_NANDDeInit
+ 211              		.thumb
+ 212              		.thumb_func
+ 214              	FMC_NANDDeInit:
+ 215              		@ args = 0, pretend = 0, frame = 0
+ 216              		@ frame_needed = 0, uses_anonymous_args = 0
+ 217              		@ link register save eliminated.
+ 218 0000 1028     		cmp	r0, #16
+ 219 0002 0CBF     		ite	eq
+ 220 0004 054B     		ldreq	r3, .L22
+ 221 0006 064B     		ldrne	r3, .L22+4
+ 222 0008 4022     		movs	r2, #64
+ 223 000a 1821     		movs	r1, #24
+ 224 000c 1960     		str	r1, [r3, #0]
+ 225 000e 5A60     		str	r2, [r3, #4]
+ 226 0010 4FF0FC32 		mov	r2, #-50529028
+ 227 0014 9A60     		str	r2, [r3, #8]
+ 228 0016 DA60     		str	r2, [r3, #12]
+ 229 0018 7047     		bx	lr
+ 230              	.L23:
+ 231 001a 00BF     		.align	2
+ 232              	.L22:
+ 233 001c 600000A0 		.word	-1610612640
+ 234 0020 800000A0 		.word	-1610612608
+ 236              		.section	.text.FMC_NANDInit,"ax",%progbits
+ 237              		.align	1
+ 238              		.global	FMC_NANDInit
+ 239              		.thumb
+ 240              		.thumb_func
+ 242              	FMC_NANDInit:
+ 243              		@ args = 0, pretend = 0, frame = 0
+ 244              		@ frame_needed = 0, uses_anonymous_args = 0
+ 245 0000 4268     		ldr	r2, [r0, #4]
+ 246 0002 8368     		ldr	r3, [r0, #8]
+ 247 0004 70B5     		push	{r4, r5, r6, lr}
+ 248 0006 42EA0304 		orr	r4, r2, r3
+ 249 000a C368     		ldr	r3, [r0, #12]
+ 250 000c 44F00804 		orr	r4, r4, #8
+ 251 0010 1C43     		orrs	r4, r4, r3
+ 252 0012 0369     		ldr	r3, [r0, #16]
+ 253 0014 1C43     		orrs	r4, r4, r3
+ 254 0016 4369     		ldr	r3, [r0, #20]
+ 255 0018 44EA4324 		orr	r4, r4, r3, lsl #9
+ 256 001c 8369     		ldr	r3, [r0, #24]
+ 257 001e 44EA4334 		orr	r4, r4, r3, lsl #13
+ 258 0022 C369     		ldr	r3, [r0, #28]
+ 259 0024 9A68     		ldr	r2, [r3, #8]
+ 260 0026 5D68     		ldr	r5, [r3, #4]
+ 261 0028 D968     		ldr	r1, [r3, #12]
+ 262 002a 1204     		lsls	r2, r2, #16
+ 263 002c 42EA0525 		orr	r5, r2, r5, lsl #8
+ 264 0030 1A68     		ldr	r2, [r3, #0]
+ 265 0032 036A     		ldr	r3, [r0, #32]
+ 266 0034 2A43     		orrs	r2, r2, r5
+ 267 0036 42EA0161 		orr	r1, r2, r1, lsl #24
+ 268 003a 9A68     		ldr	r2, [r3, #8]
+ 269 003c 93E86000 		ldmia	r3, {r5, r6}
+ 270 0040 1204     		lsls	r2, r2, #16
+ 271 0042 42EA0626 		orr	r6, r2, r6, lsl #8
+ 272 0046 DA68     		ldr	r2, [r3, #12]
+ 273 0048 0368     		ldr	r3, [r0, #0]
+ 274 004a 102B     		cmp	r3, #16
+ 275 004c 0CBF     		ite	eq
+ 276 004e 044B     		ldreq	r3, .L28
+ 277 0050 044B     		ldrne	r3, .L28+4
+ 278 0052 3543     		orrs	r5, r5, r6
+ 279 0054 45EA0262 		orr	r2, r5, r2, lsl #24
+ 280 0058 1C60     		str	r4, [r3, #0]
+ 281 005a 9960     		str	r1, [r3, #8]
+ 282 005c DA60     		str	r2, [r3, #12]
+ 283 005e 70BD     		pop	{r4, r5, r6, pc}
+ 284              	.L29:
+ 285              		.align	2
+ 286              	.L28:
+ 287 0060 600000A0 		.word	-1610612640
+ 288 0064 800000A0 		.word	-1610612608
+ 290              		.section	.text.FMC_NANDStructInit,"ax",%progbits
+ 291              		.align	1
+ 292              		.global	FMC_NANDStructInit
+ 293              		.thumb
+ 294              		.thumb_func
+ 296              	FMC_NANDStructInit:
+ 297              		@ args = 0, pretend = 0, frame = 0
+ 298              		@ frame_needed = 0, uses_anonymous_args = 0
+ 299              		@ link register save eliminated.
+ 300 0000 0023     		movs	r3, #0
+ 301 0002 1022     		movs	r2, #16
+ 302 0004 80E80C00 		stmia	r0, {r2, r3}
+ 303 0008 8260     		str	r2, [r0, #8]
+ 304 000a C269     		ldr	r2, [r0, #28]
+ 305 000c C360     		str	r3, [r0, #12]
+ 306 000e 0361     		str	r3, [r0, #16]
+ 307 0010 4361     		str	r3, [r0, #20]
+ 308 0012 8361     		str	r3, [r0, #24]
+ 309 0014 FC23     		movs	r3, #252
+ 310 0016 1360     		str	r3, [r2, #0]
+ 311 0018 5360     		str	r3, [r2, #4]
+ 312 001a 9360     		str	r3, [r2, #8]
+ 313 001c D360     		str	r3, [r2, #12]
+ 314 001e 026A     		ldr	r2, [r0, #32]
+ 315 0020 1360     		str	r3, [r2, #0]
+ 316 0022 5360     		str	r3, [r2, #4]
+ 317 0024 9360     		str	r3, [r2, #8]
+ 318 0026 D360     		str	r3, [r2, #12]
+ 319 0028 7047     		bx	lr
+ 321              		.section	.text.FMC_NANDCmd,"ax",%progbits
+ 322              		.align	1
+ 323              		.global	FMC_NANDCmd
+ 324              		.thumb
+ 325              		.thumb_func
+ 327              	FMC_NANDCmd:
+ 328              		@ args = 0, pretend = 0, frame = 0
+ 329              		@ frame_needed = 0, uses_anonymous_args = 0
+ 330              		@ link register save eliminated.
+ 331 0000 41B1     		cbz	r1, .L32
+ 332 0002 1028     		cmp	r0, #16
+ 333 0004 0CBF     		ite	eq
+ 334 0006 084B     		ldreq	r3, .L38
+ 335 0008 084B     		ldrne	r3, .L38+4
+ 336 000a 1A68     		ldr	r2, [r3, #0]
+ 337 000c 42F00402 		orr	r2, r2, #4
+ 338 0010 1A60     		str	r2, [r3, #0]
+ 339 0012 7047     		bx	lr
+ 340              	.L32:
+ 341 0014 1028     		cmp	r0, #16
+ 342 0016 0CBF     		ite	eq
+ 343 0018 034A     		ldreq	r2, .L38
+ 344 001a 044A     		ldrne	r2, .L38+4
+ 345 001c 044B     		ldr	r3, .L38+8
+ 346 001e 1168     		ldr	r1, [r2, #0]
+ 347 0020 0B40     		ands	r3, r3, r1
+ 348 0022 1360     		str	r3, [r2, #0]
+ 349 0024 7047     		bx	lr
+ 350              	.L39:
+ 351 0026 00BF     		.align	2
+ 352              	.L38:
+ 353 0028 600000A0 		.word	-1610612640
+ 354 002c 800000A0 		.word	-1610612608
+ 355 0030 FBFF0F00 		.word	1048571
+ 357              		.section	.text.FMC_NANDECCCmd,"ax",%progbits
+ 358              		.align	1
+ 359              		.global	FMC_NANDECCCmd
+ 360              		.thumb
+ 361              		.thumb_func
+ 363              	FMC_NANDECCCmd:
+ 364              		@ args = 0, pretend = 0, frame = 0
+ 365              		@ frame_needed = 0, uses_anonymous_args = 0
+ 366              		@ link register save eliminated.
+ 367 0000 41B1     		cbz	r1, .L41
+ 368 0002 1028     		cmp	r0, #16
+ 369 0004 0CBF     		ite	eq
+ 370 0006 084B     		ldreq	r3, .L47
+ 371 0008 084B     		ldrne	r3, .L47+4
+ 372 000a 1A68     		ldr	r2, [r3, #0]
+ 373 000c 42F04002 		orr	r2, r2, #64
+ 374 0010 1A60     		str	r2, [r3, #0]
+ 375 0012 7047     		bx	lr
+ 376              	.L41:
+ 377 0014 1028     		cmp	r0, #16
+ 378 0016 0CBF     		ite	eq
+ 379 0018 034A     		ldreq	r2, .L47
+ 380 001a 044A     		ldrne	r2, .L47+4
+ 381 001c 044B     		ldr	r3, .L47+8
+ 382 001e 1168     		ldr	r1, [r2, #0]
+ 383 0020 0B40     		ands	r3, r3, r1
+ 384 0022 1360     		str	r3, [r2, #0]
+ 385 0024 7047     		bx	lr
+ 386              	.L48:
+ 387 0026 00BF     		.align	2
+ 388              	.L47:
+ 389 0028 600000A0 		.word	-1610612640
+ 390 002c 800000A0 		.word	-1610612608
+ 391 0030 BFFF0F00 		.word	1048511
+ 393              		.section	.text.FMC_GetECC,"ax",%progbits
+ 394              		.align	1
+ 395              		.global	FMC_GetECC
+ 396              		.thumb
+ 397              		.thumb_func
+ 399              	FMC_GetECC:
+ 400              		@ args = 0, pretend = 0, frame = 0
+ 401              		@ frame_needed = 0, uses_anonymous_args = 0
+ 402              		@ link register save eliminated.
+ 403 0000 1028     		cmp	r0, #16
+ 404 0002 0CBF     		ite	eq
+ 405 0004 014B     		ldreq	r3, .L53
+ 406 0006 024B     		ldrne	r3, .L53+4
+ 407 0008 5869     		ldr	r0, [r3, #20]
+ 408 000a 7047     		bx	lr
+ 409              	.L54:
+ 410              		.align	2
+ 411              	.L53:
+ 412 000c 600000A0 		.word	-1610612640
+ 413 0010 800000A0 		.word	-1610612608
+ 415              		.section	.text.FMC_PCCARDDeInit,"ax",%progbits
+ 416              		.align	1
+ 417              		.global	FMC_PCCARDDeInit
+ 418              		.thumb
+ 419              		.thumb_func
+ 421              	FMC_PCCARDDeInit:
+ 422              		@ args = 0, pretend = 0, frame = 0
+ 423              		@ frame_needed = 0, uses_anonymous_args = 0
+ 424              		@ link register save eliminated.
+ 425 0000 054B     		ldr	r3, .L56
+ 426 0002 1822     		movs	r2, #24
+ 427 0004 1A60     		str	r2, [r3, #0]
+ 428 0006 0022     		movs	r2, #0
+ 429 0008 5A60     		str	r2, [r3, #4]
+ 430 000a 4FF0FC32 		mov	r2, #-50529028
+ 431 000e 9A60     		str	r2, [r3, #8]
+ 432 0010 DA60     		str	r2, [r3, #12]
+ 433 0012 1A61     		str	r2, [r3, #16]
+ 434 0014 7047     		bx	lr
+ 435              	.L57:
+ 436 0016 00BF     		.align	2
+ 437              	.L56:
+ 438 0018 A00000A0 		.word	-1610612576
+ 440              		.section	.text.FMC_PCCARDInit,"ax",%progbits
+ 441              		.align	1
+ 442              		.global	FMC_PCCARDInit
+ 443              		.thumb
+ 444              		.thumb_func
+ 446              	FMC_PCCARDInit:
+ 447              		@ args = 0, pretend = 0, frame = 0
+ 448              		@ frame_needed = 0, uses_anonymous_args = 0
+ 449 0000 0368     		ldr	r3, [r0, #0]
+ 450 0002 43F01002 		orr	r2, r3, #16
+ 451 0006 4368     		ldr	r3, [r0, #4]
+ 452 0008 42EA4322 		orr	r2, r2, r3, lsl #9
+ 453 000c 8368     		ldr	r3, [r0, #8]
+ 454 000e 42EA4332 		orr	r2, r2, r3, lsl #13
+ 455 0012 144B     		ldr	r3, .L59
+ 456 0014 10B5     		push	{r4, lr}
+ 457 0016 1A60     		str	r2, [r3, #0]
+ 458 0018 C268     		ldr	r2, [r0, #12]
+ 459 001a 9168     		ldr	r1, [r2, #8]
+ 460 001c 5468     		ldr	r4, [r2, #4]
+ 461 001e 0904     		lsls	r1, r1, #16
+ 462 0020 41EA0424 		orr	r4, r1, r4, lsl #8
+ 463 0024 1168     		ldr	r1, [r2, #0]
+ 464 0026 2143     		orrs	r1, r1, r4
+ 465 0028 D468     		ldr	r4, [r2, #12]
+ 466 002a 0269     		ldr	r2, [r0, #16]
+ 467 002c 41EA0461 		orr	r1, r1, r4, lsl #24
+ 468 0030 9960     		str	r1, [r3, #8]
+ 469 0032 9168     		ldr	r1, [r2, #8]
+ 470 0034 5468     		ldr	r4, [r2, #4]
+ 471 0036 0904     		lsls	r1, r1, #16
+ 472 0038 41EA0424 		orr	r4, r1, r4, lsl #8
+ 473 003c 1168     		ldr	r1, [r2, #0]
+ 474 003e 2143     		orrs	r1, r1, r4
+ 475 0040 D468     		ldr	r4, [r2, #12]
+ 476 0042 4269     		ldr	r2, [r0, #20]
+ 477 0044 41EA0461 		orr	r1, r1, r4, lsl #24
+ 478 0048 D960     		str	r1, [r3, #12]
+ 479 004a 9168     		ldr	r1, [r2, #8]
+ 480 004c 5068     		ldr	r0, [r2, #4]
+ 481 004e 0904     		lsls	r1, r1, #16
+ 482 0050 41EA0020 		orr	r0, r1, r0, lsl #8
+ 483 0054 1168     		ldr	r1, [r2, #0]
+ 484 0056 0143     		orrs	r1, r1, r0
+ 485 0058 D068     		ldr	r0, [r2, #12]
+ 486 005a 41EA0061 		orr	r1, r1, r0, lsl #24
+ 487 005e 1961     		str	r1, [r3, #16]
+ 488 0060 10BD     		pop	{r4, pc}
+ 489              	.L60:
+ 490 0062 00BF     		.align	2
+ 491              	.L59:
+ 492 0064 A00000A0 		.word	-1610612576
+ 494              		.section	.text.FMC_PCCARDStructInit,"ax",%progbits
+ 495              		.align	1
+ 496              		.global	FMC_PCCARDStructInit
+ 497              		.thumb
+ 498              		.thumb_func
+ 500              	FMC_PCCARDStructInit:
+ 501              		@ args = 0, pretend = 0, frame = 0
+ 502              		@ frame_needed = 0, uses_anonymous_args = 0
+ 503              		@ link register save eliminated.
+ 504 0000 C268     		ldr	r2, [r0, #12]
+ 505 0002 0023     		movs	r3, #0
+ 506 0004 0360     		str	r3, [r0, #0]
+ 507 0006 4360     		str	r3, [r0, #4]
+ 508 0008 8360     		str	r3, [r0, #8]
+ 509 000a FC23     		movs	r3, #252
+ 510 000c 1360     		str	r3, [r2, #0]
+ 511 000e 5360     		str	r3, [r2, #4]
+ 512 0010 9360     		str	r3, [r2, #8]
+ 513 0012 D360     		str	r3, [r2, #12]
+ 514 0014 0269     		ldr	r2, [r0, #16]
+ 515 0016 1360     		str	r3, [r2, #0]
+ 516 0018 5360     		str	r3, [r2, #4]
+ 517 001a 9360     		str	r3, [r2, #8]
+ 518 001c D360     		str	r3, [r2, #12]
+ 519 001e 4269     		ldr	r2, [r0, #20]
+ 520 0020 1360     		str	r3, [r2, #0]
+ 521 0022 5360     		str	r3, [r2, #4]
+ 522 0024 9360     		str	r3, [r2, #8]
+ 523 0026 D360     		str	r3, [r2, #12]
+ 524 0028 7047     		bx	lr
+ 526              		.section	.text.FMC_PCCARDCmd,"ax",%progbits
+ 527              		.align	1
+ 528              		.global	FMC_PCCARDCmd
+ 529              		.thumb
+ 530              		.thumb_func
+ 532              	FMC_PCCARDCmd:
+ 533              		@ args = 0, pretend = 0, frame = 0
+ 534              		@ frame_needed = 0, uses_anonymous_args = 0
+ 535              		@ link register save eliminated.
+ 536 0000 054B     		ldr	r3, .L66
+ 537 0002 18B1     		cbz	r0, .L63
+ 538 0004 1A68     		ldr	r2, [r3, #0]
+ 539 0006 42F00402 		orr	r2, r2, #4
+ 540 000a 02E0     		b	.L65
+ 541              	.L63:
+ 542 000c 1968     		ldr	r1, [r3, #0]
+ 543 000e 034A     		ldr	r2, .L66+4
+ 544 0010 0A40     		ands	r2, r2, r1
+ 545              	.L65:
+ 546 0012 1A60     		str	r2, [r3, #0]
+ 547 0014 7047     		bx	lr
+ 548              	.L67:
+ 549 0016 00BF     		.align	2
+ 550              	.L66:
+ 551 0018 A00000A0 		.word	-1610612576
+ 552 001c FBFF0F00 		.word	1048571
+ 554              		.section	.text.FMC_ITConfig,"ax",%progbits
+ 555              		.align	1
+ 556              		.global	FMC_ITConfig
+ 557              		.thumb
+ 558              		.thumb_func
+ 560              	FMC_ITConfig:
+ 561              		@ args = 0, pretend = 0, frame = 0
+ 562              		@ frame_needed = 0, uses_anonymous_args = 0
+ 563              		@ link register save eliminated.
+ 564 0000 5AB1     		cbz	r2, .L69
+ 565 0002 1028     		cmp	r0, #16
+ 566 0004 01D1     		bne	.L70
+ 567 0006 0D4B     		ldr	r3, .L78
+ 568 0008 04E0     		b	.L77
+ 569              	.L70:
+ 570 000a B0F5807F 		cmp	r0, #256
+ 571 000e 0CBF     		ite	eq
+ 572 0010 0B4B     		ldreq	r3, .L78+4
+ 573 0012 0C4B     		ldrne	r3, .L78+8
+ 574              	.L77:
+ 575 0014 5A68     		ldr	r2, [r3, #4]
+ 576 0016 1143     		orrs	r1, r1, r2
+ 577 0018 0EE0     		b	.L75
+ 578              	.L69:
+ 579 001a 1028     		cmp	r0, #16
+ 580 001c 04D1     		bne	.L73
+ 581 001e 074B     		ldr	r3, .L78
+ 582 0020 5A68     		ldr	r2, [r3, #4]
+ 583 0022 22EA0101 		bic	r1, r2, r1
+ 584 0026 07E0     		b	.L75
+ 585              	.L73:
+ 586 0028 B0F5807F 		cmp	r0, #256
+ 587 002c 0CBF     		ite	eq
+ 588 002e 044B     		ldreq	r3, .L78+4
+ 589 0030 044B     		ldrne	r3, .L78+8
+ 590 0032 5A68     		ldr	r2, [r3, #4]
+ 591 0034 C943     		mvns	r1, r1
+ 592 0036 1140     		ands	r1, r1, r2
+ 593              	.L75:
+ 594 0038 5960     		str	r1, [r3, #4]
+ 595 003a 7047     		bx	lr
+ 596              	.L79:
+ 597              		.align	2
+ 598              	.L78:
+ 599 003c 600000A0 		.word	-1610612640
+ 600 0040 800000A0 		.word	-1610612608
+ 601 0044 A00000A0 		.word	-1610612576
+ 603              		.section	.text.FMC_GetFlagStatus,"ax",%progbits
+ 604              		.align	1
+ 605              		.global	FMC_GetFlagStatus
+ 606              		.thumb
+ 607              		.thumb_func
+ 609              	FMC_GetFlagStatus:
+ 610              		@ args = 0, pretend = 0, frame = 0
+ 611              		@ frame_needed = 0, uses_anonymous_args = 0
+ 612              		@ link register save eliminated.
+ 613 0000 1028     		cmp	r0, #16
+ 614 0002 01D1     		bne	.L81
+ 615 0004 064B     		ldr	r3, .L85
+ 616 0006 04E0     		b	.L84
+ 617              	.L81:
+ 618 0008 B0F5807F 		cmp	r0, #256
+ 619 000c 0CBF     		ite	eq
+ 620 000e 054B     		ldreq	r3, .L85+4
+ 621 0010 054B     		ldrne	r3, .L85+8
+ 622              	.L84:
+ 623 0012 5B68     		ldr	r3, [r3, #4]
+ 624 0014 03EA0100 		and	r0, r3, r1
+ 625 0018 431A     		subs	r3, r0, r1
+ 626 001a 5842     		rsbs	r0, r3, #0
+ 627 001c 5841     		adcs	r0, r0, r3
+ 628 001e 7047     		bx	lr
+ 629              	.L86:
+ 630              		.align	2
+ 631              	.L85:
+ 632 0020 600000A0 		.word	-1610612640
+ 633 0024 800000A0 		.word	-1610612608
+ 634 0028 A00000A0 		.word	-1610612576
+ 636              		.section	.text.FMC_ClearFlag,"ax",%progbits
+ 637              		.align	1
+ 638              		.global	FMC_ClearFlag
+ 639              		.thumb
+ 640              		.thumb_func
+ 642              	FMC_ClearFlag:
+ 643              		@ args = 0, pretend = 0, frame = 0
+ 644              		@ frame_needed = 0, uses_anonymous_args = 0
+ 645              		@ link register save eliminated.
+ 646 0000 1028     		cmp	r0, #16
+ 647 0002 04D1     		bne	.L88
+ 648 0004 074B     		ldr	r3, .L93
+ 649 0006 5A68     		ldr	r2, [r3, #4]
+ 650 0008 22EA0101 		bic	r1, r2, r1
+ 651 000c 07E0     		b	.L91
+ 652              	.L88:
+ 653 000e B0F5807F 		cmp	r0, #256
+ 654 0012 0CBF     		ite	eq
+ 655 0014 044B     		ldreq	r3, .L93+4
+ 656 0016 054B     		ldrne	r3, .L93+8
+ 657 0018 5A68     		ldr	r2, [r3, #4]
+ 658 001a C943     		mvns	r1, r1
+ 659 001c 1140     		ands	r1, r1, r2
+ 660              	.L91:
+ 661 001e 5960     		str	r1, [r3, #4]
+ 662 0020 7047     		bx	lr
+ 663              	.L94:
+ 664 0022 00BF     		.align	2
+ 665              	.L93:
+ 666 0024 600000A0 		.word	-1610612640
+ 667 0028 800000A0 		.word	-1610612608
+ 668 002c A00000A0 		.word	-1610612576
+ 670              		.section	.text.FMC_GetITStatus,"ax",%progbits
+ 671              		.align	1
+ 672              		.global	FMC_GetITStatus
+ 673              		.thumb
+ 674              		.thumb_func
+ 676              	FMC_GetITStatus:
+ 677              		@ args = 0, pretend = 0, frame = 0
+ 678              		@ frame_needed = 0, uses_anonymous_args = 0
+ 679              		@ link register save eliminated.
+ 680 0000 1028     		cmp	r0, #16
+ 681 0002 01D1     		bne	.L96
+ 682 0004 074B     		ldr	r3, .L102
+ 683 0006 04E0     		b	.L101
+ 684              	.L96:
+ 685 0008 B0F5807F 		cmp	r0, #256
+ 686 000c 0CBF     		ite	eq
+ 687 000e 064B     		ldreq	r3, .L102+4
+ 688 0010 064B     		ldrne	r3, .L102+8
+ 689              	.L101:
+ 690 0012 5B68     		ldr	r3, [r3, #4]
+ 691 0014 13EAD100 		ands	r0, r3, r1, lsr #3
+ 692 0018 03D0     		beq	.L99
+ 693 001a 0B42     		tst	r3, r1
+ 694 001c 0CBF     		ite	eq
+ 695 001e 0020     		moveq	r0, #0
+ 696 0020 0120     		movne	r0, #1
+ 697              	.L99:
+ 698 0022 7047     		bx	lr
+ 699              	.L103:
+ 700              		.align	2
+ 701              	.L102:
+ 702 0024 600000A0 		.word	-1610612640
+ 703 0028 800000A0 		.word	-1610612608
+ 704 002c A00000A0 		.word	-1610612576
+ 706              		.section	.text.FMC_ClearITPendingBit,"ax",%progbits
+ 707              		.align	1
+ 708              		.global	FMC_ClearITPendingBit
+ 709              		.thumb
+ 710              		.thumb_func
+ 712              	FMC_ClearITPendingBit:
+ 713              		@ args = 0, pretend = 0, frame = 0
+ 714              		@ frame_needed = 0, uses_anonymous_args = 0
+ 715              		@ link register save eliminated.
+ 716 0000 1028     		cmp	r0, #16
+ 717 0002 04D1     		bne	.L105
+ 718 0004 074B     		ldr	r3, .L110
+ 719 0006 5A68     		ldr	r2, [r3, #4]
+ 720 0008 22EAD101 		bic	r1, r2, r1, lsr #3
+ 721 000c 08E0     		b	.L108
+ 722              	.L105:
+ 723 000e B0F5807F 		cmp	r0, #256
+ 724 0012 0CBF     		ite	eq
+ 725 0014 044B     		ldreq	r3, .L110+4
+ 726 0016 054B     		ldrne	r3, .L110+8
+ 727 0018 5A68     		ldr	r2, [r3, #4]
+ 728 001a C908     		lsrs	r1, r1, #3
+ 729 001c 22EA0101 		bic	r1, r2, r1
+ 730              	.L108:
+ 731 0020 5960     		str	r1, [r3, #4]
+ 732 0022 7047     		bx	lr
+ 733              	.L111:
+ 734              		.align	2
+ 735              	.L110:
+ 736 0024 600000A0 		.word	-1610612640
+ 737 0028 800000A0 		.word	-1610612608
+ 738 002c A00000A0 		.word	-1610612576
+ 740              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f30x_fmc.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:16     .text.FMC_NORSRAMDeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:21     .text.FMC_NORSRAMDeInit:00000000 FMC_NORSRAMDeInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:43     .text.FMC_NORSRAMInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:48     .text.FMC_NORSRAMInit:00000000 FMC_NORSRAMInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:130    .text.FMC_NORSRAMInit:000000bc $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:133    .text.FMC_NORSRAMStructInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:138    .text.FMC_NORSRAMStructInit:00000000 FMC_NORSRAMStructInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:182    .text.FMC_NORSRAMCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:187    .text.FMC_NORSRAMCmd:00000000 FMC_NORSRAMCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:206    .text.FMC_NORSRAMCmd:00000020 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:209    .text.FMC_NANDDeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:214    .text.FMC_NANDDeInit:00000000 FMC_NANDDeInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:233    .text.FMC_NANDDeInit:0000001c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:237    .text.FMC_NANDInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:242    .text.FMC_NANDInit:00000000 FMC_NANDInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:287    .text.FMC_NANDInit:00000060 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:291    .text.FMC_NANDStructInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:296    .text.FMC_NANDStructInit:00000000 FMC_NANDStructInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:322    .text.FMC_NANDCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:327    .text.FMC_NANDCmd:00000000 FMC_NANDCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:353    .text.FMC_NANDCmd:00000028 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:358    .text.FMC_NANDECCCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:363    .text.FMC_NANDECCCmd:00000000 FMC_NANDECCCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:389    .text.FMC_NANDECCCmd:00000028 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:394    .text.FMC_GetECC:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:399    .text.FMC_GetECC:00000000 FMC_GetECC
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:412    .text.FMC_GetECC:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:416    .text.FMC_PCCARDDeInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:421    .text.FMC_PCCARDDeInit:00000000 FMC_PCCARDDeInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:438    .text.FMC_PCCARDDeInit:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:441    .text.FMC_PCCARDInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:446    .text.FMC_PCCARDInit:00000000 FMC_PCCARDInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:492    .text.FMC_PCCARDInit:00000064 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:495    .text.FMC_PCCARDStructInit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:500    .text.FMC_PCCARDStructInit:00000000 FMC_PCCARDStructInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:527    .text.FMC_PCCARDCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:532    .text.FMC_PCCARDCmd:00000000 FMC_PCCARDCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:551    .text.FMC_PCCARDCmd:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:555    .text.FMC_ITConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:560    .text.FMC_ITConfig:00000000 FMC_ITConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:599    .text.FMC_ITConfig:0000003c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:604    .text.FMC_GetFlagStatus:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:609    .text.FMC_GetFlagStatus:00000000 FMC_GetFlagStatus
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:632    .text.FMC_GetFlagStatus:00000020 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:637    .text.FMC_ClearFlag:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:642    .text.FMC_ClearFlag:00000000 FMC_ClearFlag
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:666    .text.FMC_ClearFlag:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:671    .text.FMC_GetITStatus:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:676    .text.FMC_GetITStatus:00000000 FMC_GetITStatus
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:702    .text.FMC_GetITStatus:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:707    .text.FMC_ClearITPendingBit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:712    .text.FMC_ClearITPendingBit:00000000 FMC_ClearITPendingBit
+C:\Users\THANGN~1\AppData\Local\Temp\ccPhboGX.s:736    .text.FMC_ClearITPendingBit:00000024 $d
+
+NO UNDEFINED SYMBOLS

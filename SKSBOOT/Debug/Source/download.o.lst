@@ -1,0 +1,89 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"download.c"
+  15              		.section	.text.SerialDownload,"ax",%progbits
+  16              		.align	1
+  17              		.global	SerialDownload
+  18              		.thumb
+  19              		.thumb_func
+  21              	SerialDownload:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24 0000 70B5     		push	{r4, r5, r6, lr}
+  25 0002 3420     		movs	r0, #52
+  26 0004 FFF7FEFF 		bl	FLASH_ClearFlag
+  27 0008 FFF7FEFF 		bl	Ymodem_Receive
+  28 000c 051E     		subs	r5, r0, #0
+  29 000e 1DDD     		ble	.L1
+  30 0010 0F4C     		ldr	r4, .L3
+  31 0012 104E     		ldr	r6, .L3+4
+  32 0014 2046     		mov	r0, r4
+  33 0016 FFF7FEFF 		bl	flash_read_uboot_info
+  34 001a 3520     		movs	r0, #53
+  35 001c E560     		str	r5, [r4, #12]
+  36 001e FFF7FEFF 		bl	FLASH_ClearFlag
+  37 0022 FFF7FEFF 		bl	CRC_ResetDR
+  38 0026 A910     		asrs	r1, r5, #2
+  39 0028 0131     		adds	r1, r1, #1
+  40 002a 3046     		mov	r0, r6
+  41 002c FFF7FEFF 		bl	CRC_CalcBlockCRC
+  42 0030 094B     		ldr	r3, .L3+8
+  43 0032 A060     		str	r0, [r4, #8]
+  44 0034 6361     		str	r3, [r4, #20]
+  45 0036 2046     		mov	r0, r4
+  46 0038 0123     		movs	r3, #1
+  47 003a A661     		str	r6, [r4, #24]
+  48 003c 2362     		str	r3, [r4, #32]
+  49 003e FFF7FEFF 		bl	flash_write_uboot_info
+  50 0042 0648     		ldr	r0, .L3+12
+  51 0044 BDE87040 		pop	{r4, r5, r6, lr}
+  52 0048 FFF7FEBF 		b	xprintf
+  53              	.L1:
+  54 004c 70BD     		pop	{r4, r5, r6, pc}
+  55              	.L4:
+  56 004e 00BF     		.align	2
+  57              	.L3:
+  58 0050 00000000 		.word	boot_inf
+  59 0054 00700308 		.word	134443008
+  60 0058 00500008 		.word	134238208
+  61 005c 00000000 		.word	.LC0
+  63              		.comm	boot_inf,76,4
+  64              		.section	.rodata.str1.1,"aMS",%progbits,1
+  65              	.LC0:
+  66 0000 0D0A5072 		.ascii	"\015\012Programming Completed Successfully!\015\012"
+  66      6F677261 
+  66      6D6D696E 
+  66      6720436F 
+  66      6D706C65 
+  67 0027 2D2D2D2D 		.ascii	"--------------------------------\015\012\000"
+  67      2D2D2D2D 
+  67      2D2D2D2D 
+  67      2D2D2D2D 
+  67      2D2D2D2D 
+  68              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 download.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccoJ0uiS.s:16     .text.SerialDownload:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccoJ0uiS.s:21     .text.SerialDownload:00000000 SerialDownload
+C:\Users\THANGN~1\AppData\Local\Temp\ccoJ0uiS.s:58     .text.SerialDownload:00000050 $d
+                            *COM*:0000004c boot_inf
+
+UNDEFINED SYMBOLS
+FLASH_ClearFlag
+Ymodem_Receive
+flash_read_uboot_info
+CRC_ResetDR
+CRC_CalcBlockCRC
+flash_write_uboot_info
+xprintf

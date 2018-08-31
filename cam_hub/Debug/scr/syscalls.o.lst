@@ -1,0 +1,1005 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"syscalls.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text._sbrk,"ax",%progbits
+  18              		.align	1
+  19              		.global	_sbrk
+  20              		.code	16
+  21              		.thumb_func
+  23              	_sbrk:
+  24              	.LFB33:
+  25              		.file 1 "../scr/syscalls.c"
+   1:../scr/syscalls.c **** /*
+   2:../scr/syscalls.c ****  * syscalls.c
+   3:../scr/syscalls.c ****  *
+   4:../scr/syscalls.c ****  *  @brief: Come descritto qui:
+   5:../scr/syscalls.c ****  *
+   6:../scr/syscalls.c ****  *  			 http://embdev.net/topic/177530
+   7:../scr/syscalls.c ****  *  			 http://www.utasker.com/forum/index.php?topic=748.0 (terzo post)
+   8:../scr/syscalls.c ****  *  			 file:///C:/Programmi/CodeSourcery/Sourcery%20G++%20Lite/share/doc/arm-arm-none-eabi/html/li
+   9:../scr/syscalls.c ****  *
+  10:../scr/syscalls.c ****  *  questo codice serve a linkare correttamente la libreria newlib degli ARM.
+  11:../scr/syscalls.c ****  *  Il codice risultante qui sotto e' un collage delle varie versioni di syscall.c trovate in giro
+  12:../scr/syscalls.c ****  *  per la rete e fornisce una versione minimale che consente di compilare il progetto
+  13:../scr/syscalls.c ****  *  correttamente.
+  14:../scr/syscalls.c ****  */
+  15:../scr/syscalls.c **** // TODO: Da verificare se non crea problemi di sorta a runtime.
+  16:../scr/syscalls.c **** #include <reent.h>
+  17:../scr/syscalls.c **** #include <errno.h>
+  18:../scr/syscalls.c **** #include <stdlib.h> /* abort */
+  19:../scr/syscalls.c **** #include <sys/types.h>
+  20:../scr/syscalls.c **** #include <sys/stat.h>
+  21:../scr/syscalls.c **** 
+  22:../scr/syscalls.c **** #include "stm32f0xx.h" /* for _get_PSP() from core_cm3.h*/
+  23:../scr/syscalls.c **** 
+  24:../scr/syscalls.c **** #undef errno
+  25:../scr/syscalls.c **** extern int errno;
+  26:../scr/syscalls.c **** extern int _end;
+  27:../scr/syscalls.c **** 
+  28:../scr/syscalls.c **** int putChar(int ch);
+  29:../scr/syscalls.c **** 
+  30:../scr/syscalls.c **** caddr_t _sbrk(int incr) {
+  26              		.loc 1 30 0
+  27              		.cfi_startproc
+  28              	.LVL0:
+  31:../scr/syscalls.c **** 
+  32:../scr/syscalls.c **** 	static unsigned char *heap = NULL;
+  33:../scr/syscalls.c **** 	unsigned char *prev_heap;
+  34:../scr/syscalls.c **** 	if (heap == NULL) {
+  29              		.loc 1 34 0
+  30 0000 054B     		ldr	r3, .L3
+  30:../scr/syscalls.c **** caddr_t _sbrk(int incr) {
+  31              		.loc 1 30 0
+  32 0002 00B5     		push	{lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 4
+  35              		.cfi_offset 14, -4
+  36              		.loc 1 34 0
+  37 0004 1A68     		ldr	r2, [r3]
+  38 0006 002A     		cmp	r2, #0
+  39 0008 01D1     		bne	.L2
+  35:../scr/syscalls.c **** 		heap = (unsigned char *) &_end;
+  40              		.loc 1 35 0
+  41 000a 044A     		ldr	r2, .L3+4
+  42 000c 1A60     		str	r2, [r3]
+  43              	.L2:
+  36:../scr/syscalls.c **** 	}
+  37:../scr/syscalls.c **** 
+  38:../scr/syscalls.c **** 	prev_heap = heap;
+  44              		.loc 1 38 0
+  45 000e 1A68     		ldr	r2, [r3]
+  46              	.LVL1:
+  39:../scr/syscalls.c **** 	heap += incr;
+  40:../scr/syscalls.c **** 	return (caddr_t) prev_heap;
+  41:../scr/syscalls.c **** }
+  47              		.loc 1 41 0
+  48              		@ sp needed for prologue
+  39:../scr/syscalls.c **** 	heap += incr;
+  49              		.loc 1 39 0
+  50 0010 1018     		add	r0, r2, r0
+  51              	.LVL2:
+  52 0012 1860     		str	r0, [r3]
+  53              		.loc 1 41 0
+  54 0014 101C     		mov	r0, r2
+  55 0016 00BD     		pop	{pc}
+  56              	.L4:
+  57              		.align	2
+  58              	.L3:
+  59 0018 00000000 		.word	.LANCHOR0
+  60 001c 00000000 		.word	_end
+  61              		.cfi_endproc
+  62              	.LFE33:
+  64              		.section	.text._exit,"ax",%progbits
+  65              		.align	1
+  66              		.global	_exit
+  67              		.code	16
+  68              		.thumb_func
+  70              	_exit:
+  71              	.LFB34:
+  42:../scr/syscalls.c **** 
+  43:../scr/syscalls.c **** void _exit(int status) {
+  72              		.loc 1 43 0
+  73              		.cfi_startproc
+  74              	.LVL3:
+  75 0000 00B5     		push	{lr}
+  76              	.LCFI1:
+  77              		.cfi_def_cfa_offset 4
+  78              		.cfi_offset 14, -4
+  79              	.L6:
+  80 0002 FEE7     		b	.L6
+  81              		.cfi_endproc
+  82              	.LFE34:
+  84              		.section	.text._getpid,"ax",%progbits
+  85              		.align	1
+  86              		.global	_getpid
+  87              		.code	16
+  88              		.thumb_func
+  90              	_getpid:
+  91              	.LFB35:
+  44:../scr/syscalls.c **** 	// xprintf("_exit called with parameter %d\n", status);
+  45:../scr/syscalls.c **** 	while (1) {
+  46:../scr/syscalls.c **** 		;
+  47:../scr/syscalls.c **** 	} // Blocca tutto!
+  48:../scr/syscalls.c **** }
+  49:../scr/syscalls.c **** 
+  50:../scr/syscalls.c **** int _getpid(void) {
+  92              		.loc 1 50 0
+  93              		.cfi_startproc
+  51:../scr/syscalls.c **** 	return 1;
+  52:../scr/syscalls.c **** }
+  94              		.loc 1 52 0
+  95 0000 0120     		mov	r0, #1
+  96              		@ sp needed for prologue
+  97 0002 7047     		bx	lr
+  98              		.cfi_endproc
+  99              	.LFE35:
+ 101              		.section	.text._kill,"ax",%progbits
+ 102              		.align	1
+ 103              		.global	_kill
+ 104              		.code	16
+ 105              		.thumb_func
+ 107              	_kill:
+ 108              	.LFB36:
+  53:../scr/syscalls.c **** 
+  54:../scr/syscalls.c **** int _kill(int pid, int sig) {
+ 109              		.loc 1 54 0
+ 110              		.cfi_startproc
+ 111              	.LVL4:
+  55:../scr/syscalls.c **** 	pid = pid;
+  56:../scr/syscalls.c **** 	sig = sig; /* avoid warnings */
+  57:../scr/syscalls.c **** 	errno = EINVAL;
+ 112              		.loc 1 57 0
+ 113 0000 024B     		ldr	r3, .L9
+ 114 0002 1622     		mov	r2, #22
+  58:../scr/syscalls.c **** 	return -1;
+ 115              		.loc 1 58 0
+ 116 0004 0120     		mov	r0, #1
+ 117              	.LVL5:
+  59:../scr/syscalls.c **** }
+ 118              		.loc 1 59 0
+ 119 0006 4042     		neg	r0, r0
+  57:../scr/syscalls.c **** 	errno = EINVAL;
+ 120              		.loc 1 57 0
+ 121 0008 1A60     		str	r2, [r3]
+ 122              		.loc 1 59 0
+ 123              		@ sp needed for prologue
+ 124 000a 7047     		bx	lr
+ 125              	.L10:
+ 126              		.align	2
+ 127              	.L9:
+ 128 000c 00000000 		.word	errno
+ 129              		.cfi_endproc
+ 130              	.LFE36:
+ 132              		.section	.text.link,"ax",%progbits
+ 133              		.align	1
+ 134              		.global	link
+ 135              		.code	16
+ 136              		.thumb_func
+ 138              	link:
+ 139              	.LFB37:
+  60:../scr/syscalls.c **** 
+  61:../scr/syscalls.c **** int link(char *old, char *new) {
+ 140              		.loc 1 61 0
+ 141              		.cfi_startproc
+ 142              	.LVL6:
+  62:../scr/syscalls.c **** 	return -1;
+ 143              		.loc 1 62 0
+ 144 0000 0120     		mov	r0, #1
+ 145              	.LVL7:
+  63:../scr/syscalls.c **** }
+ 146              		.loc 1 63 0
+ 147 0002 4042     		neg	r0, r0
+ 148              		@ sp needed for prologue
+ 149 0004 7047     		bx	lr
+ 150              		.cfi_endproc
+ 151              	.LFE37:
+ 153              		.section	.text._close,"ax",%progbits
+ 154              		.align	1
+ 155              		.global	_close
+ 156              		.code	16
+ 157              		.thumb_func
+ 159              	_close:
+ 160              	.LFB38:
+  64:../scr/syscalls.c **** 
+  65:../scr/syscalls.c **** int _close(int file) {
+ 161              		.loc 1 65 0
+ 162              		.cfi_startproc
+ 163              	.LVL8:
+  66:../scr/syscalls.c **** 	return -1;
+ 164              		.loc 1 66 0
+ 165 0000 0120     		mov	r0, #1
+ 166              	.LVL9:
+  67:../scr/syscalls.c **** }
+ 167              		.loc 1 67 0
+ 168 0002 4042     		neg	r0, r0
+ 169              		@ sp needed for prologue
+ 170 0004 7047     		bx	lr
+ 171              		.cfi_endproc
+ 172              	.LFE38:
+ 174              		.section	.text._fstat,"ax",%progbits
+ 175              		.align	1
+ 176              		.global	_fstat
+ 177              		.code	16
+ 178              		.thumb_func
+ 180              	_fstat:
+ 181              	.LFB39:
+  68:../scr/syscalls.c **** 
+  69:../scr/syscalls.c **** int _fstat(int file, struct stat *st) {
+ 182              		.loc 1 69 0
+ 183              		.cfi_startproc
+ 184              	.LVL10:
+  70:../scr/syscalls.c **** 	st->st_mode = S_IFCHR;
+ 185              		.loc 1 70 0
+ 186 0000 8023     		mov	r3, #128
+ 187 0002 9B01     		lsl	r3, r3, #6
+  71:../scr/syscalls.c **** 	return 0;
+  72:../scr/syscalls.c **** }
+ 188              		.loc 1 72 0
+ 189 0004 0020     		mov	r0, #0
+ 190              	.LVL11:
+  70:../scr/syscalls.c **** 	st->st_mode = S_IFCHR;
+ 191              		.loc 1 70 0
+ 192 0006 4B60     		str	r3, [r1, #4]
+ 193              		.loc 1 72 0
+ 194              		@ sp needed for prologue
+ 195 0008 7047     		bx	lr
+ 196              		.cfi_endproc
+ 197              	.LFE39:
+ 199              		.section	.text._isatty,"ax",%progbits
+ 200              		.align	1
+ 201              		.global	_isatty
+ 202              		.code	16
+ 203              		.thumb_func
+ 205              	_isatty:
+ 206              	.LFB40:
+  73:../scr/syscalls.c **** 
+  74:../scr/syscalls.c **** int _isatty(int file) {
+ 207              		.loc 1 74 0
+ 208              		.cfi_startproc
+ 209              	.LVL12:
+  75:../scr/syscalls.c **** 	return 1;
+  76:../scr/syscalls.c **** }
+ 210              		.loc 1 76 0
+ 211 0000 0120     		mov	r0, #1
+ 212              	.LVL13:
+ 213              		@ sp needed for prologue
+ 214 0002 7047     		bx	lr
+ 215              		.cfi_endproc
+ 216              	.LFE40:
+ 218              		.section	.text._lseek,"ax",%progbits
+ 219              		.align	1
+ 220              		.global	_lseek
+ 221              		.code	16
+ 222              		.thumb_func
+ 224              	_lseek:
+ 225              	.LFB41:
+  77:../scr/syscalls.c **** 
+  78:../scr/syscalls.c **** int _lseek(int file, int ptr, int dir) {
+ 226              		.loc 1 78 0
+ 227              		.cfi_startproc
+ 228              	.LVL14:
+  79:../scr/syscalls.c **** 	return 0;
+  80:../scr/syscalls.c **** }
+ 229              		.loc 1 80 0
+ 230 0000 0020     		mov	r0, #0
+ 231              	.LVL15:
+ 232              		@ sp needed for prologue
+ 233 0002 7047     		bx	lr
+ 234              		.cfi_endproc
+ 235              	.LFE41:
+ 237              		.section	.text._read,"ax",%progbits
+ 238              		.align	1
+ 239              		.global	_read
+ 240              		.code	16
+ 241              		.thumb_func
+ 243              	_read:
+ 244              	.LFB42:
+  81:../scr/syscalls.c **** 
+  82:../scr/syscalls.c **** int _read(int file, char *ptr, int len) {
+ 245              		.loc 1 82 0
+ 246              		.cfi_startproc
+ 247              	.LVL16:
+  83:../scr/syscalls.c **** 	return 0;
+  84:../scr/syscalls.c **** }
+ 248              		.loc 1 84 0
+ 249 0000 0020     		mov	r0, #0
+ 250              	.LVL17:
+ 251              		@ sp needed for prologue
+ 252 0002 7047     		bx	lr
+ 253              		.cfi_endproc
+ 254              	.LFE42:
+ 256              		.section	.text._write,"ax",%progbits
+ 257              		.align	1
+ 258              		.global	_write
+ 259              		.code	16
+ 260              		.thumb_func
+ 262              	_write:
+ 263              	.LFB43:
+  85:../scr/syscalls.c **** 
+  86:../scr/syscalls.c **** int _write(int file, char *ptr, int len) {
+ 264              		.loc 1 86 0
+ 265              		.cfi_startproc
+ 266              	.LVL18:
+ 267 0000 70B5     		push	{r4, r5, r6, lr}
+ 268              	.LCFI2:
+ 269              		.cfi_def_cfa_offset 16
+ 270              		.cfi_offset 4, -16
+ 271              		.cfi_offset 5, -12
+ 272              		.cfi_offset 6, -8
+ 273              		.cfi_offset 14, -4
+ 274              		.loc 1 86 0
+ 275 0002 0E1C     		mov	r6, r1
+ 276 0004 151C     		mov	r5, r2
+  87:../scr/syscalls.c **** 	register int i;
+  88:../scr/syscalls.c **** 	for (i = 0; i < len; ++i) {
+ 277              		.loc 1 88 0
+ 278 0006 0C1C     		mov	r4, r1
+ 279 0008 03E0     		b	.L18
+ 280              	.LVL19:
+ 281              	.L19:
+  89:../scr/syscalls.c **** 		putChar(*ptr++);
+ 282              		.loc 1 89 0 discriminator 2
+ 283 000a 2078     		ldrb	r0, [r4]
+ 284 000c 0134     		add	r4, r4, #1
+ 285              	.LVL20:
+ 286 000e FFF7FEFF 		bl	putChar
+ 287              	.LVL21:
+ 288              	.L18:
+  86:../scr/syscalls.c **** int _write(int file, char *ptr, int len) {
+ 289              		.loc 1 86 0 discriminator 1
+ 290 0012 A31B     		sub	r3, r4, r6
+  88:../scr/syscalls.c **** 	for (i = 0; i < len; ++i) {
+ 291              		.loc 1 88 0 discriminator 1
+ 292 0014 AB42     		cmp	r3, r5
+ 293 0016 F8DB     		blt	.L19
+  90:../scr/syscalls.c **** 	}
+  91:../scr/syscalls.c **** 
+  92:../scr/syscalls.c **** 	return len;
+  93:../scr/syscalls.c **** }
+ 294              		.loc 1 93 0
+ 295 0018 281C     		mov	r0, r5
+ 296              		@ sp needed for prologue
+ 297              	.LVL22:
+ 298              	.LVL23:
+ 299 001a 70BD     		pop	{r4, r5, r6, pc}
+ 300              		.cfi_endproc
+ 301              	.LFE43:
+ 303              		.section	.text.get_heap_end,"ax",%progbits
+ 304              		.align	1
+ 305              		.global	get_heap_end
+ 306              		.code	16
+ 307              		.thumb_func
+ 309              	get_heap_end:
+ 310              	.LFB44:
+  94:../scr/syscalls.c **** 
+  95:../scr/syscalls.c **** // extern char _end; /* Defined by the linker (c'è gia' sopra)*/
+  96:../scr/syscalls.c **** static char *heap_end;
+  97:../scr/syscalls.c **** 
+  98:../scr/syscalls.c **** char* get_heap_end(void) {
+ 311              		.loc 1 98 0
+ 312              		.cfi_startproc
+  99:../scr/syscalls.c **** 	return (char*) heap_end;
+ 313              		.loc 1 99 0
+ 314 0000 014B     		ldr	r3, .L21
+ 100:../scr/syscalls.c **** }
+ 315              		.loc 1 100 0
+ 316              		@ sp needed for prologue
+  99:../scr/syscalls.c **** 	return (char*) heap_end;
+ 317              		.loc 1 99 0
+ 318 0002 1868     		ldr	r0, [r3]
+ 319              		.loc 1 100 0
+ 320 0004 7047     		bx	lr
+ 321              	.L22:
+ 322 0006 C046     		.align	2
+ 323              	.L21:
+ 324 0008 00000000 		.word	.LANCHOR1
+ 325              		.cfi_endproc
+ 326              	.LFE44:
+ 328              		.section	.text.get_stack_top,"ax",%progbits
+ 329              		.align	1
+ 330              		.global	get_stack_top
+ 331              		.code	16
+ 332              		.thumb_func
+ 334              	get_stack_top:
+ 335              	.LFB45:
+ 101:../scr/syscalls.c **** 
+ 102:../scr/syscalls.c **** char* get_stack_top(void) {
+ 336              		.loc 1 102 0
+ 337              		.cfi_startproc
+ 338              	.LBB4:
+ 339              	.LBB5:
+ 340              		.file 2 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\CMSIS\\Include/core_cmFunc.h"
+   1:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /**************************************************************************//**
+   2:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  * @file     core_cmFunc.h
+   3:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  * @brief    CMSIS Cortex-M Core Function Access Header File
+   4:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  * @version  V3.20
+   5:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  * @date     25. February 2013
+   6:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  *
+   7:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  * @note
+   8:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  *
+   9:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  ******************************************************************************/
+  10:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* Copyright (c) 2009 - 2013 ARM LIMITED
+  11:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  12:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    All rights reserved.
+  13:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    Redistribution and use in source and binary forms, with or without
+  14:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    modification, are permitted provided that the following conditions are met:
+  15:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    - Redistributions of source code must retain the above copyright
+  16:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****      notice, this list of conditions and the following disclaimer.
+  17:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    - Redistributions in binary form must reproduce the above copyright
+  18:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****      notice, this list of conditions and the following disclaimer in the
+  19:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****      documentation and/or other materials provided with the distribution.
+  20:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  21:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****      to endorse or promote products derived from this software without
+  22:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****      specific prior written permission.
+  23:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    *
+  24:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  25:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  26:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  27:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  28:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  29:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  30:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  31:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  32:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  33:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  34:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    POSSIBILITY OF SUCH DAMAGE.
+  35:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    ---------------------------------------------------------------------------*/
+  36:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  37:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  38:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #ifndef __CORE_CMFUNC_H
+  39:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #define __CORE_CMFUNC_H
+  40:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  41:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  42:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* ###########################  Core Function Access  ########################### */
+  43:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+  44:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \defgroup CMSIS_Core_RegAccFunctions CMSIS Core Register Access Functions
+  45:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   @{
+  46:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+  47:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  48:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #if   defined ( __CC_ARM ) /*------------------RealView Compiler -----------------*/
+  49:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* ARM armcc specific functions */
+  50:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  51:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #if (__ARMCC_VERSION < 400677)
+  52:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   #error "Please use ARM Compiler Toolchain V4.0.677 or later!"
+  53:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #endif
+  54:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  55:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* intrinsic void __enable_irq();     */
+  56:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* intrinsic void __disable_irq();    */
+  57:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  58:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Control Register
+  59:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  60:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the Control Register.
+  61:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  62:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               Control Register value
+  63:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+  64:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_CONTROL(void)
+  65:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+  66:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regControl         __ASM("control");
+  67:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regControl);
+  68:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+  69:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  70:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  71:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Control Register
+  72:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  73:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function writes the given value to the Control Register.
+  74:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  75:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    control  Control Register value to set
+  76:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+  77:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE void __set_CONTROL(uint32_t control)
+  78:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+  79:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regControl         __ASM("control");
+  80:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __regControl = control;
+  81:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+  82:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  83:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  84:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get IPSR Register
+  85:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  86:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the IPSR Register.
+  87:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  88:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               IPSR Register value
+  89:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+  90:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_IPSR(void)
+  91:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+  92:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regIPSR          __ASM("ipsr");
+  93:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regIPSR);
+  94:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+  95:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  96:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  97:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get APSR Register
+  98:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+  99:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the APSR Register.
+ 100:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 101:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               APSR Register value
+ 102:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 103:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_APSR(void)
+ 104:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 105:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regAPSR          __ASM("apsr");
+ 106:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regAPSR);
+ 107:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 108:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 109:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 110:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get xPSR Register
+ 111:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 112:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the xPSR Register.
+ 113:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 114:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               xPSR Register value
+ 115:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 116:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_xPSR(void)
+ 117:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 118:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regXPSR          __ASM("xpsr");
+ 119:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regXPSR);
+ 120:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 121:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 122:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 123:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Process Stack Pointer
+ 124:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 125:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current value of the Process Stack Pointer (PSP).
+ 126:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 127:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               PSP Register value
+ 128:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 129:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_PSP(void)
+ 130:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 131:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regProcessStackPointer  __ASM("psp");
+ 132:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regProcessStackPointer);
+ 133:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 134:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 135:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 136:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Process Stack Pointer
+ 137:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 138:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function assigns the given value to the Process Stack Pointer (PSP).
+ 139:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 140:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    topOfProcStack  Process Stack Pointer value to set
+ 141:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 142:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE void __set_PSP(uint32_t topOfProcStack)
+ 143:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 144:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regProcessStackPointer  __ASM("psp");
+ 145:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __regProcessStackPointer = topOfProcStack;
+ 146:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 147:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 148:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 149:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Main Stack Pointer
+ 150:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 151:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current value of the Main Stack Pointer (MSP).
+ 152:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 153:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               MSP Register value
+ 154:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 155:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_MSP(void)
+ 156:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 157:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regMainStackPointer     __ASM("msp");
+ 158:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regMainStackPointer);
+ 159:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 160:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 161:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 162:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Main Stack Pointer
+ 163:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 164:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function assigns the given value to the Main Stack Pointer (MSP).
+ 165:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 166:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    topOfMainStack  Main Stack Pointer value to set
+ 167:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 168:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE void __set_MSP(uint32_t topOfMainStack)
+ 169:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 170:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regMainStackPointer     __ASM("msp");
+ 171:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __regMainStackPointer = topOfMainStack;
+ 172:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 173:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 174:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 175:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Priority Mask
+ 176:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 177:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current state of the priority mask bit from the Priority Mask Registe
+ 178:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 179:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               Priority Mask value
+ 180:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 181:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_PRIMASK(void)
+ 182:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 183:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regPriMask         __ASM("primask");
+ 184:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regPriMask);
+ 185:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 186:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 187:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 188:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Priority Mask
+ 189:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 190:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function assigns the given value to the Priority Mask Register.
+ 191:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 192:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    priMask  Priority Mask
+ 193:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 194:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE void __set_PRIMASK(uint32_t priMask)
+ 195:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 196:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regPriMask         __ASM("primask");
+ 197:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __regPriMask = (priMask);
+ 198:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 199:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 200:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 201:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #if       (__CORTEX_M >= 0x03)
+ 202:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 203:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Enable FIQ
+ 204:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 205:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function enables FIQ interrupts by clearing the F-bit in the CPSR.
+ 206:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     Can only be executed in Privileged modes.
+ 207:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 208:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #define __enable_fault_irq                __enable_fiq
+ 209:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 210:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 211:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Disable FIQ
+ 212:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 213:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function disables FIQ interrupts by setting the F-bit in the CPSR.
+ 214:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     Can only be executed in Privileged modes.
+ 215:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 216:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #define __disable_fault_irq               __disable_fiq
+ 217:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 218:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 219:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Base Priority
+ 220:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 221:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current value of the Base Priority register.
+ 222:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 223:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               Base Priority register value
+ 224:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 225:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t  __get_BASEPRI(void)
+ 226:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 227:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regBasePri         __ASM("basepri");
+ 228:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regBasePri);
+ 229:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 230:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 231:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 232:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Base Priority
+ 233:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 234:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function assigns the given value to the Base Priority register.
+ 235:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 236:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    basePri  Base Priority value to set
+ 237:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 238:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE void __set_BASEPRI(uint32_t basePri)
+ 239:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 240:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regBasePri         __ASM("basepri");
+ 241:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __regBasePri = (basePri & 0xff);
+ 242:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 243:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 244:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 245:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Fault Mask
+ 246:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 247:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current value of the Fault Mask register.
+ 248:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 249:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               Fault Mask register value
+ 250:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 251:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_FAULTMASK(void)
+ 252:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 253:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regFaultMask       __ASM("faultmask");
+ 254:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regFaultMask);
+ 255:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 256:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 257:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 258:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Fault Mask
+ 259:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 260:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function assigns the given value to the Fault Mask register.
+ 261:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 262:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    faultMask  Fault Mask value to set
+ 263:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 264:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE void __set_FAULTMASK(uint32_t faultMask)
+ 265:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 266:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regFaultMask       __ASM("faultmask");
+ 267:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __regFaultMask = (faultMask & (uint32_t)1);
+ 268:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 269:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 270:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #endif /* (__CORTEX_M >= 0x03) */
+ 271:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 272:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 273:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #if       (__CORTEX_M == 0x04)
+ 274:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 275:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get FPSCR
+ 276:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 277:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current value of the Floating Point Status/Control register.
+ 278:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 279:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               Floating Point Status/Control register value
+ 280:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 281:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE uint32_t __get_FPSCR(void)
+ 282:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 283:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+ 284:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regfpscr         __ASM("fpscr");
+ 285:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(__regfpscr);
+ 286:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #else
+ 287:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****    return(0);
+ 288:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #endif
+ 289:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 290:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 291:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 292:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set FPSCR
+ 293:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 294:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function assigns the given value to the Floating Point Status/Control register.
+ 295:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 296:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    fpscr  Floating Point Status/Control value to set
+ 297:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 298:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
+ 299:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 300:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+ 301:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t __regfpscr         __ASM("fpscr");
+ 302:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __regfpscr = (fpscr);
+ 303:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #endif
+ 304:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 305:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 306:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #endif /* (__CORTEX_M == 0x04) */
+ 307:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 308:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 309:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
+ 310:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* IAR iccarm specific functions */
+ 311:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 312:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #include <cmsis_iar.h>
+ 313:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 314:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 315:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #elif defined ( __TMS470__ ) /*---------------- TI CCS Compiler ------------------*/
+ 316:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* TI CCS specific functions */
+ 317:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 318:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #include <cmsis_ccs.h>
+ 319:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 320:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 321:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** #elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
+ 322:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /* GNU gcc specific functions */
+ 323:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 324:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Enable IRQ Interrupts
+ 325:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 326:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   This function enables IRQ interrupts by clearing the I-bit in the CPSR.
+ 327:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   Can only be executed in Privileged modes.
+ 328:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 329:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __enable_irq(void)
+ 330:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 331:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("cpsie i" : : : "memory");
+ 332:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 333:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 334:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 335:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Disable IRQ Interrupts
+ 336:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 337:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   This function disables IRQ interrupts by setting the I-bit in the CPSR.
+ 338:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   Can only be executed in Privileged modes.
+ 339:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 340:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __disable_irq(void)
+ 341:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 342:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("cpsid i" : : : "memory");
+ 343:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 344:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 345:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 346:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Control Register
+ 347:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 348:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the Control Register.
+ 349:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 350:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               Control Register value
+ 351:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 352:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_CONTROL(void)
+ 353:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 354:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   uint32_t result;
+ 355:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 356:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MRS %0, control" : "=r" (result) );
+ 357:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(result);
+ 358:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 359:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 360:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 361:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Control Register
+ 362:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 363:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function writes the given value to the Control Register.
+ 364:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 365:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    control  Control Register value to set
+ 366:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 367:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_CONTROL(uint32_t control)
+ 368:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 369:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MSR control, %0" : : "r" (control) : "memory");
+ 370:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 371:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 372:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 373:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get IPSR Register
+ 374:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 375:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the IPSR Register.
+ 376:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 377:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               IPSR Register value
+ 378:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 379:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_IPSR(void)
+ 380:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 381:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   uint32_t result;
+ 382:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 383:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MRS %0, ipsr" : "=r" (result) );
+ 384:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(result);
+ 385:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 386:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 387:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 388:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get APSR Register
+ 389:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 390:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the APSR Register.
+ 391:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 392:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               APSR Register value
+ 393:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 394:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_APSR(void)
+ 395:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 396:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   uint32_t result;
+ 397:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 398:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MRS %0, apsr" : "=r" (result) );
+ 399:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(result);
+ 400:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 401:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 402:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 403:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get xPSR Register
+ 404:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 405:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the content of the xPSR Register.
+ 406:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 407:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               xPSR Register value
+ 408:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 409:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_xPSR(void)
+ 410:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 411:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   uint32_t result;
+ 412:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 413:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MRS %0, xpsr" : "=r" (result) );
+ 414:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(result);
+ 415:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 416:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 417:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 418:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Process Stack Pointer
+ 419:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 420:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current value of the Process Stack Pointer (PSP).
+ 421:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 422:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               PSP Register value
+ 423:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 424:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_PSP(void)
+ 425:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 426:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t result;
+ 427:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 428:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MRS %0, psp\n"  : "=r" (result) );
+ 429:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   return(result);
+ 430:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 431:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 432:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 433:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Set Process Stack Pointer
+ 434:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 435:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function assigns the given value to the Process Stack Pointer (PSP).
+ 436:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 437:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \param [in]    topOfProcStack  Process Stack Pointer value to set
+ 438:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 439:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_PSP(uint32_t topOfProcStack)
+ 440:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 441:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MSR psp, %0\n" : : "r" (topOfProcStack) : "sp");
+ 442:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** }
+ 443:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 444:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 445:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** /** \brief  Get Main Stack Pointer
+ 446:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 447:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     This function returns the current value of the Main Stack Pointer (MSP).
+ 448:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 449:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****     \return               MSP Register value
+ 450:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****  */
+ 451:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __get_MSP(void)
+ 452:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** {
+ 453:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   register uint32_t result;
+ 454:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h **** 
+ 455:D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include\core_cmFunc.h ****   __ASM volatile ("MRS %0, msp\n" : "=r" (result) );
+ 341              		.loc 2 455 0
+ 342              	@ 455 "D:\EclipseIndigo\workspace\cam_hub\Libraries\CMSIS\Include/core_cmFunc.h" 1
+ 343 0000 EFF30880 		MRS r0, msp
+ 344              	
+ 345              	@ 0 "" 2
+ 346              	.LVL24:
+ 347              		.code	16
+ 348              	.LBE5:
+ 349              	.LBE4:
+ 103:../scr/syscalls.c **** 	return (char*) __get_MSP();
+ 104:../scr/syscalls.c **** }
+ 350              		.loc 1 104 0
+ 351              		@ sp needed for prologue
+ 352 0004 7047     		bx	lr
+ 353              		.cfi_endproc
+ 354              	.LFE45:
+ 356              		.section	.bss.heap.6780,"aw",%nobits
+ 357              		.align	2
+ 358              		.set	.LANCHOR0,. + 0
+ 361              	heap.6780:
+ 362 0000 00000000 		.space	4
+ 363              		.section	.bss.heap_end,"aw",%nobits
+ 364              		.align	2
+ 365              		.set	.LANCHOR1,. + 0
+ 368              	heap_end:
+ 369 0000 00000000 		.space	4
+ 370              		.text
+ 371              	.Letext0:
+ 372              		.file 3 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 373              		.file 4 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 374              		.file 5 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 375              		.file 6 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+DEFINED SYMBOLS
+                            *ABS*:00000000 syscalls.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:18     .text._sbrk:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:23     .text._sbrk:00000000 _sbrk
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:59     .text._sbrk:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:65     .text._exit:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:70     .text._exit:00000000 _exit
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:85     .text._getpid:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:90     .text._getpid:00000000 _getpid
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:102    .text._kill:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:107    .text._kill:00000000 _kill
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:128    .text._kill:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:133    .text.link:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:138    .text.link:00000000 link
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:154    .text._close:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:159    .text._close:00000000 _close
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:175    .text._fstat:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:180    .text._fstat:00000000 _fstat
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:200    .text._isatty:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:205    .text._isatty:00000000 _isatty
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:219    .text._lseek:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:224    .text._lseek:00000000 _lseek
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:238    .text._read:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:243    .text._read:00000000 _read
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:257    .text._write:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:262    .text._write:00000000 _write
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:304    .text.get_heap_end:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:309    .text.get_heap_end:00000000 get_heap_end
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:324    .text.get_heap_end:00000008 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:329    .text.get_stack_top:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:334    .text.get_stack_top:00000000 get_stack_top
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:357    .bss.heap.6780:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:361    .bss.heap.6780:00000000 heap.6780
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:364    .bss.heap_end:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccxn6FMx.s:368    .bss.heap_end:00000000 heap_end
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.90b54cb79624a05a6a75538133d4ee2f
+                           .group:00000000 wm4.newlib.h.8.e1d498e57c12962fc6d7be5061a6981a
+                           .group:00000000 wm4.config.h.184.720a0632b4c315f4e8d8f1fee595bb41
+                           .group:00000000 wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04
+                           .group:00000000 wm4._default_types.h.6.1dbd2e581fd590860c7c17f21d147e91
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4.stddef.h.349.31f4c5baff3fa2689010b32028da9c47
+                           .group:00000000 wm4.reent.h.16.fbf96e140479440ec10fa8cd451b198e
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.reent.h.97.2ae38345dababbc3acb159bb773d0e93
+                           .group:00000000 wm4.stddef.h.139.56375c5edbb32675a8ff33c493afa18e
+                           .group:00000000 wm4.errno.h.2.5b3f581717bc0b96d84329979b470db5
+                           .group:00000000 wm4.errno.h.9.fa967cb39a1c663b143273e5c44dae1a
+                           .group:00000000 wm4.stdlib.h.18.6f6153fd5cb89acd58c0f0ab1f77e147
+                           .group:00000000 wm4.stddef.h.235.fb53403984550eba259277227435d55a
+                           .group:00000000 wm4.stdlib.h.55.cc7580498961d3920a349b9c75da3bb9
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.40.49dc34f32a4640c142fac2cd2ba0bdf0
+                           .group:00000000 wm4.types.h.80.f2bfdfeee9f340633702c07fad9b5e01
+                           .group:00000000 wm4.time.h.2.9857e62ad6ac99431e29d58067232314
+                           .group:00000000 wm4.time.h.33.7f5d132454e7bf35c22009dbda1491ee
+                           .group:00000000 wm4.stddef.h.161.e50ff8a9d5d1abbc15641da28ac571bf
+                           .group:00000000 wm4.time.h.199.86a924f58be8b6c7bbcf58ec9b75ac50
+                           .group:00000000 wm4.stat.h.69.169a67369ef31f6ea38a12bc9ba4e5dd
+                           .group:00000000 wm4.stm32f0xx.h.54.2936c65ea497e2b9f6697d244f204f4f
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.491.56b995fdd6b34ccece7fa7ee90a03d09
+                           .group:00000000 wm4.stm32f0xx_adc.h.31.deffd6417c7f5b0940228cd2f9270807
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.ff204b27217b5926452ab2f52b527ff3
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.02fa02b24c01ae505c73e46ccbb612cf
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+
+UNDEFINED SYMBOLS
+_end
+errno
+putChar

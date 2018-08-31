@@ -1,0 +1,1009 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f30x_flash.c"
+  15              		.section	.text.FLASH_SetLatency,"ax",%progbits
+  16              		.align	1
+  17              		.global	FLASH_SetLatency
+  18              		.thumb
+  19              		.thumb_func
+  21              	FLASH_SetLatency:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		@ link register save eliminated.
+  25 0000 034B     		ldr	r3, .L2
+  26 0002 1A68     		ldr	r2, [r3, #0]
+  27 0004 22F00302 		bic	r2, r2, #3
+  28 0008 1043     		orrs	r0, r0, r2
+  29 000a 1860     		str	r0, [r3, #0]
+  30 000c 7047     		bx	lr
+  31              	.L3:
+  32 000e 00BF     		.align	2
+  33              	.L2:
+  34 0010 00200240 		.word	1073881088
+  36              		.section	.text.FLASH_HalfCycleAccessCmd,"ax",%progbits
+  37              		.align	1
+  38              		.global	FLASH_HalfCycleAccessCmd
+  39              		.thumb
+  40              		.thumb_func
+  42              	FLASH_HalfCycleAccessCmd:
+  43              		@ args = 0, pretend = 0, frame = 0
+  44              		@ frame_needed = 0, uses_anonymous_args = 0
+  45              		@ link register save eliminated.
+  46 0000 044B     		ldr	r3, .L8
+  47 0002 1A68     		ldr	r2, [r3, #0]
+  48 0004 10B1     		cbz	r0, .L5
+  49 0006 42F00802 		orr	r2, r2, #8
+  50 000a 01E0     		b	.L7
+  51              	.L5:
+  52 000c 22F00802 		bic	r2, r2, #8
+  53              	.L7:
+  54 0010 1A60     		str	r2, [r3, #0]
+  55 0012 7047     		bx	lr
+  56              	.L9:
+  57              		.align	2
+  58              	.L8:
+  59 0014 00200240 		.word	1073881088
+  61              		.section	.text.FLASH_PrefetchBufferCmd,"ax",%progbits
+  62              		.align	1
+  63              		.global	FLASH_PrefetchBufferCmd
+  64              		.thumb
+  65              		.thumb_func
+  67              	FLASH_PrefetchBufferCmd:
+  68              		@ args = 0, pretend = 0, frame = 0
+  69              		@ frame_needed = 0, uses_anonymous_args = 0
+  70              		@ link register save eliminated.
+  71 0000 044B     		ldr	r3, .L14
+  72 0002 1A68     		ldr	r2, [r3, #0]
+  73 0004 10B1     		cbz	r0, .L11
+  74 0006 42F01002 		orr	r2, r2, #16
+  75 000a 01E0     		b	.L13
+  76              	.L11:
+  77 000c 22F01002 		bic	r2, r2, #16
+  78              	.L13:
+  79 0010 1A60     		str	r2, [r3, #0]
+  80 0012 7047     		bx	lr
+  81              	.L15:
+  82              		.align	2
+  83              	.L14:
+  84 0014 00200240 		.word	1073881088
+  86              		.section	.text.FLASH_Unlock,"ax",%progbits
+  87              		.align	1
+  88              		.global	FLASH_Unlock
+  89              		.thumb
+  90              		.thumb_func
+  92              	FLASH_Unlock:
+  93              		@ args = 0, pretend = 0, frame = 0
+  94              		@ frame_needed = 0, uses_anonymous_args = 0
+  95              		@ link register save eliminated.
+  96 0000 044B     		ldr	r3, .L21
+  97 0002 1A69     		ldr	r2, [r3, #16]
+  98 0004 1206     		lsls	r2, r2, #24
+  99 0006 04D5     		bpl	.L16
+ 100 0008 034A     		ldr	r2, .L21+4
+ 101 000a 5A60     		str	r2, [r3, #4]
+ 102 000c 02F18832 		add	r2, r2, #-2004318072
+ 103 0010 5A60     		str	r2, [r3, #4]
+ 104              	.L16:
+ 105 0012 7047     		bx	lr
+ 106              	.L22:
+ 107              		.align	2
+ 108              	.L21:
+ 109 0014 00200240 		.word	1073881088
+ 110 0018 23016745 		.word	1164378403
+ 112              		.section	.text.FLASH_Lock,"ax",%progbits
+ 113              		.align	1
+ 114              		.global	FLASH_Lock
+ 115              		.thumb
+ 116              		.thumb_func
+ 118              	FLASH_Lock:
+ 119              		@ args = 0, pretend = 0, frame = 0
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121              		@ link register save eliminated.
+ 122 0000 024B     		ldr	r3, .L24
+ 123 0002 1A69     		ldr	r2, [r3, #16]
+ 124 0004 42F08002 		orr	r2, r2, #128
+ 125 0008 1A61     		str	r2, [r3, #16]
+ 126 000a 7047     		bx	lr
+ 127              	.L25:
+ 128              		.align	2
+ 129              	.L24:
+ 130 000c 00200240 		.word	1073881088
+ 132              		.section	.text.FLASH_OB_Unlock,"ax",%progbits
+ 133              		.align	1
+ 134              		.global	FLASH_OB_Unlock
+ 135              		.thumb
+ 136              		.thumb_func
+ 138              	FLASH_OB_Unlock:
+ 139              		@ args = 0, pretend = 0, frame = 0
+ 140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141              		@ link register save eliminated.
+ 142 0000 044B     		ldr	r3, .L28
+ 143 0002 1A69     		ldr	r2, [r3, #16]
+ 144 0004 9105     		lsls	r1, r2, #22
+ 145 0006 04D4     		bmi	.L26
+ 146 0008 034A     		ldr	r2, .L28+4
+ 147 000a 9A60     		str	r2, [r3, #8]
+ 148 000c 02F18832 		add	r2, r2, #-2004318072
+ 149 0010 9A60     		str	r2, [r3, #8]
+ 150              	.L26:
+ 151 0012 7047     		bx	lr
+ 152              	.L29:
+ 153              		.align	2
+ 154              	.L28:
+ 155 0014 00200240 		.word	1073881088
+ 156 0018 23016745 		.word	1164378403
+ 158              		.section	.text.FLASH_OB_Lock,"ax",%progbits
+ 159              		.align	1
+ 160              		.global	FLASH_OB_Lock
+ 161              		.thumb
+ 162              		.thumb_func
+ 164              	FLASH_OB_Lock:
+ 165              		@ args = 0, pretend = 0, frame = 0
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167              		@ link register save eliminated.
+ 168 0000 024B     		ldr	r3, .L31
+ 169 0002 1A69     		ldr	r2, [r3, #16]
+ 170 0004 22F40072 		bic	r2, r2, #512
+ 171 0008 1A61     		str	r2, [r3, #16]
+ 172 000a 7047     		bx	lr
+ 173              	.L32:
+ 174              		.align	2
+ 175              	.L31:
+ 176 000c 00200240 		.word	1073881088
+ 178              		.section	.text.FLASH_OB_Launch,"ax",%progbits
+ 179              		.align	1
+ 180              		.global	FLASH_OB_Launch
+ 181              		.thumb
+ 182              		.thumb_func
+ 184              	FLASH_OB_Launch:
+ 185              		@ args = 0, pretend = 0, frame = 0
+ 186              		@ frame_needed = 0, uses_anonymous_args = 0
+ 187              		@ link register save eliminated.
+ 188 0000 024B     		ldr	r3, .L34
+ 189 0002 1A69     		ldr	r2, [r3, #16]
+ 190 0004 42F40052 		orr	r2, r2, #8192
+ 191 0008 1A61     		str	r2, [r3, #16]
+ 192 000a 7047     		bx	lr
+ 193              	.L35:
+ 194              		.align	2
+ 195              	.L34:
+ 196 000c 00200240 		.word	1073881088
+ 198              		.section	.text.FLASH_OB_GetUser,"ax",%progbits
+ 199              		.align	1
+ 200              		.global	FLASH_OB_GetUser
+ 201              		.thumb
+ 202              		.thumb_func
+ 204              	FLASH_OB_GetUser:
+ 205              		@ args = 0, pretend = 0, frame = 0
+ 206              		@ frame_needed = 0, uses_anonymous_args = 0
+ 207              		@ link register save eliminated.
+ 208 0000 024B     		ldr	r3, .L37
+ 209 0002 D869     		ldr	r0, [r3, #28]
+ 210 0004 C0F30720 		ubfx	r0, r0, #8, #8
+ 211 0008 7047     		bx	lr
+ 212              	.L38:
+ 213 000a 00BF     		.align	2
+ 214              	.L37:
+ 215 000c 00200240 		.word	1073881088
+ 217              		.section	.text.FLASH_OB_GetWRP,"ax",%progbits
+ 218              		.align	1
+ 219              		.global	FLASH_OB_GetWRP
+ 220              		.thumb
+ 221              		.thumb_func
+ 223              	FLASH_OB_GetWRP:
+ 224              		@ args = 0, pretend = 0, frame = 0
+ 225              		@ frame_needed = 0, uses_anonymous_args = 0
+ 226              		@ link register save eliminated.
+ 227 0000 014B     		ldr	r3, .L40
+ 228 0002 186A     		ldr	r0, [r3, #32]
+ 229 0004 7047     		bx	lr
+ 230              	.L41:
+ 231 0006 00BF     		.align	2
+ 232              	.L40:
+ 233 0008 00200240 		.word	1073881088
+ 235              		.section	.text.FLASH_OB_GetRDP,"ax",%progbits
+ 236              		.align	1
+ 237              		.global	FLASH_OB_GetRDP
+ 238              		.thumb
+ 239              		.thumb_func
+ 241              	FLASH_OB_GetRDP:
+ 242              		@ args = 0, pretend = 0, frame = 0
+ 243              		@ frame_needed = 0, uses_anonymous_args = 0
+ 244              		@ link register save eliminated.
+ 245 0000 034B     		ldr	r3, .L43
+ 246 0002 DB69     		ldr	r3, [r3, #28]
+ 247 0004 13F0060F 		tst	r3, #6
+ 248 0008 0CBF     		ite	eq
+ 249 000a 0020     		moveq	r0, #0
+ 250 000c 0120     		movne	r0, #1
+ 251 000e 7047     		bx	lr
+ 252              	.L44:
+ 253              		.align	2
+ 254              	.L43:
+ 255 0010 00200240 		.word	1073881088
+ 257              		.section	.text.FLASH_ITConfig,"ax",%progbits
+ 258              		.align	1
+ 259              		.global	FLASH_ITConfig
+ 260              		.thumb
+ 261              		.thumb_func
+ 263              	FLASH_ITConfig:
+ 264              		@ args = 0, pretend = 0, frame = 0
+ 265              		@ frame_needed = 0, uses_anonymous_args = 0
+ 266              		@ link register save eliminated.
+ 267 0000 044B     		ldr	r3, .L49
+ 268 0002 1A69     		ldr	r2, [r3, #16]
+ 269 0004 09B1     		cbz	r1, .L46
+ 270 0006 1043     		orrs	r0, r0, r2
+ 271 0008 01E0     		b	.L48
+ 272              	.L46:
+ 273 000a 22EA0000 		bic	r0, r2, r0
+ 274              	.L48:
+ 275 000e 1861     		str	r0, [r3, #16]
+ 276 0010 7047     		bx	lr
+ 277              	.L50:
+ 278 0012 00BF     		.align	2
+ 279              	.L49:
+ 280 0014 00200240 		.word	1073881088
+ 282              		.section	.text.FLASH_GetFlagStatus,"ax",%progbits
+ 283              		.align	1
+ 284              		.global	FLASH_GetFlagStatus
+ 285              		.thumb
+ 286              		.thumb_func
+ 288              	FLASH_GetFlagStatus:
+ 289              		@ args = 0, pretend = 0, frame = 0
+ 290              		@ frame_needed = 0, uses_anonymous_args = 0
+ 291              		@ link register save eliminated.
+ 292 0000 034B     		ldr	r3, .L52
+ 293 0002 DB68     		ldr	r3, [r3, #12]
+ 294 0004 1842     		tst	r0, r3
+ 295 0006 0CBF     		ite	eq
+ 296 0008 0020     		moveq	r0, #0
+ 297 000a 0120     		movne	r0, #1
+ 298 000c 7047     		bx	lr
+ 299              	.L53:
+ 300 000e 00BF     		.align	2
+ 301              	.L52:
+ 302 0010 00200240 		.word	1073881088
+ 304              		.section	.text.FLASH_ClearFlag,"ax",%progbits
+ 305              		.align	1
+ 306              		.global	FLASH_ClearFlag
+ 307              		.thumb
+ 308              		.thumb_func
+ 310              	FLASH_ClearFlag:
+ 311              		@ args = 0, pretend = 0, frame = 0
+ 312              		@ frame_needed = 0, uses_anonymous_args = 0
+ 313              		@ link register save eliminated.
+ 314 0000 014B     		ldr	r3, .L55
+ 315 0002 D860     		str	r0, [r3, #12]
+ 316 0004 7047     		bx	lr
+ 317              	.L56:
+ 318 0006 00BF     		.align	2
+ 319              	.L55:
+ 320 0008 00200240 		.word	1073881088
+ 322              		.section	.text.FLASH_GetStatus,"ax",%progbits
+ 323              		.align	1
+ 324              		.global	FLASH_GetStatus
+ 325              		.thumb
+ 326              		.thumb_func
+ 328              	FLASH_GetStatus:
+ 329              		@ args = 0, pretend = 0, frame = 0
+ 330              		@ frame_needed = 0, uses_anonymous_args = 0
+ 331              		@ link register save eliminated.
+ 332 0000 084B     		ldr	r3, .L63
+ 333 0002 DA68     		ldr	r2, [r3, #12]
+ 334 0004 D207     		lsls	r2, r2, #31
+ 335 0006 09D4     		bmi	.L60
+ 336 0008 DA68     		ldr	r2, [r3, #12]
+ 337 000a D006     		lsls	r0, r2, #27
+ 338 000c 08D4     		bmi	.L61
+ 339 000e DB68     		ldr	r3, [r3, #12]
+ 340 0010 13F0040F 		tst	r3, #4
+ 341 0014 0CBF     		ite	eq
+ 342 0016 0420     		moveq	r0, #4
+ 343 0018 0320     		movne	r0, #3
+ 344 001a 7047     		bx	lr
+ 345              	.L60:
+ 346 001c 0120     		movs	r0, #1
+ 347 001e 7047     		bx	lr
+ 348              	.L61:
+ 349 0020 0220     		movs	r0, #2
+ 350 0022 7047     		bx	lr
+ 351              	.L64:
+ 352              		.align	2
+ 353              	.L63:
+ 354 0024 00200240 		.word	1073881088
+ 356              		.section	.text.FLASH_WaitForLastOperation,"ax",%progbits
+ 357              		.align	1
+ 358              		.global	FLASH_WaitForLastOperation
+ 359              		.thumb
+ 360              		.thumb_func
+ 362              	FLASH_WaitForLastOperation:
+ 363              		@ args = 0, pretend = 0, frame = 0
+ 364              		@ frame_needed = 0, uses_anonymous_args = 0
+ 365 0000 10B5     		push	{r4, lr}
+ 366 0002 0446     		mov	r4, r0
+ 367 0004 FFF7FEFF 		bl	FLASH_GetStatus
+ 368 0008 02E0     		b	.L66
+ 369              	.L68:
+ 370 000a FFF7FEFF 		bl	FLASH_GetStatus
+ 371 000e 013C     		subs	r4, r4, #1
+ 372              	.L66:
+ 373 0010 0128     		cmp	r0, #1
+ 374 0012 03D1     		bne	.L67
+ 375 0014 002C     		cmp	r4, #0
+ 376 0016 F8D1     		bne	.L68
+ 377 0018 0520     		movs	r0, #5
+ 378 001a 10BD     		pop	{r4, pc}
+ 379              	.L67:
+ 380 001c 002C     		cmp	r4, #0
+ 381 001e 08BF     		it	eq
+ 382 0020 0520     		moveq	r0, #5
+ 383 0022 10BD     		pop	{r4, pc}
+ 385              		.section	.text.FLASH_ProgramOptionByteData,"ax",%progbits
+ 386              		.align	1
+ 387              		.global	FLASH_ProgramOptionByteData
+ 388              		.thumb
+ 389              		.thumb_func
+ 391              	FLASH_ProgramOptionByteData:
+ 392              		@ args = 0, pretend = 0, frame = 0
+ 393              		@ frame_needed = 0, uses_anonymous_args = 0
+ 394 0000 70B5     		push	{r4, r5, r6, lr}
+ 395 0002 0546     		mov	r5, r0
+ 396 0004 4FF43020 		mov	r0, #720896
+ 397 0008 0E46     		mov	r6, r1
+ 398 000a FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 399 000e 0428     		cmp	r0, #4
+ 400 0010 0FD1     		bne	.L72
+ 401 0012 084C     		ldr	r4, .L76
+ 402 0014 2369     		ldr	r3, [r4, #16]
+ 403 0016 43F01003 		orr	r3, r3, #16
+ 404 001a 2361     		str	r3, [r4, #16]
+ 405 001c 4FF43020 		mov	r0, #720896
+ 406 0020 2E80     		strh	r6, [r5, #0]	@ movhi
+ 407 0022 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 408 0026 0528     		cmp	r0, #5
+ 409 0028 03D0     		beq	.L72
+ 410 002a 2369     		ldr	r3, [r4, #16]
+ 411 002c 23F01003 		bic	r3, r3, #16
+ 412 0030 2361     		str	r3, [r4, #16]
+ 413              	.L72:
+ 414 0032 70BD     		pop	{r4, r5, r6, pc}
+ 415              	.L77:
+ 416              		.align	2
+ 417              	.L76:
+ 418 0034 00200240 		.word	1073881088
+ 420              		.section	.text.FLASH_OB_WriteUser,"ax",%progbits
+ 421              		.align	1
+ 422              		.global	FLASH_OB_WriteUser
+ 423              		.thumb
+ 424              		.thumb_func
+ 426              	FLASH_OB_WriteUser:
+ 427              		@ args = 0, pretend = 0, frame = 0
+ 428              		@ frame_needed = 0, uses_anonymous_args = 0
+ 429 0000 38B5     		push	{r3, r4, r5, lr}
+ 430 0002 104C     		ldr	r4, .L83
+ 431 0004 104B     		ldr	r3, .L83+4
+ 432 0006 A360     		str	r3, [r4, #8]
+ 433 0008 03F18833 		add	r3, r3, #-2004318072
+ 434 000c 0546     		mov	r5, r0
+ 435 000e A360     		str	r3, [r4, #8]
+ 436 0010 4FF43020 		mov	r0, #720896
+ 437 0014 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 438 0018 0428     		cmp	r0, #4
+ 439 001a 11D1     		bne	.L79
+ 440 001c 2369     		ldr	r3, [r4, #16]
+ 441 001e 43F01003 		orr	r3, r3, #16
+ 442 0022 2361     		str	r3, [r4, #16]
+ 443 0024 094B     		ldr	r3, .L83+8
+ 444 0026 45F08805 		orr	r5, r5, #136
+ 445 002a 5D80     		strh	r5, [r3, #2]	@ movhi
+ 446 002c 4FF43020 		mov	r0, #720896
+ 447 0030 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 448 0034 0528     		cmp	r0, #5
+ 449 0036 03D0     		beq	.L79
+ 450 0038 2369     		ldr	r3, [r4, #16]
+ 451 003a 23F01003 		bic	r3, r3, #16
+ 452 003e 2361     		str	r3, [r4, #16]
+ 453              	.L79:
+ 454 0040 38BD     		pop	{r3, r4, r5, pc}
+ 455              	.L84:
+ 456 0042 00BF     		.align	2
+ 457              	.L83:
+ 458 0044 00200240 		.word	1073881088
+ 459 0048 23016745 		.word	1164378403
+ 460 004c 00F8FF1F 		.word	536868864
+ 462              		.section	.text.FLASH_OB_SRAMParityConfig,"ax",%progbits
+ 463              		.align	1
+ 464              		.global	FLASH_OB_SRAMParityConfig
+ 465              		.thumb
+ 466              		.thumb_func
+ 468              	FLASH_OB_SRAMParityConfig:
+ 469              		@ args = 0, pretend = 0, frame = 0
+ 470              		@ frame_needed = 0, uses_anonymous_args = 0
+ 471 0000 38B5     		push	{r3, r4, r5, lr}
+ 472 0002 0546     		mov	r5, r0
+ 473 0004 4FF43020 		mov	r0, #720896
+ 474 0008 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 475 000c 0428     		cmp	r0, #4
+ 476 000e 12D1     		bne	.L86
+ 477 0010 094C     		ldr	r4, .L90
+ 478 0012 2369     		ldr	r3, [r4, #16]
+ 479 0014 43F01003 		orr	r3, r3, #16
+ 480 0018 2361     		str	r3, [r4, #16]
+ 481 001a 084B     		ldr	r3, .L90+4
+ 482 001c 45F0BF05 		orr	r5, r5, #191
+ 483 0020 5D80     		strh	r5, [r3, #2]	@ movhi
+ 484 0022 4FF43020 		mov	r0, #720896
+ 485 0026 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 486 002a 0528     		cmp	r0, #5
+ 487 002c 03D0     		beq	.L86
+ 488 002e 2369     		ldr	r3, [r4, #16]
+ 489 0030 23F01003 		bic	r3, r3, #16
+ 490 0034 2361     		str	r3, [r4, #16]
+ 491              	.L86:
+ 492 0036 38BD     		pop	{r3, r4, r5, pc}
+ 493              	.L91:
+ 494              		.align	2
+ 495              	.L90:
+ 496 0038 00200240 		.word	1073881088
+ 497 003c 00F8FF1F 		.word	536868864
+ 499              		.section	.text.FLASH_OB_VDDAConfig,"ax",%progbits
+ 500              		.align	1
+ 501              		.global	FLASH_OB_VDDAConfig
+ 502              		.thumb
+ 503              		.thumb_func
+ 505              	FLASH_OB_VDDAConfig:
+ 506              		@ args = 0, pretend = 0, frame = 0
+ 507              		@ frame_needed = 0, uses_anonymous_args = 0
+ 508 0000 38B5     		push	{r3, r4, r5, lr}
+ 509 0002 104C     		ldr	r4, .L97
+ 510 0004 104B     		ldr	r3, .L97+4
+ 511 0006 A360     		str	r3, [r4, #8]
+ 512 0008 03F18833 		add	r3, r3, #-2004318072
+ 513 000c 0546     		mov	r5, r0
+ 514 000e A360     		str	r3, [r4, #8]
+ 515 0010 4FF43020 		mov	r0, #720896
+ 516 0014 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 517 0018 0428     		cmp	r0, #4
+ 518 001a 11D1     		bne	.L93
+ 519 001c 2369     		ldr	r3, [r4, #16]
+ 520 001e 43F01003 		orr	r3, r3, #16
+ 521 0022 2361     		str	r3, [r4, #16]
+ 522 0024 094B     		ldr	r3, .L97+8
+ 523 0026 45F0DF05 		orr	r5, r5, #223
+ 524 002a 5D80     		strh	r5, [r3, #2]	@ movhi
+ 525 002c 4FF43020 		mov	r0, #720896
+ 526 0030 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 527 0034 0528     		cmp	r0, #5
+ 528 0036 03D0     		beq	.L93
+ 529 0038 2369     		ldr	r3, [r4, #16]
+ 530 003a 23F01003 		bic	r3, r3, #16
+ 531 003e 2361     		str	r3, [r4, #16]
+ 532              	.L93:
+ 533 0040 38BD     		pop	{r3, r4, r5, pc}
+ 534              	.L98:
+ 535 0042 00BF     		.align	2
+ 536              	.L97:
+ 537 0044 00200240 		.word	1073881088
+ 538 0048 23016745 		.word	1164378403
+ 539 004c 00F8FF1F 		.word	536868864
+ 541              		.section	.text.FLASH_OB_BOOTConfig,"ax",%progbits
+ 542              		.align	1
+ 543              		.global	FLASH_OB_BOOTConfig
+ 544              		.thumb
+ 545              		.thumb_func
+ 547              	FLASH_OB_BOOTConfig:
+ 548              		@ args = 0, pretend = 0, frame = 0
+ 549              		@ frame_needed = 0, uses_anonymous_args = 0
+ 550 0000 38B5     		push	{r3, r4, r5, lr}
+ 551 0002 104C     		ldr	r4, .L104
+ 552 0004 104B     		ldr	r3, .L104+4
+ 553 0006 A360     		str	r3, [r4, #8]
+ 554 0008 03F18833 		add	r3, r3, #-2004318072
+ 555 000c 0546     		mov	r5, r0
+ 556 000e A360     		str	r3, [r4, #8]
+ 557 0010 4FF43020 		mov	r0, #720896
+ 558 0014 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 559 0018 0428     		cmp	r0, #4
+ 560 001a 11D1     		bne	.L100
+ 561 001c 2369     		ldr	r3, [r4, #16]
+ 562 001e 43F01003 		orr	r3, r3, #16
+ 563 0022 2361     		str	r3, [r4, #16]
+ 564 0024 094B     		ldr	r3, .L104+8
+ 565 0026 45F0EF05 		orr	r5, r5, #239
+ 566 002a 5D80     		strh	r5, [r3, #2]	@ movhi
+ 567 002c 4FF43020 		mov	r0, #720896
+ 568 0030 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 569 0034 0528     		cmp	r0, #5
+ 570 0036 03D0     		beq	.L100
+ 571 0038 2369     		ldr	r3, [r4, #16]
+ 572 003a 23F01003 		bic	r3, r3, #16
+ 573 003e 2361     		str	r3, [r4, #16]
+ 574              	.L100:
+ 575 0040 38BD     		pop	{r3, r4, r5, pc}
+ 576              	.L105:
+ 577 0042 00BF     		.align	2
+ 578              	.L104:
+ 579 0044 00200240 		.word	1073881088
+ 580 0048 23016745 		.word	1164378403
+ 581 004c 00F8FF1F 		.word	536868864
+ 583              		.section	.text.FLASH_OB_UserConfig,"ax",%progbits
+ 584              		.align	1
+ 585              		.global	FLASH_OB_UserConfig
+ 586              		.thumb
+ 587              		.thumb_func
+ 589              	FLASH_OB_UserConfig:
+ 590              		@ args = 0, pretend = 0, frame = 0
+ 591              		@ frame_needed = 0, uses_anonymous_args = 0
+ 592 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 593 0002 124C     		ldr	r4, .L111
+ 594 0004 124B     		ldr	r3, .L111+4
+ 595 0006 A360     		str	r3, [r4, #8]
+ 596 0008 03F18833 		add	r3, r3, #-2004318072
+ 597 000c 0546     		mov	r5, r0
+ 598 000e A360     		str	r3, [r4, #8]
+ 599 0010 4FF43020 		mov	r0, #720896
+ 600 0014 0E46     		mov	r6, r1
+ 601 0016 1746     		mov	r7, r2
+ 602 0018 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 603 001c 0428     		cmp	r0, #4
+ 604 001e 14D1     		bne	.L107
+ 605 0020 2369     		ldr	r3, [r4, #16]
+ 606 0022 65F00705 		orn	r5, r5, #7
+ 607 0026 43F01003 		orr	r3, r3, #16
+ 608 002a 2E43     		orrs	r6, r6, r5
+ 609 002c 2361     		str	r3, [r4, #16]
+ 610 002e 3743     		orrs	r7, r7, r6
+ 611 0030 084B     		ldr	r3, .L111+8
+ 612 0032 FFB2     		uxtb	r7, r7
+ 613 0034 5F80     		strh	r7, [r3, #2]	@ movhi
+ 614 0036 4FF43020 		mov	r0, #720896
+ 615 003a FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 616 003e 0528     		cmp	r0, #5
+ 617 0040 03D0     		beq	.L107
+ 618 0042 2369     		ldr	r3, [r4, #16]
+ 619 0044 23F01003 		bic	r3, r3, #16
+ 620 0048 2361     		str	r3, [r4, #16]
+ 621              	.L107:
+ 622 004a F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 623              	.L112:
+ 624              		.align	2
+ 625              	.L111:
+ 626 004c 00200240 		.word	1073881088
+ 627 0050 23016745 		.word	1164378403
+ 628 0054 00F8FF1F 		.word	536868864
+ 630              		.section	.text.FLASH_OB_RDPConfig,"ax",%progbits
+ 631              		.align	1
+ 632              		.global	FLASH_OB_RDPConfig
+ 633              		.thumb
+ 634              		.thumb_func
+ 636              	FLASH_OB_RDPConfig:
+ 637              		@ args = 0, pretend = 0, frame = 0
+ 638              		@ frame_needed = 0, uses_anonymous_args = 0
+ 639 0000 38B5     		push	{r3, r4, r5, lr}
+ 640 0002 0546     		mov	r5, r0
+ 641 0004 4FF43020 		mov	r0, #720896
+ 642 0008 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 643 000c 0428     		cmp	r0, #4
+ 644 000e 2AD1     		bne	.L114
+ 645 0010 154C     		ldr	r4, .L122
+ 646 0012 2369     		ldr	r3, [r4, #16]
+ 647 0014 43F02003 		orr	r3, r3, #32
+ 648 0018 2361     		str	r3, [r4, #16]
+ 649 001a 2369     		ldr	r3, [r4, #16]
+ 650 001c 43F04003 		orr	r3, r3, #64
+ 651 0020 2361     		str	r3, [r4, #16]
+ 652 0022 4FF43020 		mov	r0, #720896
+ 653 0026 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 654 002a 0428     		cmp	r0, #4
+ 655 002c 15D1     		bne	.L115
+ 656 002e 2369     		ldr	r3, [r4, #16]
+ 657 0030 23F02003 		bic	r3, r3, #32
+ 658 0034 2361     		str	r3, [r4, #16]
+ 659 0036 2369     		ldr	r3, [r4, #16]
+ 660 0038 43F01003 		orr	r3, r3, #16
+ 661 003c 2361     		str	r3, [r4, #16]
+ 662 003e 0B4B     		ldr	r3, .L122+4
+ 663 0040 4FF43020 		mov	r0, #720896
+ 664 0044 1D80     		strh	r5, [r3, #0]	@ movhi
+ 665 0046 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 666 004a 0528     		cmp	r0, #5
+ 667 004c 01D1     		bne	.L116
+ 668              	.L117:
+ 669 004e 0520     		movs	r0, #5
+ 670 0050 38BD     		pop	{r3, r4, r5, pc}
+ 671              	.L116:
+ 672 0052 2369     		ldr	r3, [r4, #16]
+ 673 0054 23F01003 		bic	r3, r3, #16
+ 674 0058 04E0     		b	.L121
+ 675              	.L115:
+ 676 005a 0528     		cmp	r0, #5
+ 677 005c F7D0     		beq	.L117
+ 678 005e 2369     		ldr	r3, [r4, #16]
+ 679 0060 23F02003 		bic	r3, r3, #32
+ 680              	.L121:
+ 681 0064 2361     		str	r3, [r4, #16]
+ 682              	.L114:
+ 683 0066 38BD     		pop	{r3, r4, r5, pc}
+ 684              	.L123:
+ 685              		.align	2
+ 686              	.L122:
+ 687 0068 00200240 		.word	1073881088
+ 688 006c 00F8FF1F 		.word	536868864
+ 690              		.section	.text.FLASH_OB_EnableWRP,"ax",%progbits
+ 691              		.align	1
+ 692              		.global	FLASH_OB_EnableWRP
+ 693              		.thumb
+ 694              		.thumb_func
+ 696              	FLASH_OB_EnableWRP:
+ 697              		@ args = 0, pretend = 0, frame = 0
+ 698              		@ frame_needed = 0, uses_anonymous_args = 0
+ 699 0000 10B5     		push	{r4, lr}
+ 700 0002 0446     		mov	r4, r0
+ 701 0004 4FF43020 		mov	r0, #720896
+ 702 0008 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 703 000c 0428     		cmp	r0, #4
+ 704 000e 3FD1     		bne	.L125
+ 705 0010 204A     		ldr	r2, .L149
+ 706 0012 E443     		mvns	r4, r4
+ 707 0014 1169     		ldr	r1, [r2, #16]
+ 708 0016 E3B2     		uxtb	r3, r4
+ 709 0018 41F01001 		orr	r1, r1, #16
+ 710 001c FF2B     		cmp	r3, #255
+ 711 001e 1161     		str	r1, [r2, #16]
+ 712 0020 04D1     		bne	.L126
+ 713              	.L129:
+ 714 0022 C4F30723 		ubfx	r3, r4, #8, #8
+ 715 0026 FF2B     		cmp	r3, #255
+ 716 0028 0ED1     		bne	.L127
+ 717 002a 08E0     		b	.L128
+ 718              	.L126:
+ 719 002c 1A4A     		ldr	r2, .L149+4
+ 720 002e 4FF43020 		mov	r0, #720896
+ 721 0032 1381     		strh	r3, [r2, #8]	@ movhi
+ 722 0034 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 723 0038 0428     		cmp	r0, #4
+ 724 003a 22D1     		bne	.L135
+ 725 003c F1E7     		b	.L129
+ 726              	.L128:
+ 727 003e C4F30743 		ubfx	r3, r4, #16, #8
+ 728 0042 FF2B     		cmp	r3, #255
+ 729 0044 0ED1     		bne	.L131
+ 730 0046 08E0     		b	.L132
+ 731              	.L127:
+ 732 0048 134A     		ldr	r2, .L149+4
+ 733 004a 4FF43020 		mov	r0, #720896
+ 734 004e 5381     		strh	r3, [r2, #10]	@ movhi
+ 735 0050 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 736 0054 0428     		cmp	r0, #4
+ 737 0056 F2D0     		beq	.L128
+ 738 0058 13E0     		b	.L135
+ 739              	.L132:
+ 740 005a 240E     		lsrs	r4, r4, #24
+ 741 005c FF2C     		cmp	r4, #255
+ 742 005e 0AD1     		bne	.L133
+ 743 0060 0420     		movs	r0, #4
+ 744 0062 10E0     		b	.L134
+ 745              	.L131:
+ 746 0064 0C4A     		ldr	r2, .L149+4
+ 747 0066 4FF43020 		mov	r0, #720896
+ 748 006a 9381     		strh	r3, [r2, #12]	@ movhi
+ 749 006c FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 750 0070 0428     		cmp	r0, #4
+ 751 0072 F2D0     		beq	.L132
+ 752 0074 05E0     		b	.L135
+ 753              	.L133:
+ 754 0076 084B     		ldr	r3, .L149+4
+ 755 0078 4FF43020 		mov	r0, #720896
+ 756 007c DC81     		strh	r4, [r3, #14]	@ movhi
+ 757 007e FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 758              	.L135:
+ 759 0082 0528     		cmp	r0, #5
+ 760 0084 04D0     		beq	.L125
+ 761              	.L134:
+ 762 0086 034B     		ldr	r3, .L149
+ 763 0088 1A69     		ldr	r2, [r3, #16]
+ 764 008a 22F01002 		bic	r2, r2, #16
+ 765 008e 1A61     		str	r2, [r3, #16]
+ 766              	.L125:
+ 767 0090 10BD     		pop	{r4, pc}
+ 768              	.L150:
+ 769 0092 00BF     		.align	2
+ 770              	.L149:
+ 771 0094 00200240 		.word	1073881088
+ 772 0098 00F8FF1F 		.word	536868864
+ 774              		.section	.text.FLASH_OB_Erase,"ax",%progbits
+ 775              		.align	1
+ 776              		.global	FLASH_OB_Erase
+ 777              		.thumb
+ 778              		.thumb_func
+ 780              	FLASH_OB_Erase:
+ 781              		@ args = 0, pretend = 0, frame = 0
+ 782              		@ frame_needed = 0, uses_anonymous_args = 0
+ 783 0000 38B5     		push	{r3, r4, r5, lr}
+ 784 0002 FFF7FEFF 		bl	FLASH_OB_GetRDP
+ 785 0006 0028     		cmp	r0, #0
+ 786 0008 0CBF     		ite	eq
+ 787 000a AA25     		moveq	r5, #170
+ 788 000c 0025     		movne	r5, #0
+ 789 000e 4FF43020 		mov	r0, #720896
+ 790 0012 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 791 0016 0428     		cmp	r0, #4
+ 792 0018 24D1     		bne	.L153
+ 793 001a 134C     		ldr	r4, .L163
+ 794 001c 2369     		ldr	r3, [r4, #16]
+ 795 001e 43F02003 		orr	r3, r3, #32
+ 796 0022 2361     		str	r3, [r4, #16]
+ 797 0024 2369     		ldr	r3, [r4, #16]
+ 798 0026 43F04003 		orr	r3, r3, #64
+ 799 002a 2361     		str	r3, [r4, #16]
+ 800 002c 4FF43020 		mov	r0, #720896
+ 801 0030 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 802 0034 0428     		cmp	r0, #4
+ 803 0036 0DD1     		bne	.L162
+ 804 0038 2369     		ldr	r3, [r4, #16]
+ 805 003a 23F02003 		bic	r3, r3, #32
+ 806 003e 2361     		str	r3, [r4, #16]
+ 807 0040 2369     		ldr	r3, [r4, #16]
+ 808 0042 43F01003 		orr	r3, r3, #16
+ 809 0046 2361     		str	r3, [r4, #16]
+ 810 0048 084B     		ldr	r3, .L163+4
+ 811 004a 4FF43020 		mov	r0, #720896
+ 812 004e 1D80     		strh	r5, [r3, #0]	@ movhi
+ 813 0050 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 814              	.L162:
+ 815 0054 0528     		cmp	r0, #5
+ 816 0056 01D1     		bne	.L161
+ 817 0058 0520     		movs	r0, #5
+ 818 005a 38BD     		pop	{r3, r4, r5, pc}
+ 819              	.L161:
+ 820 005c 2369     		ldr	r3, [r4, #16]
+ 821 005e 23F01003 		bic	r3, r3, #16
+ 822 0062 2361     		str	r3, [r4, #16]
+ 823              	.L153:
+ 824 0064 38BD     		pop	{r3, r4, r5, pc}
+ 825              	.L164:
+ 826 0066 00BF     		.align	2
+ 827              	.L163:
+ 828 0068 00200240 		.word	1073881088
+ 829 006c 00F8FF1F 		.word	536868864
+ 831              		.section	.text.FLASH_ProgramHalfWord,"ax",%progbits
+ 832              		.align	1
+ 833              		.global	FLASH_ProgramHalfWord
+ 834              		.thumb
+ 835              		.thumb_func
+ 837              	FLASH_ProgramHalfWord:
+ 838              		@ args = 0, pretend = 0, frame = 0
+ 839              		@ frame_needed = 0, uses_anonymous_args = 0
+ 840 0000 70B5     		push	{r4, r5, r6, lr}
+ 841 0002 0546     		mov	r5, r0
+ 842 0004 4FF43020 		mov	r0, #720896
+ 843 0008 0E46     		mov	r6, r1
+ 844 000a FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 845 000e 0428     		cmp	r0, #4
+ 846 0010 0DD1     		bne	.L166
+ 847 0012 074C     		ldr	r4, .L167
+ 848 0014 2369     		ldr	r3, [r4, #16]
+ 849 0016 43F00103 		orr	r3, r3, #1
+ 850 001a 2361     		str	r3, [r4, #16]
+ 851 001c 4FF43020 		mov	r0, #720896
+ 852 0020 2E80     		strh	r6, [r5, #0]	@ movhi
+ 853 0022 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 854 0026 2369     		ldr	r3, [r4, #16]
+ 855 0028 23F00103 		bic	r3, r3, #1
+ 856 002c 2361     		str	r3, [r4, #16]
+ 857              	.L166:
+ 858 002e 70BD     		pop	{r4, r5, r6, pc}
+ 859              	.L168:
+ 860              		.align	2
+ 861              	.L167:
+ 862 0030 00200240 		.word	1073881088
+ 864              		.section	.text.FLASH_ProgramWord,"ax",%progbits
+ 865              		.align	1
+ 866              		.global	FLASH_ProgramWord
+ 867              		.thumb
+ 868              		.thumb_func
+ 870              	FLASH_ProgramWord:
+ 871              		@ args = 0, pretend = 0, frame = 8
+ 872              		@ frame_needed = 0, uses_anonymous_args = 0
+ 873 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 874 0002 0023     		movs	r3, #0
+ 875 0004 0646     		mov	r6, r0
+ 876 0006 4FF43020 		mov	r0, #720896
+ 877 000a 0D46     		mov	r5, r1
+ 878 000c 0193     		str	r3, [sp, #4]
+ 879 000e FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 880 0012 0428     		cmp	r0, #4
+ 881 0014 18D1     		bne	.L170
+ 882 0016 0D4C     		ldr	r4, .L172
+ 883 0018 2369     		ldr	r3, [r4, #16]
+ 884 001a 43F00103 		orr	r3, r3, #1
+ 885 001e 2361     		str	r3, [r4, #16]
+ 886 0020 4FF43020 		mov	r0, #720896
+ 887 0024 3580     		strh	r5, [r6, #0]	@ movhi
+ 888 0026 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 889 002a 0428     		cmp	r0, #4
+ 890 002c 08D1     		bne	.L171
+ 891 002e 0236     		adds	r6, r6, #2
+ 892 0030 0196     		str	r6, [sp, #4]
+ 893 0032 019B     		ldr	r3, [sp, #4]
+ 894 0034 2D0C     		lsrs	r5, r5, #16
+ 895 0036 1D80     		strh	r5, [r3, #0]	@ movhi
+ 896 0038 4FF43020 		mov	r0, #720896
+ 897 003c FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 898              	.L171:
+ 899 0040 2369     		ldr	r3, [r4, #16]
+ 900 0042 23F00103 		bic	r3, r3, #1
+ 901 0046 2361     		str	r3, [r4, #16]
+ 902              	.L170:
+ 903 0048 7CBD     		pop	{r2, r3, r4, r5, r6, pc}
+ 904              	.L173:
+ 905 004a 00BF     		.align	2
+ 906              	.L172:
+ 907 004c 00200240 		.word	1073881088
+ 909              		.section	.text.FLASH_EraseAllPages,"ax",%progbits
+ 910              		.align	1
+ 911              		.global	FLASH_EraseAllPages
+ 912              		.thumb
+ 913              		.thumb_func
+ 915              	FLASH_EraseAllPages:
+ 916              		@ args = 0, pretend = 0, frame = 0
+ 917              		@ frame_needed = 0, uses_anonymous_args = 0
+ 918 0000 10B5     		push	{r4, lr}
+ 919 0002 4FF43020 		mov	r0, #720896
+ 920 0006 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 921 000a 0428     		cmp	r0, #4
+ 922 000c 10D1     		bne	.L175
+ 923 000e 094C     		ldr	r4, .L176
+ 924 0010 2369     		ldr	r3, [r4, #16]
+ 925 0012 43F00403 		orr	r3, r3, #4
+ 926 0016 2361     		str	r3, [r4, #16]
+ 927 0018 2369     		ldr	r3, [r4, #16]
+ 928 001a 43F04003 		orr	r3, r3, #64
+ 929 001e 2361     		str	r3, [r4, #16]
+ 930 0020 4FF43020 		mov	r0, #720896
+ 931 0024 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 932 0028 2369     		ldr	r3, [r4, #16]
+ 933 002a 23F00403 		bic	r3, r3, #4
+ 934 002e 2361     		str	r3, [r4, #16]
+ 935              	.L175:
+ 936 0030 10BD     		pop	{r4, pc}
+ 937              	.L177:
+ 938 0032 00BF     		.align	2
+ 939              	.L176:
+ 940 0034 00200240 		.word	1073881088
+ 942              		.section	.text.FLASH_ErasePage,"ax",%progbits
+ 943              		.align	1
+ 944              		.global	FLASH_ErasePage
+ 945              		.thumb
+ 946              		.thumb_func
+ 948              	FLASH_ErasePage:
+ 949              		@ args = 0, pretend = 0, frame = 0
+ 950              		@ frame_needed = 0, uses_anonymous_args = 0
+ 951 0000 38B5     		push	{r3, r4, r5, lr}
+ 952 0002 0546     		mov	r5, r0
+ 953 0004 4FF43020 		mov	r0, #720896
+ 954 0008 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 955 000c 0428     		cmp	r0, #4
+ 956 000e 11D1     		bne	.L179
+ 957 0010 094C     		ldr	r4, .L180
+ 958 0012 2369     		ldr	r3, [r4, #16]
+ 959 0014 43F00203 		orr	r3, r3, #2
+ 960 0018 2361     		str	r3, [r4, #16]
+ 961 001a 6561     		str	r5, [r4, #20]
+ 962 001c 2369     		ldr	r3, [r4, #16]
+ 963 001e 43F04003 		orr	r3, r3, #64
+ 964 0022 2361     		str	r3, [r4, #16]
+ 965 0024 4FF43020 		mov	r0, #720896
+ 966 0028 FFF7FEFF 		bl	FLASH_WaitForLastOperation
+ 967 002c 2369     		ldr	r3, [r4, #16]
+ 968 002e 23F00203 		bic	r3, r3, #2
+ 969 0032 2361     		str	r3, [r4, #16]
+ 970              	.L179:
+ 971 0034 38BD     		pop	{r3, r4, r5, pc}
+ 972              	.L181:
+ 973 0036 00BF     		.align	2
+ 974              	.L180:
+ 975 0038 00200240 		.word	1073881088
+ 977              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f30x_flash.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:16     .text.FLASH_SetLatency:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:21     .text.FLASH_SetLatency:00000000 FLASH_SetLatency
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:34     .text.FLASH_SetLatency:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:37     .text.FLASH_HalfCycleAccessCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:42     .text.FLASH_HalfCycleAccessCmd:00000000 FLASH_HalfCycleAccessCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:59     .text.FLASH_HalfCycleAccessCmd:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:62     .text.FLASH_PrefetchBufferCmd:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:67     .text.FLASH_PrefetchBufferCmd:00000000 FLASH_PrefetchBufferCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:84     .text.FLASH_PrefetchBufferCmd:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:87     .text.FLASH_Unlock:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:92     .text.FLASH_Unlock:00000000 FLASH_Unlock
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:109    .text.FLASH_Unlock:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:113    .text.FLASH_Lock:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:118    .text.FLASH_Lock:00000000 FLASH_Lock
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:130    .text.FLASH_Lock:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:133    .text.FLASH_OB_Unlock:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:138    .text.FLASH_OB_Unlock:00000000 FLASH_OB_Unlock
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:155    .text.FLASH_OB_Unlock:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:159    .text.FLASH_OB_Lock:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:164    .text.FLASH_OB_Lock:00000000 FLASH_OB_Lock
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:176    .text.FLASH_OB_Lock:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:179    .text.FLASH_OB_Launch:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:184    .text.FLASH_OB_Launch:00000000 FLASH_OB_Launch
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:196    .text.FLASH_OB_Launch:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:199    .text.FLASH_OB_GetUser:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:204    .text.FLASH_OB_GetUser:00000000 FLASH_OB_GetUser
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:215    .text.FLASH_OB_GetUser:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:218    .text.FLASH_OB_GetWRP:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:223    .text.FLASH_OB_GetWRP:00000000 FLASH_OB_GetWRP
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:233    .text.FLASH_OB_GetWRP:00000008 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:236    .text.FLASH_OB_GetRDP:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:241    .text.FLASH_OB_GetRDP:00000000 FLASH_OB_GetRDP
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:255    .text.FLASH_OB_GetRDP:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:258    .text.FLASH_ITConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:263    .text.FLASH_ITConfig:00000000 FLASH_ITConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:280    .text.FLASH_ITConfig:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:283    .text.FLASH_GetFlagStatus:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:288    .text.FLASH_GetFlagStatus:00000000 FLASH_GetFlagStatus
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:302    .text.FLASH_GetFlagStatus:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:305    .text.FLASH_ClearFlag:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:310    .text.FLASH_ClearFlag:00000000 FLASH_ClearFlag
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:320    .text.FLASH_ClearFlag:00000008 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:323    .text.FLASH_GetStatus:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:328    .text.FLASH_GetStatus:00000000 FLASH_GetStatus
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:354    .text.FLASH_GetStatus:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:357    .text.FLASH_WaitForLastOperation:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:362    .text.FLASH_WaitForLastOperation:00000000 FLASH_WaitForLastOperation
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:386    .text.FLASH_ProgramOptionByteData:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:391    .text.FLASH_ProgramOptionByteData:00000000 FLASH_ProgramOptionByteData
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:418    .text.FLASH_ProgramOptionByteData:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:421    .text.FLASH_OB_WriteUser:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:426    .text.FLASH_OB_WriteUser:00000000 FLASH_OB_WriteUser
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:458    .text.FLASH_OB_WriteUser:00000044 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:463    .text.FLASH_OB_SRAMParityConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:468    .text.FLASH_OB_SRAMParityConfig:00000000 FLASH_OB_SRAMParityConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:496    .text.FLASH_OB_SRAMParityConfig:00000038 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:500    .text.FLASH_OB_VDDAConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:505    .text.FLASH_OB_VDDAConfig:00000000 FLASH_OB_VDDAConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:537    .text.FLASH_OB_VDDAConfig:00000044 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:542    .text.FLASH_OB_BOOTConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:547    .text.FLASH_OB_BOOTConfig:00000000 FLASH_OB_BOOTConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:579    .text.FLASH_OB_BOOTConfig:00000044 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:584    .text.FLASH_OB_UserConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:589    .text.FLASH_OB_UserConfig:00000000 FLASH_OB_UserConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:626    .text.FLASH_OB_UserConfig:0000004c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:631    .text.FLASH_OB_RDPConfig:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:636    .text.FLASH_OB_RDPConfig:00000000 FLASH_OB_RDPConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:687    .text.FLASH_OB_RDPConfig:00000068 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:691    .text.FLASH_OB_EnableWRP:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:696    .text.FLASH_OB_EnableWRP:00000000 FLASH_OB_EnableWRP
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:771    .text.FLASH_OB_EnableWRP:00000094 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:775    .text.FLASH_OB_Erase:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:780    .text.FLASH_OB_Erase:00000000 FLASH_OB_Erase
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:828    .text.FLASH_OB_Erase:00000068 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:832    .text.FLASH_ProgramHalfWord:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:837    .text.FLASH_ProgramHalfWord:00000000 FLASH_ProgramHalfWord
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:862    .text.FLASH_ProgramHalfWord:00000030 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:865    .text.FLASH_ProgramWord:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:870    .text.FLASH_ProgramWord:00000000 FLASH_ProgramWord
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:907    .text.FLASH_ProgramWord:0000004c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:910    .text.FLASH_EraseAllPages:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:915    .text.FLASH_EraseAllPages:00000000 FLASH_EraseAllPages
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:940    .text.FLASH_EraseAllPages:00000034 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:943    .text.FLASH_ErasePage:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:948    .text.FLASH_ErasePage:00000000 FLASH_ErasePage
+C:\Users\THANGN~1\AppData\Local\Temp\ccLfg3dp.s:975    .text.FLASH_ErasePage:00000038 $d
+
+NO UNDEFINED SYMBOLS

@@ -1,0 +1,465 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"CAM_0706.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.CAM_0706_Reset,"ax",%progbits
+  18              		.align	1
+  19              		.global	CAM_0706_Reset
+  20              		.code	16
+  21              		.thumb_func
+  23              	CAM_0706_Reset:
+  24              	.LFB33:
+  25              		.file 1 "../scr/CAM_0706.c"
+   1:../scr/CAM_0706.c **** /*
+   2:../scr/CAM_0706.c ****  * CAM_0706.c
+   3:../scr/CAM_0706.c ****  *
+   4:../scr/CAM_0706.c ****  *  Created on: May 14, 2018
+   5:../scr/CAM_0706.c ****  *      Author: ThangNguyen
+   6:../scr/CAM_0706.c ****  */
+   7:../scr/CAM_0706.c **** #include <stm32f0xx_usart.h>
+   8:../scr/CAM_0706.c **** #include "CAM_0706.h"
+   9:../scr/CAM_0706.c **** extern void USARTxPutChar(USART_TypeDef * USARTx, uint8_t c);
+  10:../scr/CAM_0706.c **** int CAM_0706_Reset(USART_TypeDef * USARTx) {
+  26              		.loc 1 10 0
+  27              		.cfi_startproc
+  28              	.LVL0:
+  29 0000 10B5     		push	{r4, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 4, -8
+  33              		.cfi_offset 14, -4
+  11:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x56);
+  34              		.loc 1 11 0
+  35 0002 5621     		mov	r1, #86
+  10:../scr/CAM_0706.c **** int CAM_0706_Reset(USART_TypeDef * USARTx) {
+  36              		.loc 1 10 0
+  37 0004 041C     		mov	r4, r0
+  38              		.loc 1 11 0
+  39 0006 FFF7FEFF 		bl	USARTxPutChar
+  40              	.LVL1:
+  12:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+  41              		.loc 1 12 0
+  42 000a 201C     		mov	r0, r4
+  43 000c 0021     		mov	r1, #0
+  44 000e FFF7FEFF 		bl	USARTxPutChar
+  45              	.LVL2:
+  13:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x26);
+  46              		.loc 1 13 0
+  47 0012 201C     		mov	r0, r4
+  48 0014 2621     		mov	r1, #38
+  49 0016 FFF7FEFF 		bl	USARTxPutChar
+  50              	.LVL3:
+  14:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+  51              		.loc 1 14 0
+  52 001a 201C     		mov	r0, r4
+  53 001c 0021     		mov	r1, #0
+  54 001e FFF7FEFF 		bl	USARTxPutChar
+  55              	.LVL4:
+  15:../scr/CAM_0706.c **** 	return 0;
+  16:../scr/CAM_0706.c **** }
+  56              		.loc 1 16 0
+  57              		@ sp needed for prologue
+  58 0022 0020     		mov	r0, #0
+  59              	.LVL5:
+  60 0024 10BD     		pop	{r4, pc}
+  61              		.cfi_endproc
+  62              	.LFE33:
+  64              		.section	.text.CAM_0706_TakePicture,"ax",%progbits
+  65              		.align	1
+  66              		.global	CAM_0706_TakePicture
+  67              		.code	16
+  68              		.thumb_func
+  70              	CAM_0706_TakePicture:
+  71              	.LFB34:
+  17:../scr/CAM_0706.c **** int CAM_0706_TakePicture(USART_TypeDef * USARTx) {
+  72              		.loc 1 17 0
+  73              		.cfi_startproc
+  74              	.LVL6:
+  75 0000 10B5     		push	{r4, lr}
+  76              	.LCFI1:
+  77              		.cfi_def_cfa_offset 8
+  78              		.cfi_offset 4, -8
+  79              		.cfi_offset 14, -4
+  18:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x56);
+  80              		.loc 1 18 0
+  81 0002 5621     		mov	r1, #86
+  17:../scr/CAM_0706.c **** int CAM_0706_TakePicture(USART_TypeDef * USARTx) {
+  82              		.loc 1 17 0
+  83 0004 041C     		mov	r4, r0
+  84              		.loc 1 18 0
+  85 0006 FFF7FEFF 		bl	USARTxPutChar
+  86              	.LVL7:
+  19:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+  87              		.loc 1 19 0
+  88 000a 201C     		mov	r0, r4
+  89 000c 0021     		mov	r1, #0
+  90 000e FFF7FEFF 		bl	USARTxPutChar
+  91              	.LVL8:
+  20:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x36);
+  92              		.loc 1 20 0
+  93 0012 201C     		mov	r0, r4
+  94 0014 3621     		mov	r1, #54
+  95 0016 FFF7FEFF 		bl	USARTxPutChar
+  96              	.LVL9:
+  21:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x01);
+  97              		.loc 1 21 0
+  98 001a 201C     		mov	r0, r4
+  99 001c 0121     		mov	r1, #1
+ 100 001e FFF7FEFF 		bl	USARTxPutChar
+ 101              	.LVL10:
+  22:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+ 102              		.loc 1 22 0
+ 103 0022 201C     		mov	r0, r4
+ 104 0024 0021     		mov	r1, #0
+ 105 0026 FFF7FEFF 		bl	USARTxPutChar
+ 106              	.LVL11:
+  23:../scr/CAM_0706.c **** 	return 0;
+  24:../scr/CAM_0706.c **** }
+ 107              		.loc 1 24 0
+ 108              		@ sp needed for prologue
+ 109 002a 0020     		mov	r0, #0
+ 110              	.LVL12:
+ 111 002c 10BD     		pop	{r4, pc}
+ 112              		.cfi_endproc
+ 113              	.LFE34:
+ 115              		.section	.text.CAM_0706_ReadFlieSize,"ax",%progbits
+ 116              		.align	1
+ 117              		.global	CAM_0706_ReadFlieSize
+ 118              		.code	16
+ 119              		.thumb_func
+ 121              	CAM_0706_ReadFlieSize:
+ 122              	.LFB35:
+  25:../scr/CAM_0706.c **** int CAM_0706_ReadFlieSize(USART_TypeDef * USARTx) {
+ 123              		.loc 1 25 0
+ 124              		.cfi_startproc
+ 125              	.LVL13:
+ 126 0000 10B5     		push	{r4, lr}
+ 127              	.LCFI2:
+ 128              		.cfi_def_cfa_offset 8
+ 129              		.cfi_offset 4, -8
+ 130              		.cfi_offset 14, -4
+  26:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x56);
+ 131              		.loc 1 26 0
+ 132 0002 5621     		mov	r1, #86
+  25:../scr/CAM_0706.c **** int CAM_0706_ReadFlieSize(USART_TypeDef * USARTx) {
+ 133              		.loc 1 25 0
+ 134 0004 041C     		mov	r4, r0
+ 135              		.loc 1 26 0
+ 136 0006 FFF7FEFF 		bl	USARTxPutChar
+ 137              	.LVL14:
+  27:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+ 138              		.loc 1 27 0
+ 139 000a 201C     		mov	r0, r4
+ 140 000c 0021     		mov	r1, #0
+ 141 000e FFF7FEFF 		bl	USARTxPutChar
+ 142              	.LVL15:
+  28:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x34);
+ 143              		.loc 1 28 0
+ 144 0012 201C     		mov	r0, r4
+ 145 0014 3421     		mov	r1, #52
+ 146 0016 FFF7FEFF 		bl	USARTxPutChar
+ 147              	.LVL16:
+  29:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x01);
+ 148              		.loc 1 29 0
+ 149 001a 201C     		mov	r0, r4
+ 150 001c 0121     		mov	r1, #1
+ 151 001e FFF7FEFF 		bl	USARTxPutChar
+ 152              	.LVL17:
+  30:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+ 153              		.loc 1 30 0
+ 154 0022 201C     		mov	r0, r4
+ 155 0024 0021     		mov	r1, #0
+ 156 0026 FFF7FEFF 		bl	USARTxPutChar
+ 157              	.LVL18:
+  31:../scr/CAM_0706.c **** 	return 0;
+  32:../scr/CAM_0706.c **** }
+ 158              		.loc 1 32 0
+ 159              		@ sp needed for prologue
+ 160 002a 0020     		mov	r0, #0
+ 161              	.LVL19:
+ 162 002c 10BD     		pop	{r4, pc}
+ 163              		.cfi_endproc
+ 164              	.LFE35:
+ 166              		.section	.text.CAM_0706_StopTakePicture,"ax",%progbits
+ 167              		.align	1
+ 168              		.global	CAM_0706_StopTakePicture
+ 169              		.code	16
+ 170              		.thumb_func
+ 172              	CAM_0706_StopTakePicture:
+ 173              	.LFB36:
+  33:../scr/CAM_0706.c **** int CAM_0706_StopTakePicture(USART_TypeDef * USARTx) {
+ 174              		.loc 1 33 0
+ 175              		.cfi_startproc
+ 176              	.LVL20:
+ 177 0000 10B5     		push	{r4, lr}
+ 178              	.LCFI3:
+ 179              		.cfi_def_cfa_offset 8
+ 180              		.cfi_offset 4, -8
+ 181              		.cfi_offset 14, -4
+  34:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x56);
+ 182              		.loc 1 34 0
+ 183 0002 5621     		mov	r1, #86
+  33:../scr/CAM_0706.c **** int CAM_0706_StopTakePicture(USART_TypeDef * USARTx) {
+ 184              		.loc 1 33 0
+ 185 0004 041C     		mov	r4, r0
+ 186              		.loc 1 34 0
+ 187 0006 FFF7FEFF 		bl	USARTxPutChar
+ 188              	.LVL21:
+  35:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+ 189              		.loc 1 35 0
+ 190 000a 201C     		mov	r0, r4
+ 191 000c 0021     		mov	r1, #0
+ 192 000e FFF7FEFF 		bl	USARTxPutChar
+ 193              	.LVL22:
+  36:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x36);
+ 194              		.loc 1 36 0
+ 195 0012 201C     		mov	r0, r4
+ 196 0014 3621     		mov	r1, #54
+ 197 0016 FFF7FEFF 		bl	USARTxPutChar
+ 198              	.LVL23:
+  37:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x01);
+ 199              		.loc 1 37 0
+ 200 001a 201C     		mov	r0, r4
+ 201 001c 0121     		mov	r1, #1
+ 202 001e FFF7FEFF 		bl	USARTxPutChar
+ 203              	.LVL24:
+  38:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x03);
+ 204              		.loc 1 38 0
+ 205 0022 201C     		mov	r0, r4
+ 206 0024 0321     		mov	r1, #3
+ 207 0026 FFF7FEFF 		bl	USARTxPutChar
+ 208              	.LVL25:
+  39:../scr/CAM_0706.c **** 	return 0;
+  40:../scr/CAM_0706.c **** }
+ 209              		.loc 1 40 0
+ 210              		@ sp needed for prologue
+ 211 002a 0020     		mov	r0, #0
+ 212              	.LVL26:
+ 213 002c 10BD     		pop	{r4, pc}
+ 214              		.cfi_endproc
+ 215              	.LFE36:
+ 217              		.section	.text.CAM_0706_CompressionRatio,"ax",%progbits
+ 218              		.align	1
+ 219              		.global	CAM_0706_CompressionRatio
+ 220              		.code	16
+ 221              		.thumb_func
+ 223              	CAM_0706_CompressionRatio:
+ 224              	.LFB37:
+  41:../scr/CAM_0706.c **** int CAM_0706_CompressionRatio(USART_TypeDef * USARTx, int xx) {
+ 225              		.loc 1 41 0
+ 226              		.cfi_startproc
+ 227              	.LVL27:
+ 228 0000 38B5     		push	{r3, r4, r5, lr}
+ 229              	.LCFI4:
+ 230              		.cfi_def_cfa_offset 16
+ 231              		.cfi_offset 3, -16
+ 232              		.cfi_offset 4, -12
+ 233              		.cfi_offset 5, -8
+ 234              		.cfi_offset 14, -4
+ 235              		.loc 1 41 0
+ 236 0002 041C     		mov	r4, r0
+ 237 0004 0D1C     		mov	r5, r1
+  42:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x56);
+ 238              		.loc 1 42 0
+ 239 0006 5621     		mov	r1, #86
+ 240              	.LVL28:
+ 241 0008 FFF7FEFF 		bl	USARTxPutChar
+ 242              	.LVL29:
+  43:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+ 243              		.loc 1 43 0
+ 244 000c 201C     		mov	r0, r4
+ 245 000e 0021     		mov	r1, #0
+ 246 0010 FFF7FEFF 		bl	USARTxPutChar
+ 247              	.LVL30:
+  44:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x31);
+ 248              		.loc 1 44 0
+ 249 0014 201C     		mov	r0, r4
+ 250 0016 3121     		mov	r1, #49
+ 251 0018 FFF7FEFF 		bl	USARTxPutChar
+ 252              	.LVL31:
+  45:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x05);
+ 253              		.loc 1 45 0
+ 254 001c 201C     		mov	r0, r4
+ 255 001e 0521     		mov	r1, #5
+ 256 0020 FFF7FEFF 		bl	USARTxPutChar
+ 257              	.LVL32:
+  46:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x01);
+ 258              		.loc 1 46 0
+ 259 0024 201C     		mov	r0, r4
+ 260 0026 0121     		mov	r1, #1
+ 261 0028 FFF7FEFF 		bl	USARTxPutChar
+ 262              	.LVL33:
+  47:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x01);
+ 263              		.loc 1 47 0
+ 264 002c 201C     		mov	r0, r4
+ 265 002e 0121     		mov	r1, #1
+ 266 0030 FFF7FEFF 		bl	USARTxPutChar
+ 267              	.LVL34:
+  48:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x12);
+ 268              		.loc 1 48 0
+ 269 0034 201C     		mov	r0, r4
+ 270 0036 1221     		mov	r1, #18
+ 271 0038 FFF7FEFF 		bl	USARTxPutChar
+ 272              	.LVL35:
+  49:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x04);
+ 273              		.loc 1 49 0
+ 274 003c 201C     		mov	r0, r4
+ 275 003e 0421     		mov	r1, #4
+ 276 0040 FFF7FEFF 		bl	USARTxPutChar
+ 277              	.LVL36:
+  50:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, xx);
+ 278              		.loc 1 50 0
+ 279 0044 E9B2     		uxtb	r1, r5
+ 280 0046 201C     		mov	r0, r4
+ 281 0048 FFF7FEFF 		bl	USARTxPutChar
+ 282              	.LVL37:
+  51:../scr/CAM_0706.c **** 	return 0;
+  52:../scr/CAM_0706.c **** }
+ 283              		.loc 1 52 0
+ 284              		@ sp needed for prologue
+ 285 004c 0020     		mov	r0, #0
+ 286              	.LVL38:
+ 287              	.LVL39:
+ 288 004e 38BD     		pop	{r3, r4, r5, pc}
+ 289              		.cfi_endproc
+ 290              	.LFE37:
+ 292              		.section	.text.CAM_0706_ReadPictureContent,"ax",%progbits
+ 293              		.align	1
+ 294              		.global	CAM_0706_ReadPictureContent
+ 295              		.code	16
+ 296              		.thumb_func
+ 298              	CAM_0706_ReadPictureContent:
+ 299              	.LFB38:
+  53:../scr/CAM_0706.c **** int CAM_0706_ReadPictureContent(USART_TypeDef * USARTx) {
+ 300              		.loc 1 53 0
+ 301              		.cfi_startproc
+ 302              	.LVL40:
+ 303 0000 10B5     		push	{r4, lr}
+ 304              	.LCFI5:
+ 305              		.cfi_def_cfa_offset 8
+ 306              		.cfi_offset 4, -8
+ 307              		.cfi_offset 14, -4
+  54:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x56);
+ 308              		.loc 1 54 0
+ 309 0002 5621     		mov	r1, #86
+  53:../scr/CAM_0706.c **** int CAM_0706_ReadPictureContent(USART_TypeDef * USARTx) {
+ 310              		.loc 1 53 0
+ 311 0004 041C     		mov	r4, r0
+ 312              		.loc 1 54 0
+ 313 0006 FFF7FEFF 		bl	USARTxPutChar
+ 314              	.LVL41:
+  55:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x00);
+ 315              		.loc 1 55 0
+ 316 000a 201C     		mov	r0, r4
+ 317 000c 0021     		mov	r1, #0
+ 318 000e FFF7FEFF 		bl	USARTxPutChar
+ 319              	.LVL42:
+  56:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x31);
+ 320              		.loc 1 56 0
+ 321 0012 201C     		mov	r0, r4
+ 322 0014 3121     		mov	r1, #49
+ 323 0016 FFF7FEFF 		bl	USARTxPutChar
+ 324              	.LVL43:
+  57:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x05);
+ 325              		.loc 1 57 0
+ 326 001a 201C     		mov	r0, r4
+ 327 001c 0521     		mov	r1, #5
+ 328 001e FFF7FEFF 		bl	USARTxPutChar
+ 329              	.LVL44:
+  58:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x01);
+ 330              		.loc 1 58 0
+ 331 0022 201C     		mov	r0, r4
+ 332 0024 0121     		mov	r1, #1
+ 333 0026 FFF7FEFF 		bl	USARTxPutChar
+ 334              	.LVL45:
+  59:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x01);
+ 335              		.loc 1 59 0
+ 336 002a 201C     		mov	r0, r4
+ 337 002c 0121     		mov	r1, #1
+ 338 002e FFF7FEFF 		bl	USARTxPutChar
+ 339              	.LVL46:
+  60:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x12);
+ 340              		.loc 1 60 0
+ 341 0032 201C     		mov	r0, r4
+ 342 0034 1221     		mov	r1, #18
+ 343 0036 FFF7FEFF 		bl	USARTxPutChar
+ 344              	.LVL47:
+  61:../scr/CAM_0706.c **** 	USARTxPutChar(USARTx, 0x04);
+ 345              		.loc 1 61 0
+ 346 003a 201C     		mov	r0, r4
+ 347 003c 0421     		mov	r1, #4
+ 348 003e FFF7FEFF 		bl	USARTxPutChar
+ 349              	.LVL48:
+  62:../scr/CAM_0706.c **** 	return 0;
+  63:../scr/CAM_0706.c **** }
+ 350              		.loc 1 63 0
+ 351              		@ sp needed for prologue
+ 352 0042 0020     		mov	r0, #0
+ 353              	.LVL49:
+ 354 0044 10BD     		pop	{r4, pc}
+ 355              		.cfi_endproc
+ 356              	.LFE38:
+ 358              		.text
+ 359              	.Letext0:
+ 360              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 361              		.file 3 "D:\\EclipseIndigo\\workspace\\cam_hub\\scr/stm32f0xx.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 CAM_0706.c
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:18     .text.CAM_0706_Reset:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:23     .text.CAM_0706_Reset:00000000 CAM_0706_Reset
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:65     .text.CAM_0706_TakePicture:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:70     .text.CAM_0706_TakePicture:00000000 CAM_0706_TakePicture
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:116    .text.CAM_0706_ReadFlieSize:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:121    .text.CAM_0706_ReadFlieSize:00000000 CAM_0706_ReadFlieSize
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:167    .text.CAM_0706_StopTakePicture:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:172    .text.CAM_0706_StopTakePicture:00000000 CAM_0706_StopTakePicture
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:218    .text.CAM_0706_CompressionRatio:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:223    .text.CAM_0706_CompressionRatio:00000000 CAM_0706_CompressionRatio
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:293    .text.CAM_0706_ReadPictureContent:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc14RBDT.s:298    .text.CAM_0706_ReadPictureContent:00000000 CAM_0706_ReadPictureContent
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.90b54cb79624a05a6a75538133d4ee2f
+                           .group:00000000 wm4.stm32f0xx.h.54.2936c65ea497e2b9f6697d244f204f4f
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.491.56b995fdd6b34ccece7fa7ee90a03d09
+                           .group:00000000 wm4.stm32f0xx_adc.h.31.deffd6417c7f5b0940228cd2f9270807
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.ff204b27217b5926452ab2f52b527ff3
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.02fa02b24c01ae505c73e46ccbb612cf
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.stm32f0xx_usart.h.110.6995e3c92210e6fb4aaf9b9da4f2c961
+
+UNDEFINED SYMBOLS
+USARTxPutChar

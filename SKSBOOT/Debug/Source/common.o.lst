@@ -1,0 +1,754 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"common.c"
+  15              		.section	.text.FLASH_PagesMask,"ax",%progbits
+  16              		.align	1
+  17              		.global	FLASH_PagesMask
+  18              		.thumb
+  19              		.thumb_func
+  21              	FLASH_PagesMask:
+  22              		@ args = 0, pretend = 0, frame = 8
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		@ link register save eliminated.
+  25 0000 82B0     		sub	sp, sp, #8
+  26 0002 0190     		str	r0, [sp, #4]
+  27 0004 0198     		ldr	r0, [sp, #4]
+  28 0006 4305     		lsls	r3, r0, #21
+  29 0008 4FEAD020 		lsr	r0, r0, #11
+  30 000c 18BF     		it	ne
+  31 000e 0130     		addne	r0, r0, #1
+  32 0010 02B0     		add	sp, sp, #8
+  33 0012 7047     		bx	lr
+  35              		.section	.text.FLASH_DisableWriteProtectionPages,"ax",%progbits
+  36              		.align	1
+  37              		.global	FLASH_DisableWriteProtectionPages
+  38              		.thumb
+  39              		.thumb_func
+  41              	FLASH_DisableWriteProtectionPages:
+  42              		@ args = 0, pretend = 0, frame = 0
+  43              		@ frame_needed = 0, uses_anonymous_args = 0
+  44 0000 70B5     		push	{r4, r5, r6, lr}
+  45 0002 0546     		mov	r5, r0
+  46 0004 FFF7FEFF 		bl	FLASH_GetWriteProtectionOptionByte
+  47 0008 00EA0503 		and	r3, r0, r5
+  48 000c AB42     		cmp	r3, r5
+  49 000e 0646     		mov	r6, r0
+  50 0010 26D0     		beq	.L4
+  51 0012 FFF7FEFF 		bl	FLASH_GetUserOptionByte
+  52 0016 3543     		orrs	r5, r5, r6
+  53 0018 0446     		mov	r4, r0
+  54 001a FFF7FEFF 		bl	FLASH_EraseOptionBytes
+  55 001e 6B1C     		adds	r3, r5, #1
+  56 0020 00D1     		bne	.L6
+  57 0022 02E0     		b	.L17
+  58              	.L6:
+  59 0024 E843     		mvns	r0, r5
+  60 0026 FFF7FEFF 		bl	FLASH_EnableWriteProtection
+  61              	.L17:
+  62 002a 04F00703 		and	r3, r4, #7
+  63 002e 072B     		cmp	r3, #7
+  64 0030 C5B2     		uxtb	r5, r0
+  65 0032 07D0     		beq	.L8
+  66 0034 04F00100 		and	r0, r4, #1
+  67 0038 04F00201 		and	r1, r4, #2
+  68 003c 04F00402 		and	r2, r4, #4
+  69 0040 FFF7FEFF 		bl	FLASH_UserOptionByteConfig
+  70              	.L8:
+  71 0044 042D     		cmp	r5, #4
+  72 0046 0BD1     		bne	.L4
+  73              	@ 445 "D:\EclipseIndigo\workspace\SKSBOOT\Libraries\CMSIS\Include/core_cmInstr.h" 1
+  74 0048 BFF34F8F 		dsb
+  75              	@ 0 "" 2
+  76              		.thumb
+  77 004c 054A     		ldr	r2, .L18
+  78 004e 064B     		ldr	r3, .L18+4
+  79 0050 D168     		ldr	r1, [r2, #12]
+  80 0052 01F4E061 		and	r1, r1, #1792
+  81 0056 0B43     		orrs	r3, r3, r1
+  82 0058 D360     		str	r3, [r2, #12]
+  83              	@ 445 "D:\EclipseIndigo\workspace\SKSBOOT\Libraries\CMSIS\Include/core_cmInstr.h" 1
+  84 005a BFF34F8F 		dsb
+  85              	@ 0 "" 2
+  86              		.thumb
+  87              	.L11:
+  88 005e FEE7     		b	.L11
+  89              	.L4:
+  90 0060 70BD     		pop	{r4, r5, r6, pc}
+  91              	.L19:
+  92 0062 00BF     		.align	2
+  93              	.L18:
+  94 0064 00ED00E0 		.word	-536810240
+  95 0068 0400FA05 		.word	100270084
+  97              		.section	.text.flash_read_uboot_info,"ax",%progbits
+  98              		.align	1
+  99              		.global	flash_read_uboot_info
+ 100              		.thumb
+ 101              		.thumb_func
+ 103              	flash_read_uboot_info:
+ 104              		@ args = 0, pretend = 0, frame = 0
+ 105              		@ frame_needed = 0, uses_anonymous_args = 0
+ 106 0000 70B5     		push	{r4, r5, r6, lr}
+ 107 0002 084C     		ldr	r4, .L23
+ 108 0004 084D     		ldr	r5, .L23+4
+ 109 0006 0646     		mov	r6, r0
+ 110              	.L21:
+ 111 0008 3520     		movs	r0, #53
+ 112 000a FFF7FEFF 		bl	FLASH_ClearFlag
+ 113 000e 54F8042F 		ldr	r2, [r4, #4]!
+ 114 0012 3319     		adds	r3, r6, r4
+ 115 0014 03F17843 		add	r3, r3, #-134217728
+ 116 0018 A3F5FF23 		sub	r3, r3, #522240
+ 117 001c AC42     		cmp	r4, r5
+ 118 001e 1A60     		str	r2, [r3, #0]
+ 119 0020 F2D1     		bne	.L21
+ 120 0022 70BD     		pop	{r4, r5, r6, pc}
+ 121              	.L24:
+ 122              		.align	2
+ 123              	.L23:
+ 124 0024 FCF70708 		.word	134739964
+ 125 0028 48F80708 		.word	134740040
+ 127              		.section	.text.flash_write_uboot_info,"ax",%progbits
+ 128              		.align	1
+ 129              		.global	flash_write_uboot_info
+ 130              		.thumb
+ 131              		.thumb_func
+ 133              	flash_write_uboot_info:
+ 134              		@ args = 0, pretend = 0, frame = 8
+ 135              		@ frame_needed = 0, uses_anonymous_args = 0
+ 136 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 137 0002 0423     		movs	r3, #4
+ 138 0004 0546     		mov	r5, r0
+ 139 0006 3520     		movs	r0, #53
+ 140 0008 8DF80730 		strb	r3, [sp, #7]
+ 141 000c FFF7FEFF 		bl	FLASH_ClearFlag
+ 142 0010 0B48     		ldr	r0, .L28
+ 143 0012 0B4C     		ldr	r4, .L28
+ 144 0014 0B4E     		ldr	r6, .L28+4
+ 145 0016 FFF7FEFF 		bl	FLASH_ErasePage
+ 146 001a 41F20403 		movw	r3, #4100
+ 147 001e 2B61     		str	r3, [r5, #16]
+ 148              	.L26:
+ 149 0020 2B19     		adds	r3, r5, r4
+ 150 0022 03F17843 		add	r3, r3, #-134217728
+ 151 0026 A3F5FF23 		sub	r3, r3, #522240
+ 152 002a 2046     		mov	r0, r4
+ 153 002c 1968     		ldr	r1, [r3, #0]
+ 154 002e FFF7FEFF 		bl	FLASH_ProgramWord
+ 155 0032 0434     		adds	r4, r4, #4
+ 156 0034 B442     		cmp	r4, r6
+ 157 0036 8DF80700 		strb	r0, [sp, #7]
+ 158 003a F1D1     		bne	.L26
+ 159 003c 7CBD     		pop	{r2, r3, r4, r5, r6, pc}
+ 160              	.L29:
+ 161 003e 00BF     		.align	2
+ 162              	.L28:
+ 163 0040 00F80708 		.word	134739968
+ 164 0044 4CF80708 		.word	134740044
+ 166              		.section	.text.flash_read_config,"ax",%progbits
+ 167              		.align	1
+ 168              		.global	flash_read_config
+ 169              		.thumb
+ 170              		.thumb_func
+ 172              	flash_read_config:
+ 173              		@ args = 0, pretend = 0, frame = 0
+ 174              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175 0000 70B5     		push	{r4, r5, r6, lr}
+ 176 0002 084C     		ldr	r4, .L33
+ 177 0004 084D     		ldr	r5, .L33+4
+ 178 0006 0646     		mov	r6, r0
+ 179              	.L31:
+ 180 0008 3520     		movs	r0, #53
+ 181 000a FFF7FEFF 		bl	FLASH_ClearFlag
+ 182 000e 54F8042F 		ldr	r2, [r4, #4]!
+ 183 0012 3319     		adds	r3, r6, r4
+ 184 0014 03F17843 		add	r3, r3, #-134217728
+ 185 0018 A3F5FE23 		sub	r3, r3, #520192
+ 186 001c AC42     		cmp	r4, r5
+ 187 001e 1A60     		str	r2, [r3, #0]
+ 188 0020 F2D1     		bne	.L31
+ 189 0022 70BD     		pop	{r4, r5, r6, pc}
+ 190              	.L34:
+ 191              		.align	2
+ 192              	.L33:
+ 193 0024 FCEF0708 		.word	134737916
+ 194 0028 FCFF0708 		.word	134742012
+ 196              		.section	.text.flash_write_config,"ax",%progbits
+ 197              		.align	1
+ 198              		.global	flash_write_config
+ 199              		.thumb
+ 200              		.thumb_func
+ 202              	flash_write_config:
+ 203              		@ args = 0, pretend = 0, frame = 8
+ 204              		@ frame_needed = 0, uses_anonymous_args = 0
+ 205 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 206 0002 0423     		movs	r3, #4
+ 207 0004 0546     		mov	r5, r0
+ 208 0006 3520     		movs	r0, #53
+ 209 0008 8DF80730 		strb	r3, [sp, #7]
+ 210 000c FFF7FEFF 		bl	FLASH_ClearFlag
+ 211 0010 0948     		ldr	r0, .L38
+ 212 0012 094C     		ldr	r4, .L38
+ 213 0014 094E     		ldr	r6, .L38+4
+ 214 0016 FFF7FEFF 		bl	FLASH_ErasePage
+ 215              	.L36:
+ 216 001a 2B19     		adds	r3, r5, r4
+ 217 001c 03F17843 		add	r3, r3, #-134217728
+ 218 0020 A3F5FE23 		sub	r3, r3, #520192
+ 219 0024 2046     		mov	r0, r4
+ 220 0026 1968     		ldr	r1, [r3, #0]
+ 221 0028 FFF7FEFF 		bl	FLASH_ProgramWord
+ 222 002c 0434     		adds	r4, r4, #4
+ 223 002e B442     		cmp	r4, r6
+ 224 0030 8DF80700 		strb	r0, [sp, #7]
+ 225 0034 F1D1     		bne	.L36
+ 226 0036 7CBD     		pop	{r2, r3, r4, r5, r6, pc}
+ 227              	.L39:
+ 228              		.align	2
+ 229              	.L38:
+ 230 0038 00F00708 		.word	134737920
+ 231 003c 00F40708 		.word	134738944
+ 233              		.section	.text.SerialPutChar,"ax",%progbits
+ 234              		.align	1
+ 235              		.global	SerialPutChar
+ 236              		.thumb
+ 237              		.thumb_func
+ 239              	SerialPutChar:
+ 240              		@ args = 0, pretend = 0, frame = 0
+ 241              		@ frame_needed = 0, uses_anonymous_args = 0
+ 242 0000 0146     		mov	r1, r0
+ 243 0002 08B5     		push	{r3, lr}
+ 244 0004 0448     		ldr	r0, .L46
+ 245 0006 FFF7FEFF 		bl	USART_SendData
+ 246              	.L41:
+ 247 000a 0348     		ldr	r0, .L46
+ 248 000c 8021     		movs	r1, #128
+ 249 000e FFF7FEFF 		bl	USART_GetFlagStatus
+ 250 0012 0028     		cmp	r0, #0
+ 251 0014 F9D0     		beq	.L41
+ 252 0016 08BD     		pop	{r3, pc}
+ 253              	.L47:
+ 254              		.align	2
+ 255              	.L46:
+ 256 0018 00380140 		.word	1073821696
+ 258              		.section	.text.flash_copy_image,"ax",%progbits
+ 259              		.align	1
+ 260              		.global	flash_copy_image
+ 261              		.thumb
+ 262              		.thumb_func
+ 264              	flash_copy_image:
+ 265              		@ args = 0, pretend = 0, frame = 8
+ 266              		@ frame_needed = 0, uses_anonymous_args = 0
+ 267 0000 2DE9F341 		push	{r0, r1, r4, r5, r6, r7, r8, lr}
+ 268 0004 0446     		mov	r4, r0
+ 269 0006 C768     		ldr	r7, [r0, #12]
+ 270 0008 0423     		movs	r3, #4
+ 271 000a 3520     		movs	r0, #53
+ 272 000c 8DF80730 		strb	r3, [sp, #7]
+ 273 0010 FFF7FEFF 		bl	FLASH_ClearFlag
+ 274 0014 E368     		ldr	r3, [r4, #12]
+ 275 0016 23F4FF63 		bic	r3, r3, #2040
+ 276 001a 23F00703 		bic	r3, r3, #7
+ 277 001e 03F50066 		add	r6, r3, #2048
+ 278 0022 BF08     		lsrs	r7, r7, #2
+ 279 0024 F60A     		lsrs	r6, r6, #11
+ 280 0026 0137     		adds	r7, r7, #1
+ 281 0028 642E     		cmp	r6, #100
+ 282 002a A8BF     		it	ge
+ 283 002c 6426     		movge	r6, #100
+ 284 002e 0025     		movs	r5, #0
+ 285 0030 06E0     		b	.L49
+ 286              	.L50:
+ 287 0032 05F58030 		add	r0, r5, #65536
+ 288 0036 0A30     		adds	r0, r0, #10
+ 289 0038 C002     		lsls	r0, r0, #11
+ 290 003a FFF7FEFF 		bl	FLASH_ErasePage
+ 291 003e 0135     		adds	r5, r5, #1
+ 292              	.L49:
+ 293 0040 B542     		cmp	r5, r6
+ 294 0042 F6D1     		bne	.L50
+ 295 0044 4FF00A08 		mov	r8, #10
+ 296 0048 124E     		ldr	r6, .L54
+ 297 004a B7FBF8F8 		udiv	r8, r7, r8
+ 298 004e 0025     		movs	r5, #0
+ 299              	.L52:
+ 300 0050 B5FBF8F3 		udiv	r3, r5, r8
+ 301 0054 08FB1353 		mls	r3, r8, r3, r5
+ 302 0058 13B9     		cbnz	r3, .L51
+ 303 005a 2E20     		movs	r0, #46
+ 304 005c FFF7FEFF 		bl	SerialPutChar
+ 305              	.L51:
+ 306 0060 A6F54730 		sub	r0, r6, #203776
+ 307 0064 A0F57F70 		sub	r0, r0, #1020
+ 308 0068 56F8041F 		ldr	r1, [r6, #4]!
+ 309 006c FFF7FEFF 		bl	FLASH_ProgramWord
+ 310 0070 0135     		adds	r5, r5, #1
+ 311 0072 BD42     		cmp	r5, r7
+ 312 0074 8DF80700 		strb	r0, [sp, #7]
+ 313 0078 EAD3     		bcc	.L52
+ 314 007a A368     		ldr	r3, [r4, #8]
+ 315 007c 2360     		str	r3, [r4, #0]
+ 316 007e E368     		ldr	r3, [r4, #12]
+ 317 0080 6360     		str	r3, [r4, #4]
+ 318 0082 054B     		ldr	r3, .L54+4
+ 319 0084 6361     		str	r3, [r4, #20]
+ 320 0086 03F54833 		add	r3, r3, #204800
+ 321 008a A361     		str	r3, [r4, #24]
+ 322 008c 0120     		movs	r0, #1
+ 323 008e BDE8FC81 		pop	{r2, r3, r4, r5, r6, r7, r8, pc}
+ 324              	.L55:
+ 325 0092 00BF     		.align	2
+ 326              	.L54:
+ 327 0094 FC6F0308 		.word	134443004
+ 328 0098 00500008 		.word	134238208
+ 330              		.section	.text.flash_verify_image,"ax",%progbits
+ 331              		.align	1
+ 332              		.global	flash_verify_image
+ 333              		.thumb
+ 334              		.thumb_func
+ 336              	flash_verify_image:
+ 337              		@ args = 0, pretend = 0, frame = 0
+ 338              		@ frame_needed = 0, uses_anonymous_args = 0
+ 339 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 340 0002 0446     		mov	r4, r0
+ 341 0004 FFF7FEFF 		bl	flash_read_uboot_info
+ 342 0008 E168     		ldr	r1, [r4, #12]
+ 343 000a 364A     		ldr	r2, .L79
+ 344 000c 4B1E     		subs	r3, r1, #1
+ 345 000e 9342     		cmp	r3, r2
+ 346 0010 6368     		ldr	r3, [r4, #4]
+ 347 0012 11D9     		bls	.L57
+ 348 0014 013B     		subs	r3, r3, #1
+ 349 0016 9342     		cmp	r3, r2
+ 350 0018 57D8     		bhi	.L66
+ 351 001a FFF7FEFF 		bl	CRC_ResetDR
+ 352 001e 6168     		ldr	r1, [r4, #4]
+ 353 0020 3148     		ldr	r0, .L79+4
+ 354 0022 8908     		lsrs	r1, r1, #2
+ 355 0024 0131     		adds	r1, r1, #1
+ 356 0026 FFF7FEFF 		bl	CRC_CalcBlockCRC
+ 357 002a 2368     		ldr	r3, [r4, #0]
+ 358 002c 9842     		cmp	r0, r3
+ 359 002e 0CBF     		ite	eq
+ 360 0030 0120     		moveq	r0, #1
+ 361 0032 6FF00100 		mvnne	r0, #1
+ 362 0036 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 363              	.L57:
+ 364 0038 581E     		subs	r0, r3, #1
+ 365 003a 9042     		cmp	r0, r2
+ 366 003c 2068     		ldr	r0, [r4, #0]
+ 367 003e A268     		ldr	r2, [r4, #8]
+ 368 0040 94BF     		ite	ls
+ 369 0042 0025     		movls	r5, #0
+ 370 0044 0125     		movhi	r5, #1
+ 371 0046 8CBF     		ite	hi
+ 372 0048 0026     		movhi	r6, #0
+ 373 004a 0126     		movls	r6, #1
+ 374 004c 9042     		cmp	r0, r2
+ 375 004e 01D1     		bne	.L60
+ 376 0050 8B42     		cmp	r3, r1
+ 377 0052 04D0     		beq	.L61
+ 378              	.L60:
+ 379 0054 002D     		cmp	r5, #0
+ 380 0056 0CBF     		ite	eq
+ 381 0058 0225     		moveq	r5, #2
+ 382 005a 0125     		movne	r5, #1
+ 383 005c 01E0     		b	.L65
+ 384              	.L61:
+ 385 005e EDB1     		cbz	r5, .L63
+ 386 0060 0125     		movs	r5, #1
+ 387              	.L65:
+ 388 0062 FFF7FEFF 		bl	CRC_ResetDR
+ 389 0066 E168     		ldr	r1, [r4, #12]
+ 390 0068 204F     		ldr	r7, .L79+8
+ 391 006a 8908     		lsrs	r1, r1, #2
+ 392 006c 0131     		adds	r1, r1, #1
+ 393 006e 3846     		mov	r0, r7
+ 394 0070 FFF7FEFF 		bl	CRC_CalcBlockCRC
+ 395 0074 A368     		ldr	r3, [r4, #8]
+ 396 0076 9842     		cmp	r0, r3
+ 397 0078 09D1     		bne	.L64
+ 398 007a 3A68     		ldr	r2, [r7, #0]
+ 399 007c 1C4B     		ldr	r3, .L79+12
+ 400 007e 1340     		ands	r3, r3, r2
+ 401 0080 B3F1005F 		cmp	r3, #536870912
+ 402 0084 03D1     		bne	.L64
+ 403 0086 2046     		mov	r0, r4
+ 404 0088 FFF7FEFF 		bl	flash_copy_image
+ 405 008c 0226     		movs	r6, #2
+ 406              	.L64:
+ 407 008e 6368     		ldr	r3, [r4, #4]
+ 408 0090 E360     		str	r3, [r4, #12]
+ 409 0092 2368     		ldr	r3, [r4, #0]
+ 410 0094 2046     		mov	r0, r4
+ 411 0096 A360     		str	r3, [r4, #8]
+ 412 0098 FFF7FEFF 		bl	flash_write_uboot_info
+ 413              	.L63:
+ 414 009c C6B1     		cbz	r6, .L70
+ 415 009e 6368     		ldr	r3, [r4, #4]
+ 416 00a0 013B     		subs	r3, r3, #1
+ 417 00a2 0333     		adds	r3, r3, #3
+ 418 00a4 16D8     		bhi	.L71
+ 419 00a6 FFF7FEFF 		bl	CRC_ResetDR
+ 420 00aa 6168     		ldr	r1, [r4, #4]
+ 421 00ac 0E48     		ldr	r0, .L79+4
+ 422 00ae 8908     		lsrs	r1, r1, #2
+ 423 00b0 0131     		adds	r1, r1, #1
+ 424 00b2 FFF7FEFF 		bl	CRC_CalcBlockCRC
+ 425 00b6 2368     		ldr	r3, [r4, #0]
+ 426 00b8 9842     		cmp	r0, r3
+ 427 00ba 0ED1     		bne	.L72
+ 428 00bc 012D     		cmp	r5, #1
+ 429 00be 0FD0     		beq	.L73
+ 430 00c0 022E     		cmp	r6, #2
+ 431 00c2 14BF     		ite	ne
+ 432 00c4 0220     		movne	r0, #2
+ 433 00c6 0420     		moveq	r0, #4
+ 434 00c8 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 435              	.L66:
+ 436 00ca 4FF0FF30 		mov	r0, #-1
+ 437 00ce F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 438              	.L70:
+ 439 00d0 3046     		mov	r0, r6
+ 440 00d2 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 441              	.L71:
+ 442 00d4 6FF00200 		mvn	r0, #2
+ 443 00d8 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 444              	.L72:
+ 445 00da 6FF00300 		mvn	r0, #3
+ 446 00de F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 447              	.L73:
+ 448 00e0 0320     		movs	r0, #3
+ 449 00e2 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 450              	.L80:
+ 451              		.align	2
+ 452              	.L79:
+ 453 00e4 FE1F0300 		.word	204798
+ 454 00e8 00500008 		.word	134238208
+ 455 00ec 00700308 		.word	134443008
+ 456 00f0 0000FE2F 		.word	805175296
+ 458              		.section	.text.SerialKeyPressed,"ax",%progbits
+ 459              		.align	1
+ 460              		.global	SerialKeyPressed
+ 461              		.thumb
+ 462              		.thumb_func
+ 464              	SerialKeyPressed:
+ 465              		@ args = 0, pretend = 0, frame = 0
+ 466              		@ frame_needed = 0, uses_anonymous_args = 0
+ 467 0000 38B5     		push	{r3, r4, r5, lr}
+ 468 0002 054C     		ldr	r4, .L84
+ 469 0004 0546     		mov	r5, r0
+ 470 0006 2021     		movs	r1, #32
+ 471 0008 2046     		mov	r0, r4
+ 472 000a FFF7FEFF 		bl	USART_GetFlagStatus
+ 473 000e 10B1     		cbz	r0, .L82
+ 474 0010 A38C     		ldrh	r3, [r4, #36]
+ 475 0012 0120     		movs	r0, #1
+ 476 0014 2B70     		strb	r3, [r5, #0]
+ 477              	.L82:
+ 478 0016 38BD     		pop	{r3, r4, r5, pc}
+ 479              	.L85:
+ 480              		.align	2
+ 481              	.L84:
+ 482 0018 00380140 		.word	1073821696
+ 484              		.section	.text.Rcv_Byte,"ax",%progbits
+ 485              		.align	1
+ 486              		.global	Rcv_Byte
+ 487              		.thumb
+ 488              		.thumb_func
+ 490              	Rcv_Byte:
+ 491              		@ args = 0, pretend = 0, frame = 0
+ 492              		@ frame_needed = 0, uses_anonymous_args = 0
+ 493 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 494 0002 094B     		ldr	r3, .L91
+ 495 0004 1C68     		ldr	r4, [r3, #0]
+ 496 0006 0646     		mov	r6, r0
+ 497 0008 0F46     		mov	r7, r1
+ 498 000a 1D46     		mov	r5, r3
+ 499              	.L88:
+ 500 000c 3046     		mov	r0, r6
+ 501 000e FFF7FEFF 		bl	SerialKeyPressed
+ 502 0012 0128     		cmp	r0, #1
+ 503 0014 06D0     		beq	.L89
+ 504 0016 2B68     		ldr	r3, [r5, #0]
+ 505 0018 1B1B     		subs	r3, r3, r4
+ 506 001a BB42     		cmp	r3, r7
+ 507 001c F6D3     		bcc	.L88
+ 508 001e 4FF0FF30 		mov	r0, #-1
+ 509 0022 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 510              	.L89:
+ 511 0024 0020     		movs	r0, #0
+ 512 0026 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 513              	.L92:
+ 514              		.align	2
+ 515              	.L91:
+ 516 0028 00000000 		.word	ulSecCount
+ 518              		.section	.text.RcvBuff,"ax",%progbits
+ 519              		.align	1
+ 520              		.global	RcvBuff
+ 521              		.thumb
+ 522              		.thumb_func
+ 524              	RcvBuff:
+ 525              		@ args = 0, pretend = 0, frame = 0
+ 526              		@ frame_needed = 0, uses_anonymous_args = 0
+ 527 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 528 0004 0025     		movs	r5, #0
+ 529 0006 0E68     		ldr	r6, [r1, #0]
+ 530 0008 0D60     		str	r5, [r1, #0]
+ 531 000a 0746     		mov	r7, r0
+ 532 000c 0C46     		mov	r4, r1
+ 533 000e 9046     		mov	r8, r2
+ 534 0010 0BE0     		b	.L94
+ 535              	.L96:
+ 536 0012 7819     		adds	r0, r7, r5
+ 537 0014 4146     		mov	r1, r8
+ 538 0016 FFF7FEFF 		bl	Rcv_Byte
+ 539 001a 10B1     		cbz	r0, .L95
+ 540              	.L97:
+ 541 001c 2068     		ldr	r0, [r4, #0]
+ 542 001e BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 543              	.L95:
+ 544 0022 2368     		ldr	r3, [r4, #0]
+ 545 0024 0133     		adds	r3, r3, #1
+ 546 0026 2360     		str	r3, [r4, #0]
+ 547 0028 0135     		adds	r5, r5, #1
+ 548              	.L94:
+ 549 002a B542     		cmp	r5, r6
+ 550 002c F1DB     		blt	.L96
+ 551 002e F5E7     		b	.L97
+ 553              		.section	.text.gpio_pin_init,"ax",%progbits
+ 554              		.align	1
+ 555              		.global	gpio_pin_init
+ 556              		.thumb
+ 557              		.thumb_func
+ 559              	gpio_pin_init:
+ 560              		@ args = 0, pretend = 0, frame = 8
+ 561              		@ frame_needed = 0, uses_anonymous_args = 0
+ 562 0000 2DE9F743 		push	{r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
+ 563 0004 DFF8D090 		ldr	r9, .L100+8
+ 564 0008 3148     		ldr	r0, .L100
+ 565 000a 0124     		movs	r4, #1
+ 566 000c 1023     		movs	r3, #16
+ 567 000e 0025     		movs	r5, #0
+ 568 0010 0326     		movs	r6, #3
+ 569 0012 6946     		mov	r1, sp
+ 570 0014 0093     		str	r3, [sp, #0]
+ 571 0016 4FF48078 		mov	r8, #256
+ 572 001a 8DF80440 		strb	r4, [sp, #4]
+ 573 001e 8DF80650 		strb	r5, [sp, #6]
+ 574 0022 8DF80740 		strb	r4, [sp, #7]
+ 575 0026 8DF80560 		strb	r6, [sp, #5]
+ 576 002a FFF7FEFF 		bl	GPIO_Init
+ 577 002e 4846     		mov	r0, r9
+ 578 0030 6946     		mov	r1, sp
+ 579 0032 4FF40077 		mov	r7, #512
+ 580 0036 CDF80080 		str	r8, [sp, #0]
+ 581 003a 8DF80440 		strb	r4, [sp, #4]
+ 582 003e 8DF80650 		strb	r5, [sp, #6]
+ 583 0042 8DF80740 		strb	r4, [sp, #7]
+ 584 0046 8DF80560 		strb	r6, [sp, #5]
+ 585 004a FFF7FEFF 		bl	GPIO_Init
+ 586 004e 4846     		mov	r0, r9
+ 587 0050 6946     		mov	r1, sp
+ 588 0052 0097     		str	r7, [sp, #0]
+ 589 0054 8DF80440 		strb	r4, [sp, #4]
+ 590 0058 8DF80650 		strb	r5, [sp, #6]
+ 591 005c 8DF80740 		strb	r4, [sp, #7]
+ 592 0060 8DF80560 		strb	r6, [sp, #5]
+ 593 0064 FFF7FEFF 		bl	GPIO_Init
+ 594 0068 6946     		mov	r1, sp
+ 595 006a 1A48     		ldr	r0, .L100+4
+ 596 006c CDF80080 		str	r8, [sp, #0]
+ 597 0070 8DF80440 		strb	r4, [sp, #4]
+ 598 0074 8DF80650 		strb	r5, [sp, #6]
+ 599 0078 8DF80740 		strb	r4, [sp, #7]
+ 600 007c 8DF80560 		strb	r6, [sp, #5]
+ 601 0080 FFF7FEFF 		bl	GPIO_Init
+ 602 0084 0921     		movs	r1, #9
+ 603 0086 0722     		movs	r2, #7
+ 604 0088 4FF09040 		mov	r0, #1207959552
+ 605 008c FFF7FEFF 		bl	GPIO_PinAFConfig
+ 606 0090 0A21     		movs	r1, #10
+ 607 0092 0722     		movs	r2, #7
+ 608 0094 4FF09040 		mov	r0, #1207959552
+ 609 0098 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 610 009c 0223     		movs	r3, #2
+ 611 009e 6946     		mov	r1, sp
+ 612 00a0 4FF09040 		mov	r0, #1207959552
+ 613 00a4 8DF80430 		strb	r3, [sp, #4]
+ 614 00a8 8DF80560 		strb	r6, [sp, #5]
+ 615 00ac 8DF80650 		strb	r5, [sp, #6]
+ 616 00b0 8DF80740 		strb	r4, [sp, #7]
+ 617 00b4 0097     		str	r7, [sp, #0]
+ 618 00b6 FFF7FEFF 		bl	GPIO_Init
+ 619 00ba 4FF48063 		mov	r3, #1024
+ 620 00be 4FF09040 		mov	r0, #1207959552
+ 621 00c2 6946     		mov	r1, sp
+ 622 00c4 0093     		str	r3, [sp, #0]
+ 623 00c6 FFF7FEFF 		bl	GPIO_Init
+ 624 00ca BDE8FE83 		pop	{r1, r2, r3, r4, r5, r6, r7, r8, r9, pc}
+ 625              	.L101:
+ 626 00ce 00BF     		.align	2
+ 627              	.L100:
+ 628 00d0 00100048 		.word	1207963648
+ 629 00d4 00040048 		.word	1207960576
+ 630 00d8 000C0048 		.word	1207962624
+ 632              		.section	.text.iwdg_init,"ax",%progbits
+ 633              		.align	1
+ 634              		.global	iwdg_init
+ 635              		.thumb
+ 636              		.thumb_func
+ 638              	iwdg_init:
+ 639              		@ args = 0, pretend = 0, frame = 0
+ 640              		@ frame_needed = 0, uses_anonymous_args = 0
+ 641 0000 08B5     		push	{r3, lr}
+ 642 0002 45F25550 		movw	r0, #21845
+ 643 0006 FFF7FEFF 		bl	IWDG_WriteAccessCmd
+ 644 000a 0620     		movs	r0, #6
+ 645 000c FFF7FEFF 		bl	IWDG_SetPrescaler
+ 646 0010 4FF44370 		mov	r0, #780
+ 647 0014 FFF7FEFF 		bl	IWDG_SetReload
+ 648 0018 FFF7FEFF 		bl	IWDG_ReloadCounter
+ 649 001c BDE80840 		pop	{r3, lr}
+ 650 0020 FFF7FEBF 		b	IWDG_Enable
+ 652              		.section	.text.IAP_Init,"ax",%progbits
+ 653              		.align	1
+ 654              		.global	IAP_Init
+ 655              		.thumb
+ 656              		.thumb_func
+ 658              	IAP_Init:
+ 659              		@ args = 0, pretend = 0, frame = 24
+ 660              		@ frame_needed = 0, uses_anonymous_args = 0
+ 661 0000 10B5     		push	{r4, lr}
+ 662 0002 4020     		movs	r0, #64
+ 663 0004 86B0     		sub	sp, sp, #24
+ 664 0006 0121     		movs	r1, #1
+ 665 0008 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 666 000c 0121     		movs	r1, #1
+ 667 000e 4FF40010 		mov	r0, #2097152
+ 668 0012 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 669 0016 0121     		movs	r1, #1
+ 670 0018 4FF48010 		mov	r0, #1048576
+ 671 001c FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 672 0020 0121     		movs	r1, #1
+ 673 0022 4FF48010 		mov	r0, #1048576
+ 674 0026 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 675 002a 0121     		movs	r1, #1
+ 676 002c 4FF40030 		mov	r0, #131072
+ 677 0030 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 678 0034 0121     		movs	r1, #1
+ 679 0036 4FF40030 		mov	r0, #131072
+ 680 003a FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 681 003e 0121     		movs	r1, #1
+ 682 0040 4FF40030 		mov	r0, #131072
+ 683 0044 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 684 0048 0121     		movs	r1, #1
+ 685 004a 4FF48040 		mov	r0, #16384
+ 686 004e FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 687 0052 0121     		movs	r1, #1
+ 688 0054 4FF48040 		mov	r0, #16384
+ 689 0058 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+ 690 005c 0B4C     		ldr	r4, .L104
+ 691 005e FFF7FEFF 		bl	gpio_pin_init
+ 692 0062 4FF4E133 		mov	r3, #115200
+ 693 0066 0093     		str	r3, [sp, #0]
+ 694 0068 0023     		movs	r3, #0
+ 695 006a 0193     		str	r3, [sp, #4]
+ 696 006c 0293     		str	r3, [sp, #8]
+ 697 006e 0393     		str	r3, [sp, #12]
+ 698 0070 0593     		str	r3, [sp, #20]
+ 699 0072 2046     		mov	r0, r4
+ 700 0074 0C23     		movs	r3, #12
+ 701 0076 6946     		mov	r1, sp
+ 702 0078 0493     		str	r3, [sp, #16]
+ 703 007a FFF7FEFF 		bl	USART_Init
+ 704 007e 2046     		mov	r0, r4
+ 705 0080 0121     		movs	r1, #1
+ 706 0082 FFF7FEFF 		bl	USART_Cmd
+ 707 0086 06B0     		add	sp, sp, #24
+ 708 0088 10BD     		pop	{r4, pc}
+ 709              	.L105:
+ 710 008a 00BF     		.align	2
+ 711              	.L104:
+ 712 008c 00380140 		.word	1073821696
+ 714              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 common.c
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:16     .text.FLASH_PagesMask:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:21     .text.FLASH_PagesMask:00000000 FLASH_PagesMask
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:36     .text.FLASH_DisableWriteProtectionPages:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:41     .text.FLASH_DisableWriteProtectionPages:00000000 FLASH_DisableWriteProtectionPages
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:94     .text.FLASH_DisableWriteProtectionPages:00000064 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:98     .text.flash_read_uboot_info:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:103    .text.flash_read_uboot_info:00000000 flash_read_uboot_info
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:124    .text.flash_read_uboot_info:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:128    .text.flash_write_uboot_info:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:133    .text.flash_write_uboot_info:00000000 flash_write_uboot_info
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:163    .text.flash_write_uboot_info:00000040 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:167    .text.flash_read_config:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:172    .text.flash_read_config:00000000 flash_read_config
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:193    .text.flash_read_config:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:197    .text.flash_write_config:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:202    .text.flash_write_config:00000000 flash_write_config
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:230    .text.flash_write_config:00000038 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:234    .text.SerialPutChar:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:239    .text.SerialPutChar:00000000 SerialPutChar
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:256    .text.SerialPutChar:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:259    .text.flash_copy_image:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:264    .text.flash_copy_image:00000000 flash_copy_image
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:327    .text.flash_copy_image:00000094 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:331    .text.flash_verify_image:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:336    .text.flash_verify_image:00000000 flash_verify_image
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:453    .text.flash_verify_image:000000e4 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:459    .text.SerialKeyPressed:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:464    .text.SerialKeyPressed:00000000 SerialKeyPressed
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:482    .text.SerialKeyPressed:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:485    .text.Rcv_Byte:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:490    .text.Rcv_Byte:00000000 Rcv_Byte
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:516    .text.Rcv_Byte:00000028 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:519    .text.RcvBuff:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:524    .text.RcvBuff:00000000 RcvBuff
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:554    .text.gpio_pin_init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:559    .text.gpio_pin_init:00000000 gpio_pin_init
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:628    .text.gpio_pin_init:000000d0 $d
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:633    .text.iwdg_init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:638    .text.iwdg_init:00000000 iwdg_init
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:653    .text.IAP_Init:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:658    .text.IAP_Init:00000000 IAP_Init
+C:\Users\THANGN~1\AppData\Local\Temp\cc3MCrwe.s:712    .text.IAP_Init:0000008c $d
+
+UNDEFINED SYMBOLS
+FLASH_GetWriteProtectionOptionByte
+FLASH_GetUserOptionByte
+FLASH_EraseOptionBytes
+FLASH_EnableWriteProtection
+FLASH_UserOptionByteConfig
+FLASH_ClearFlag
+FLASH_ErasePage
+FLASH_ProgramWord
+USART_SendData
+USART_GetFlagStatus
+CRC_ResetDR
+CRC_CalcBlockCRC
+ulSecCount
+GPIO_Init
+GPIO_PinAFConfig
+IWDG_WriteAccessCmd
+IWDG_SetPrescaler
+IWDG_SetReload
+IWDG_ReloadCounter
+IWDG_Enable
+RCC_AHBPeriphClockCmd
+RCC_APB2PeriphClockCmd
+USART_Init
+USART_Cmd

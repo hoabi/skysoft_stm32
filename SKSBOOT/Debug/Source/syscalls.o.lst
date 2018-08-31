@@ -1,0 +1,55 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"syscalls.c"
+  15              		.section	.text._sbrk,"ax",%progbits
+  16              		.align	1
+  17              		.global	_sbrk
+  18              		.thumb
+  19              		.thumb_func
+  21              	_sbrk:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		@ link register save eliminated.
+  25 0000 044B     		ldr	r3, .L3
+  26 0002 1A68     		ldr	r2, [r3, #0]
+  27 0004 0AB9     		cbnz	r2, .L2
+  28 0006 044A     		ldr	r2, .L3+4
+  29 0008 1A60     		str	r2, [r3, #0]
+  30              	.L2:
+  31 000a 1A68     		ldr	r2, [r3, #0]
+  32 000c 1018     		adds	r0, r2, r0
+  33 000e 1860     		str	r0, [r3, #0]
+  34 0010 1046     		mov	r0, r2
+  35 0012 7047     		bx	lr
+  36              	.L4:
+  37              		.align	2
+  38              	.L3:
+  39 0014 00000000 		.word	.LANCHOR0
+  40 0018 00000000 		.word	_end
+  42              		.section	.bss.heap.8619,"aw",%nobits
+  43              		.align	2
+  44              		.set	.LANCHOR0,. + 0
+  47              	heap.8619:
+  48 0000 00000000 		.space	4
+  49              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 syscalls.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccm1Hsdo.s:16     .text._sbrk:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccm1Hsdo.s:21     .text._sbrk:00000000 _sbrk
+C:\Users\THANGN~1\AppData\Local\Temp\ccm1Hsdo.s:39     .text._sbrk:00000014 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccm1Hsdo.s:43     .bss.heap.8619:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccm1Hsdo.s:47     .bss.heap.8619:00000000 heap.8619
+
+UNDEFINED SYMBOLS
+_end

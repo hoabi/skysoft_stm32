@@ -1,0 +1,627 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 4
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"mainboot.c"
+  15              		.section	.text.NVIC_SystemReset,"ax",%progbits
+  16              		.align	1
+  17              		.thumb
+  18              		.thumb_func
+  20              	NVIC_SystemReset:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23              		@ link register save eliminated.
+  24              	@ 445 "D:\EclipseIndigo\workspace\SKSBOOT\Libraries\CMSIS\Include/core_cmInstr.h" 1
+  25 0000 BFF34F8F 		dsb
+  26              	@ 0 "" 2
+  27              		.thumb
+  28 0004 044A     		ldr	r2, .L3
+  29 0006 054B     		ldr	r3, .L3+4
+  30 0008 D168     		ldr	r1, [r2, #12]
+  31 000a 01F4E061 		and	r1, r1, #1792
+  32 000e 0B43     		orrs	r3, r3, r1
+  33 0010 D360     		str	r3, [r2, #12]
+  34              	@ 445 "D:\EclipseIndigo\workspace\SKSBOOT\Libraries\CMSIS\Include/core_cmInstr.h" 1
+  35 0012 BFF34F8F 		dsb
+  36              	@ 0 "" 2
+  37              		.thumb
+  38              	.L2:
+  39 0016 FEE7     		b	.L2
+  40              	.L4:
+  41              		.align	2
+  42              	.L3:
+  43 0018 00ED00E0 		.word	-536810240
+  44 001c 0400FA05 		.word	100270084
+  46              		.section	.text.Str2Int,"ax",%progbits
+  47              		.align	1
+  48              		.global	Str2Int
+  49              		.thumb
+  50              		.thumb_func
+  52              	Str2Int:
+  53              		@ args = 0, pretend = 0, frame = 0
+  54              		@ frame_needed = 0, uses_anonymous_args = 0
+  55 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  56 0002 0378     		ldrb	r3, [r0, #0]	@ zero_extendqisi2
+  57 0004 302B     		cmp	r3, #48
+  58 0006 2BD1     		bne	.L23
+  59 0008 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+  60 000a 782B     		cmp	r3, #120
+  61 000c 01D0     		beq	.L7
+  62 000e 582B     		cmp	r3, #88
+  63 0010 26D1     		bne	.L23
+  64              	.L7:
+  65 0012 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+  66 0014 002B     		cmp	r3, #0
+  67 0016 43D0     		beq	.L26
+  68 0018 0024     		movs	r4, #0
+  69 001a 0222     		movs	r2, #2
+  70              	.L15:
+  71 001c 835C     		ldrb	r3, [r0, r2]	@ zero_extendqisi2
+  72 001e 0BB9     		cbnz	r3, .L9
+  73 0020 0C60     		str	r4, [r1, #0]
+  74 0022 31E0     		b	.L46
+  75              	.L9:
+  76 0024 A3F14106 		sub	r6, r3, #65
+  77 0028 F6B2     		uxtb	r6, r6
+  78 002a 052E     		cmp	r6, #5
+  79 002c A3F13005 		sub	r5, r3, #48
+  80 0030 06D9     		bls	.L11
+  81 0032 A3F16107 		sub	r7, r3, #97
+  82 0036 052F     		cmp	r7, #5
+  83 0038 02D9     		bls	.L11
+  84 003a EFB2     		uxtb	r7, r5
+  85 003c 092F     		cmp	r7, #9
+  86 003e 2FD8     		bhi	.L26
+  87              	.L11:
+  88 0040 EFB2     		uxtb	r7, r5
+  89 0042 2401     		lsls	r4, r4, #4
+  90 0044 092F     		cmp	r7, #9
+  91 0046 01D8     		bhi	.L12
+  92 0048 2B46     		mov	r3, r5
+  93 004a 04E0     		b	.L13
+  94              	.L12:
+  95 004c 052E     		cmp	r6, #5
+  96 004e 01D8     		bhi	.L14
+  97 0050 373B     		subs	r3, r3, #55
+  98 0052 00E0     		b	.L13
+  99              	.L14:
+ 100 0054 573B     		subs	r3, r3, #87
+ 101              	.L13:
+ 102 0056 0132     		adds	r2, r2, #1
+ 103 0058 0B2A     		cmp	r2, #11
+ 104 005a 1C44     		add	r4, r3, r4
+ 105 005c DED1     		bne	.L15
+ 106 005e 1FE0     		b	.L26
+ 107              	.L23:
+ 108 0060 0023     		movs	r3, #0
+ 109 0062 1A46     		mov	r2, r3
+ 110 0064 0A25     		movs	r5, #10
+ 111              	.L37:
+ 112 0066 845C     		ldrb	r4, [r0, r2]	@ zero_extendqisi2
+ 113 0068 04B9     		cbnz	r4, .L16
+ 114 006a 0CE0     		b	.L47
+ 115              	.L16:
+ 116 006c 6B2C     		cmp	r4, #107
+ 117 006e 01D0     		beq	.L18
+ 118 0070 4B2C     		cmp	r4, #75
+ 119 0072 02D1     		bne	.L19
+ 120              	.L18:
+ 121 0074 0AB1     		cbz	r2, .L19
+ 122 0076 9B02     		lsls	r3, r3, #10
+ 123 0078 05E0     		b	.L47
+ 124              	.L19:
+ 125 007a 6D2C     		cmp	r4, #109
+ 126 007c 01D0     		beq	.L20
+ 127 007e 4D2C     		cmp	r4, #77
+ 128 0080 04D1     		bne	.L21
+ 129              	.L20:
+ 130 0082 1AB1     		cbz	r2, .L21
+ 131 0084 1B05     		lsls	r3, r3, #20
+ 132              	.L47:
+ 133 0086 0B60     		str	r3, [r1, #0]
+ 134              	.L46:
+ 135 0088 0120     		movs	r0, #1
+ 136 008a F0BD     		pop	{r4, r5, r6, r7, pc}
+ 137              	.L21:
+ 138 008c A4F13006 		sub	r6, r4, #48
+ 139 0090 092E     		cmp	r6, #9
+ 140 0092 05D8     		bhi	.L26
+ 141 0094 05FB0343 		mla	r3, r5, r3, r4
+ 142 0098 0132     		adds	r2, r2, #1
+ 143 009a 303B     		subs	r3, r3, #48
+ 144 009c 0B2A     		cmp	r2, #11
+ 145 009e E2D1     		bne	.L37
+ 146              	.L26:
+ 147 00a0 0020     		movs	r0, #0
+ 148 00a2 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 150              		.section	.text.SecureCheck,"ax",%progbits
+ 151              		.align	1
+ 152              		.global	SecureCheck
+ 153              		.thumb
+ 154              		.thumb_func
+ 156              	SecureCheck:
+ 157              		@ args = 0, pretend = 0, frame = 112
+ 158              		@ frame_needed = 0, uses_anonymous_args = 0
+ 159 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 160 0004 9DB0     		sub	sp, sp, #116
+ 161 0006 0021     		movs	r1, #0
+ 162 0008 3222     		movs	r2, #50
+ 163 000a 0FA8     		add	r0, sp, #60
+ 164 000c FFF7FEFF 		bl	memset
+ 165 0010 0523     		movs	r3, #5
+ 166 0012 0021     		movs	r1, #0
+ 167 0014 3222     		movs	r2, #50
+ 168 0016 02A8     		add	r0, sp, #8
+ 169 0018 0193     		str	r3, [sp, #4]
+ 170 001a FFF7FEFF 		bl	memset
+ 171 001e 0322     		movs	r2, #3
+ 172 0020 02A8     		add	r0, sp, #8
+ 173 0022 01A9     		add	r1, sp, #4
+ 174 0024 FFF7FEFF 		bl	RcvBuff
+ 175 0028 019B     		ldr	r3, [sp, #4]
+ 176 002a 052B     		cmp	r3, #5
+ 177 002c 01D0     		beq	.L49
+ 178              	.L51:
+ 179 002e 0020     		movs	r0, #0
+ 180 0030 A0E0     		b	.L50
+ 181              	.L49:
+ 182 0032 9DF80860 		ldrb	r6, [sp, #8]	@ zero_extendqisi2
+ 183 0036 242E     		cmp	r6, #36
+ 184 0038 F9D1     		bne	.L51
+ 185 003a 9DF80A70 		ldrb	r7, [sp, #10]	@ zero_extendqisi2
+ 186 003e 9DF80930 		ldrb	r3, [sp, #9]	@ zero_extendqisi2
+ 187 0042 3F04     		lsls	r7, r7, #16
+ 188 0044 47EA0367 		orr	r7, r7, r3, lsl #24
+ 189 0048 9DF80C30 		ldrb	r3, [sp, #12]	@ zero_extendqisi2
+ 190 004c 1F43     		orrs	r7, r7, r3
+ 191 004e 9DF80B30 		ldrb	r3, [sp, #11]	@ zero_extendqisi2
+ 192 0052 5324     		movs	r4, #83
+ 193 0054 4B25     		movs	r5, #75
+ 194 0056 0821     		movs	r1, #8
+ 195 0058 4FF04108 		mov	r8, #65
+ 196 005c 0DF10900 		add	r0, sp, #9
+ 197 0060 47EA0327 		orr	r7, r7, r3, lsl #8
+ 198 0064 8DF80D40 		strb	r4, [sp, #13]
+ 199 0068 8DF80E50 		strb	r5, [sp, #14]
+ 200 006c 8DF80F40 		strb	r4, [sp, #15]
+ 201 0070 8DF81080 		strb	r8, [sp, #16]
+ 202 0074 FFF7FEFF 		bl	Cal_CRC16
+ 203 0078 404B     		ldr	r3, .L54
+ 204 007a 8246     		mov	sl, r0
+ 205 007c 1868     		ldr	r0, [r3, #0]
+ 206 007e 3818     		adds	r0, r7, r0
+ 207 0080 FFF7FEFF 		bl	srand
+ 208 0084 FFF7FEFF 		bl	rand
+ 209 0088 1027     		movs	r7, #16
+ 210 008a 020E     		lsrs	r2, r0, #24
+ 211 008c 8DF84120 		strb	r2, [sp, #65]
+ 212 0090 20FA07F2 		lsr	r2, r0, r7
+ 213 0094 4223     		movs	r3, #66
+ 214 0096 8DF83C60 		strb	r6, [sp, #60]
+ 215 009a CAF3072B 		ubfx	fp, sl, #8, #8
+ 216 009e 0426     		movs	r6, #4
+ 217 00a0 8DF84220 		strb	r2, [sp, #66]
+ 218 00a4 8DF84400 		strb	r0, [sp, #68]
+ 219 00a8 020A     		lsrs	r2, r0, #8
+ 220 00aa 0821     		movs	r1, #8
+ 221 00ac 0DEB0800 		add	r0, sp, r8
+ 222 00b0 8DF84320 		strb	r2, [sp, #67]
+ 223 00b4 8DF84540 		strb	r4, [sp, #69]
+ 224 00b8 8DF84650 		strb	r5, [sp, #70]
+ 225 00bc 8DF84740 		strb	r4, [sp, #71]
+ 226 00c0 8DF84830 		strb	r3, [sp, #72]
+ 227 00c4 8DF83D70 		strb	r7, [sp, #61]
+ 228 00c8 8DF83E60 		strb	r6, [sp, #62]
+ 229 00cc 8DF83FB0 		strb	fp, [sp, #63]
+ 230 00d0 8DF840A0 		strb	sl, [sp, #64]
+ 231 00d4 FFF7FEFF 		bl	Cal_CRC16
+ 232 00d8 0821     		movs	r1, #8
+ 233 00da 8146     		mov	r9, r0
+ 234 00dc 02A8     		add	r0, sp, #8
+ 235 00de 8DF80A40 		strb	r4, [sp, #10]
+ 236 00e2 8DF80B50 		strb	r5, [sp, #11]
+ 237 00e6 8DF80C40 		strb	r4, [sp, #12]
+ 238 00ea 8DF808B0 		strb	fp, [sp, #8]
+ 239 00ee 8DF809A0 		strb	sl, [sp, #9]
+ 240 00f2 8DF80D80 		strb	r8, [sp, #13]
+ 241 00f6 8DF80E70 		strb	r7, [sp, #14]
+ 242 00fa 8DF80F60 		strb	r6, [sp, #15]
+ 243 00fe FFF7FEFF 		bl	Cal_CRC16
+ 244 0102 0024     		movs	r4, #0
+ 245 0104 0546     		mov	r5, r0
+ 246              	.L52:
+ 247 0106 0FAB     		add	r3, sp, #60
+ 248 0108 185D     		ldrb	r0, [r3, r4]	@ zero_extendqisi2
+ 249 010a 0134     		adds	r4, r4, #1
+ 250 010c FFF7FEFF 		bl	SerialPutChar
+ 251 0110 092C     		cmp	r4, #9
+ 252 0112 F8D1     		bne	.L52
+ 253 0114 0623     		movs	r3, #6
+ 254 0116 0322     		movs	r2, #3
+ 255 0118 02A8     		add	r0, sp, #8
+ 256 011a 01A9     		add	r1, sp, #4
+ 257 011c 0193     		str	r3, [sp, #4]
+ 258 011e FFF7FEFF 		bl	RcvBuff
+ 259 0122 019B     		ldr	r3, [sp, #4]
+ 260 0124 062B     		cmp	r3, #6
+ 261 0126 82D1     		bne	.L51
+ 262 0128 9DF80840 		ldrb	r4, [sp, #8]	@ zero_extendqisi2
+ 263 012c 242C     		cmp	r4, #36
+ 264 012e 7FF47EAF 		bne	.L51
+ 265 0132 9DF80930 		ldrb	r3, [sp, #9]	@ zero_extendqisi2
+ 266 0136 562B     		cmp	r3, #86
+ 267 0138 7FF479AF 		bne	.L51
+ 268 013c 9DF80A00 		ldrb	r0, [sp, #10]	@ zero_extendqisi2
+ 269 0140 9DF80B10 		ldrb	r1, [sp, #11]	@ zero_extendqisi2
+ 270 0144 9DF80C20 		ldrb	r2, [sp, #12]	@ zero_extendqisi2
+ 271 0148 9DF80D30 		ldrb	r3, [sp, #13]	@ zero_extendqisi2
+ 272 014c 41EA0021 		orr	r1, r1, r0, lsl #8
+ 273 0150 4945     		cmp	r1, r9
+ 274 0152 7FF46CAF 		bne	.L51
+ 275 0156 43EA0223 		orr	r3, r3, r2, lsl #8
+ 276 015a AB42     		cmp	r3, r5
+ 277 015c 7FF467AF 		bne	.L51
+ 278 0160 2046     		mov	r0, r4
+ 279 0162 FFF7FEFF 		bl	SerialPutChar
+ 280 0166 2046     		mov	r0, r4
+ 281 0168 FFF7FEFF 		bl	SerialPutChar
+ 282 016c 2046     		mov	r0, r4
+ 283 016e FFF7FEFF 		bl	SerialPutChar
+ 284 0172 0120     		movs	r0, #1
+ 285              	.L50:
+ 286 0174 1DB0     		add	sp, sp, #116
+ 287 0176 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, sl, fp, pc}
+ 288              	.L55:
+ 289 017a 00BF     		.align	2
+ 290              	.L54:
+ 291 017c 00000000 		.word	ulTickCount
+ 293              		.section	.text.Main_Menu,"ax",%progbits
+ 294              		.align	1
+ 295              		.global	Main_Menu
+ 296              		.thumb
+ 297              		.thumb_func
+ 299              	Main_Menu:
+ 300              		@ args = 0, pretend = 0, frame = 8
+ 301              		@ frame_needed = 0, uses_anonymous_args = 0
+ 302 0000 2DE9F743 		push	{r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
+ 303 0004 704B     		ldr	r3, .L95
+ 304 0006 714D     		ldr	r5, .L95+4
+ 305 0008 0522     		movs	r2, #5
+ 306 000a 0024     		movs	r4, #0
+ 307 000c 1A60     		str	r2, [r3, #0]
+ 308 000e 6FF01F03 		mvn	r3, #31
+ 309 0012 2B60     		str	r3, [r5, #0]
+ 310 0014 8DF80340 		strb	r4, [sp, #3]
+ 311 0018 FFF7FEFF 		bl	FLASH_OB_GetWRP
+ 312 001c 2B68     		ldr	r3, [r5, #0]
+ 313 001e 1840     		ands	r0, r0, r3
+ 314 0020 9842     		cmp	r0, r3
+ 315 0022 6B4B     		ldr	r3, .L95+8
+ 316 0024 02D0     		beq	.L57
+ 317 0026 0122     		movs	r2, #1
+ 318 0028 1A60     		str	r2, [r3, #0]
+ 319 002a 00E0     		b	.L58
+ 320              	.L57:
+ 321 002c 1C60     		str	r4, [r3, #0]
+ 322              	.L58:
+ 323 002e 694C     		ldr	r4, .L95+12
+ 324 0030 2568     		ldr	r5, [r4, #0]
+ 325 0032 FFF7FEFF 		bl	FLASH_OB_GetRDP
+ 326 0036 80B9     		cbnz	r0, .L59
+ 327 0038 FFF7FEFF 		bl	FLASH_Unlock
+ 328 003c FFF7FEFF 		bl	FLASH_OB_Unlock
+ 329 0040 BB20     		movs	r0, #187
+ 330 0042 FFF7FEFF 		bl	FLASH_OB_RDPConfig
+ 331 0046 FFF7FEFF 		bl	FLASH_OB_Launch
+ 332 004a FFF7FEFF 		bl	FLASH_OB_Lock
+ 333              	.L60:
+ 334 004e 2368     		ldr	r3, [r4, #0]
+ 335 0050 5B1B     		subs	r3, r3, r5
+ 336 0052 092B     		cmp	r3, #9
+ 337 0054 FBD9     		bls	.L60
+ 338              	.L69:
+ 339 0056 FFF7FEFF 		bl	NVIC_SystemReset
+ 340              	.L59:
+ 341 005a 5F48     		ldr	r0, .L95+16
+ 342 005c 5F4E     		ldr	r6, .L95+20
+ 343 005e 4FF40071 		mov	r1, #512
+ 344 0062 FFF7FEFF 		bl	GPIO_ResetBits
+ 345 0066 5C48     		ldr	r0, .L95+16
+ 346 0068 4FF48071 		mov	r1, #256
+ 347 006c FFF7FEFF 		bl	GPIO_SetBits
+ 348 0070 4FF00108 		mov	r8, #1
+ 349 0074 C146     		mov	r9, r8
+ 350              	.L94:
+ 351 0076 0321     		movs	r1, #3
+ 352 0078 0DF10300 		add	r0, sp, #3
+ 353 007c C6F80090 		str	r9, [r6, #0]
+ 354 0080 FFF7FEFF 		bl	Rcv_Byte
+ 355 0084 10F0FF0F 		tst	r0, #255
+ 356 0088 0546     		mov	r5, r0
+ 357 008a 28D1     		bne	.L62
+ 358 008c 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 359 0090 242B     		cmp	r3, #36
+ 360 0092 08D1     		bne	.L63
+ 361 0094 FFF7FEFF 		bl	SecureCheck
+ 362 0098 0028     		cmp	r0, #0
+ 363 009a ECD0     		beq	.L94
+ 364 009c 0223     		movs	r3, #2
+ 365 009e 3360     		str	r3, [r6, #0]
+ 366 00a0 FFF7FEFF 		bl	SerialDownload
+ 367 00a4 E7E7     		b	.L94
+ 368              	.L63:
+ 369 00a6 402B     		cmp	r3, #64
+ 370 00a8 E5D1     		bne	.L94
+ 371 00aa FFF7FEFF 		bl	SecureCheck
+ 372 00ae 0028     		cmp	r0, #0
+ 373 00b0 E1D0     		beq	.L94
+ 374 00b2 4B4C     		ldr	r4, .L95+24
+ 375 00b4 2046     		mov	r0, r4
+ 376 00b6 FFF7FEFF 		bl	flash_read_config
+ 377 00ba 45F00F03 		orr	r3, r5, #15
+ 378 00be 84F87D53 		strb	r5, [r4, #893]
+ 379 00c2 84F87E53 		strb	r5, [r4, #894]
+ 380 00c6 65F07F05 		orn	r5, r5, #127
+ 381 00ca 84F85783 		strb	r8, [r4, #855]
+ 382 00ce 84F87C33 		strb	r3, [r4, #892]
+ 383 00d2 84F87F53 		strb	r5, [r4, #895]
+ 384 00d6 2046     		mov	r0, r4
+ 385 00d8 FFF7FEFF 		bl	flash_write_config
+ 386 00dc CBE7     		b	.L94
+ 387              	.L62:
+ 388 00de 3D4C     		ldr	r4, .L95+12
+ 389 00e0 4048     		ldr	r0, .L95+28
+ 390 00e2 2568     		ldr	r5, [r4, #0]
+ 391 00e4 1021     		movs	r1, #16
+ 392 00e6 FFF7FEFF 		bl	GPIO_SetBits
+ 393              	.L66:
+ 394 00ea 2368     		ldr	r3, [r4, #0]
+ 395 00ec 5B1B     		subs	r3, r3, r5
+ 396 00ee 092B     		cmp	r3, #9
+ 397 00f0 FBD9     		bls	.L66
+ 398 00f2 1021     		movs	r1, #16
+ 399 00f4 3B48     		ldr	r0, .L95+28
+ 400 00f6 FFF7FEFF 		bl	GPIO_ResetBits
+ 401 00fa 0025     		movs	r5, #0
+ 402 00fc 3A48     		ldr	r0, .L95+32
+ 403 00fe 3560     		str	r5, [r6, #0]
+ 404 0100 FFF7FEFF 		bl	xprintf
+ 405 0104 3948     		ldr	r0, .L95+36
+ 406 0106 FFF7FEFF 		bl	flash_verify_image
+ 407 010a C4B2     		uxtb	r4, r0
+ 408 010c 002C     		cmp	r4, #0
+ 409 010e B2D0     		beq	.L94
+ 410 0110 374B     		ldr	r3, .L95+40
+ 411 0112 1A68     		ldr	r2, [r3, #0]
+ 412 0114 374B     		ldr	r3, .L95+44
+ 413 0116 1340     		ands	r3, r3, r2
+ 414 0118 B3F1005F 		cmp	r3, #536870912
+ 415 011c 50D1     		bne	.L68
+ 416 011e 3648     		ldr	r0, .L95+48
+ 417 0120 FFF7FEFF 		bl	xprintf
+ 418 0124 032C     		cmp	r4, #3
+ 419 0126 96D0     		beq	.L69
+ 420 0128 344B     		ldr	r3, .L95+52
+ 421 012a 1B68     		ldr	r3, [r3, #0]
+ 422 012c 0133     		adds	r3, r3, #1
+ 423 012e 1DD0     		beq	.L71
+ 424 0130 334C     		ldr	r4, .L95+56
+ 425 0132 3449     		ldr	r1, .L95+60
+ 426 0134 6572     		strb	r5, [r4, #9]
+ 427 0136 2046     		mov	r0, r4
+ 428 0138 FFF7FEFF 		bl	strcat
+ 429 013c 3248     		ldr	r0, .L95+64
+ 430 013e 2146     		mov	r1, r4
+ 431 0140 FFF7FEFF 		bl	strcmp
+ 432 0144 90B1     		cbz	r0, .L71
+ 433 0146 264F     		ldr	r7, .L95+24
+ 434 0148 3846     		mov	r0, r7
+ 435 014a FFF7FEFF 		bl	flash_read_config
+ 436 014e 2146     		mov	r1, r4
+ 437 0150 87F80D52 		strb	r5, [r7, #525]
+ 438 0154 87F83F52 		strb	r5, [r7, #575]
+ 439 0158 2C48     		ldr	r0, .L95+68
+ 440 015a FFF7FEFF 		bl	strcat
+ 441 015e 2C48     		ldr	r0, .L95+72
+ 442 0160 2C49     		ldr	r1, .L95+76
+ 443 0162 FFF7FEFF 		bl	strcpy
+ 444 0166 3846     		mov	r0, r7
+ 445 0168 FFF7FEFF 		bl	flash_write_config
+ 446              	.L71:
+ 447 016c 0023     		movs	r3, #0
+ 448 016e 3360     		str	r3, [r6, #0]
+ 449 0170 184B     		ldr	r3, .L95+12
+ 450 0172 1968     		ldr	r1, [r3, #0]
+ 451              	.L73:
+ 452 0174 1A68     		ldr	r2, [r3, #0]
+ 453 0176 521A     		subs	r2, r2, r1
+ 454 0178 092A     		cmp	r2, #9
+ 455 017a FBD9     		bls	.L73
+ 456 017c 0021     		movs	r1, #0
+ 457 017e 4FF08040 		mov	r0, #1073741824
+ 458 0182 FFF7FEFF 		bl	TIM_Cmd
+ 459 0186 1C23     		movs	r3, #28
+ 460 0188 0024     		movs	r4, #0
+ 461 018a 8DF80430 		strb	r3, [sp, #4]
+ 462 018e 01A8     		add	r0, sp, #4
+ 463 0190 0523     		movs	r3, #5
+ 464 0192 8DF80630 		strb	r3, [sp, #6]
+ 465 0196 8DF80540 		strb	r4, [sp, #5]
+ 466 019a 8DF80740 		strb	r4, [sp, #7]
+ 467 019e FFF7FEFF 		bl	NVIC_Init
+ 468 01a2 1D4B     		ldr	r3, .L95+80
+ 469 01a4 1A68     		ldr	r2, [r3, #0]
+ 470 01a6 1C60     		str	r4, [r3, #0]
+ 471 01a8 1C4B     		ldr	r3, .L95+84
+ 472 01aa 1D4A     		ldr	r2, .L95+88
+ 473 01ac 1B68     		ldr	r3, [r3, #0]
+ 474 01ae 1360     		str	r3, [r2, #0]
+ 475 01b0 1C4A     		ldr	r2, .L95+92
+ 476 01b2 1360     		str	r3, [r2, #0]
+ 477 01b4 0E4A     		ldr	r2, .L95+40
+ 478 01b6 1268     		ldr	r2, [r2, #0]
+ 479              	@ 456 "D:\EclipseIndigo\workspace\SKSBOOT\Libraries\CMSIS\Include/core_cmFunc.h" 1
+ 480 01b8 82F30888 		MSR msp, r2
+ 481              	
+ 482              	@ 0 "" 2
+ 483              		.thumb
+ 484 01bc 9847     		blx	r3
+ 485 01be 5AE7     		b	.L94
+ 486              	.L68:
+ 487 01c0 1948     		ldr	r0, .L95+96
+ 488 01c2 FFF7FEFF 		bl	xprintf
+ 489 01c6 56E7     		b	.L94
+ 490              	.L96:
+ 491              		.align	2
+ 492              	.L95:
+ 493 01c8 00000000 		.word	.LANCHOR0
+ 494 01cc 00000000 		.word	.LANCHOR1
+ 495 01d0 00000000 		.word	.LANCHOR2
+ 496 01d4 00000000 		.word	ulTickCount
+ 497 01d8 000C0048 		.word	1207962624
+ 498 01dc 00000000 		.word	.LANCHOR3
+ 499 01e0 00000000 		.word	packet_data
+ 500 01e4 00100048 		.word	1207963648
+ 501 01e8 00000000 		.word	.LC0
+ 502 01ec 00000000 		.word	boot_inf
+ 503 01f0 00500008 		.word	134238208
+ 504 01f4 0000FE2F 		.word	805175296
+ 505 01f8 11000000 		.word	.LC1
+ 506 01fc 00F00708 		.word	134737920
+ 507 0200 00000000 		.word	.LANCHOR4
+ 508 0204 20000000 		.word	.LC2
+ 509 0208 0DF20708 		.word	134738445
+ 510 020c 0D020000 		.word	packet_data+525
+ 511 0210 3F020000 		.word	packet_data+575
+ 512 0214 2A000000 		.word	.LC3
+ 513 0218 10E000E0 		.word	-536813552
+ 514 021c 04500008 		.word	134238212
+ 515 0220 00000000 		.word	JumpAddress
+ 516 0224 00000000 		.word	Jump_To_Application
+ 517 0228 2F000000 		.word	.LC4
+ 519              		.global	blink
+ 520              		.global	address
+ 521              		.global	FlashProtection
+ 522              		.global	UserMemoryMask1
+ 523              		.global	BlockNbr
+ 524              		.comm	JumpAddress,4,4
+ 525              		.comm	Jump_To_Application,4,4
+ 526              		.section	.bss.FlashProtection,"aw",%nobits
+ 527              		.align	2
+ 528              		.set	.LANCHOR2,. + 0
+ 531              	FlashProtection:
+ 532 0000 00000000 		.space	4
+ 533              		.section	.bss.UserMemoryMask1,"aw",%nobits
+ 534              		.align	2
+ 535              		.set	.LANCHOR1,. + 0
+ 538              	UserMemoryMask1:
+ 539 0000 00000000 		.space	4
+ 540              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 541              	.LC0:
+ 542 0000 56455249 		.ascii	"VERIFY IMAGE ...\000"
+ 542      46592049 
+ 542      4D414745 
+ 542      202E2E2E 
+ 542      00
+ 543              	.LC1:
+ 544 0011 20535543 		.ascii	" SUCCESS!!!!\015\012\000"
+ 544      43455353 
+ 544      21212121 
+ 544      0D0A00
+ 545              	.LC2:
+ 546 0020 656D6265 		.ascii	"embed.com\000"
+ 546      642E636F 
+ 546      6D00
+ 547              	.LC3:
+ 548 002a 39303030 		.ascii	"9000\000"
+ 548      00
+ 549              	.LC4:
+ 550 002f 20494E56 		.ascii	" INVALID IMAGE SIGN, RETURN BOOT LOADER\015\012\000"
+ 550      414C4944 
+ 550      20494D41 
+ 550      47452053 
+ 550      49474E2C 
+ 551              		.section	.bss.BlockNbr,"aw",%nobits
+ 552              		.align	2
+ 553              		.set	.LANCHOR0,. + 0
+ 556              	BlockNbr:
+ 557 0000 00000000 		.space	4
+ 558              		.section	.bss.address,"aw",%nobits
+ 559              		.set	.LANCHOR4,. + 0
+ 562              	address:
+ 563 0000 00000000 		.space	20
+ 563      00000000 
+ 563      00000000 
+ 563      00000000 
+ 563      00000000 
+ 564              		.section	.data.blink,"aw",%progbits
+ 565              		.align	2
+ 566              		.set	.LANCHOR3,. + 0
+ 569              	blink:
+ 570 0000 01000000 		.word	1
+ 571              		.ident	"GCC: (Sourcery CodeBench Lite 2012.09-63) 4.7.2"
+DEFINED SYMBOLS
+                            *ABS*:00000000 mainboot.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:16     .text.NVIC_SystemReset:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:20     .text.NVIC_SystemReset:00000000 NVIC_SystemReset
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:43     .text.NVIC_SystemReset:00000018 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:47     .text.Str2Int:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:52     .text.Str2Int:00000000 Str2Int
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:151    .text.SecureCheck:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:156    .text.SecureCheck:00000000 SecureCheck
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:291    .text.SecureCheck:0000017c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:294    .text.Main_Menu:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:299    .text.Main_Menu:00000000 Main_Menu
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:493    .text.Main_Menu:000001c8 $d
+                            *COM*:00000004 JumpAddress
+                            *COM*:00000004 Jump_To_Application
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:569    .data.blink:00000000 blink
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:562    .bss.address:00000000 address
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:531    .bss.FlashProtection:00000000 FlashProtection
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:538    .bss.UserMemoryMask1:00000000 UserMemoryMask1
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:556    .bss.BlockNbr:00000000 BlockNbr
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:527    .bss.FlashProtection:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:534    .bss.UserMemoryMask1:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:552    .bss.BlockNbr:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:563    .bss.address:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccrUTGoq.s:565    .data.blink:00000000 $d
+
+UNDEFINED SYMBOLS
+memset
+RcvBuff
+Cal_CRC16
+srand
+rand
+SerialPutChar
+ulTickCount
+FLASH_OB_GetWRP
+FLASH_OB_GetRDP
+FLASH_Unlock
+FLASH_OB_Unlock
+FLASH_OB_RDPConfig
+FLASH_OB_Launch
+FLASH_OB_Lock
+GPIO_ResetBits
+GPIO_SetBits
+Rcv_Byte
+SerialDownload
+flash_read_config
+flash_write_config
+xprintf
+flash_verify_image
+strcat
+strcmp
+strcpy
+TIM_Cmd
+NVIC_Init
+packet_data
+boot_inf

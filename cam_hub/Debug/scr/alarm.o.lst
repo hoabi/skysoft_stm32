@@ -1,0 +1,2000 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"alarm.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.GPIO_Init_Buzz,"ax",%progbits
+  18              		.align	1
+  19              		.global	GPIO_Init_Buzz
+  20              		.code	16
+  21              		.thumb_func
+  23              	GPIO_Init_Buzz:
+  24              	.LFB33:
+  25              		.file 1 "../scr/alarm.c"
+   1:../scr/alarm.c **** #include "alarm.h"
+   2:../scr/alarm.c **** #include "main.h"
+   3:../scr/alarm.c **** #include "config.h"
+   4:../scr/alarm.c **** 
+   5:../scr/alarm.c **** BlinkType_T redLedBlinkType;
+   6:../scr/alarm.c **** BlinkType_T greenLedBlinkType;
+   7:../scr/alarm.c **** 
+   8:../scr/alarm.c **** volatile uint32_t lastRaiseAlarm;
+   9:../scr/alarm.c **** extern volatile uint32_t ulTickCount; //10 miliseconds
+  10:../scr/alarm.c **** extern volatile uint32_t ulSecCount;
+  11:../scr/alarm.c **** 
+  12:../scr/alarm.c **** uint32_t nextGreenTick;
+  13:../scr/alarm.c **** uint32_t nextRedTick;
+  14:../scr/alarm.c **** uint32_t nextBeepTick;
+  15:../scr/alarm.c **** 
+  16:../scr/alarm.c **** typedef struct _BLINK_STEP {
+  17:../scr/alarm.c **** 	int duration;
+  18:../scr/alarm.c **** 	int type;
+  19:../scr/alarm.c **** } BLINK_STEP;
+  20:../scr/alarm.c **** 
+  21:../scr/alarm.c **** BLINK_STEP greenLedStep[4];
+  22:../scr/alarm.c **** BLINK_STEP redLedStep[4];
+  23:../scr/alarm.c **** BLINK_STEP beepStep[4];
+  24:../scr/alarm.c **** 
+  25:../scr/alarm.c **** int greenLedStepIdx = 0;
+  26:../scr/alarm.c **** int redLedStepIdx = 0;
+  27:../scr/alarm.c **** int greenLedStepCount = 5;
+  28:../scr/alarm.c **** int redLedStepCount = 5;
+  29:../scr/alarm.c **** int beepStepIdx = -1;
+  30:../scr/alarm.c **** int beepStepCount = 5;
+  31:../scr/alarm.c **** 
+  32:../scr/alarm.c **** void GPIO_Init_Buzz() {
+  26              		.loc 1 32 0
+  27              		.cfi_startproc
+  28 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 24
+  31              		.cfi_offset 0, -24
+  32              		.cfi_offset 1, -20
+  33              		.cfi_offset 2, -16
+  34              		.cfi_offset 4, -12
+  35              		.cfi_offset 5, -8
+  36              		.cfi_offset 14, -4
+  33:../scr/alarm.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  34:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  37              		.loc 1 34 0
+  38 0002 0323     		mov	r3, #3
+  39 0004 6A46     		mov	r2, sp
+  35:../scr/alarm.c **** 
+  36:../scr/alarm.c **** 	/* Configure the buzz */
+  37:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  38:../scr/alarm.c **** 	//GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+  39:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = BUZZ_PIN;
+  40:../scr/alarm.c **** 	GPIO_Init(BUZZ_PORT, &GPIO_InitStructure);
+  40              		.loc 1 40 0
+  41 0006 0E4C     		ldr	r4, .L2
+  34:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  42              		.loc 1 34 0
+  43 0008 5371     		strb	r3, [r2, #5]
+  39:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = BUZZ_PIN;
+  44              		.loc 1 39 0
+  45 000a 8023     		mov	r3, #128
+  37:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  46              		.loc 1 37 0
+  47 000c 0125     		mov	r5, #1
+  39:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = BUZZ_PIN;
+  48              		.loc 1 39 0
+  49 000e 1B02     		lsl	r3, r3, #8
+  50              		.loc 1 40 0
+  51 0010 201C     		mov	r0, r4
+  52 0012 6946     		mov	r1, sp
+  37:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  53              		.loc 1 37 0
+  54 0014 1571     		strb	r5, [r2, #4]
+  39:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = BUZZ_PIN;
+  55              		.loc 1 39 0
+  56 0016 0093     		str	r3, [sp]
+  57              		.loc 1 40 0
+  58 0018 FFF7FEFF 		bl	GPIO_Init
+  59              	.LVL0:
+  41:../scr/alarm.c **** 
+  42:../scr/alarm.c **** 	/* Configure the RED LED */
+  43:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  60              		.loc 1 43 0
+  61 001c 6B46     		mov	r3, sp
+  62 001e 1D71     		strb	r5, [r3, #4]
+  44:../scr/alarm.c **** 	//GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
+  45:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = RED_LED_PIN;
+  46:../scr/alarm.c **** 	GPIO_Init(RED_LED_PORT, &GPIO_InitStructure);
+  63              		.loc 1 46 0
+  64 0020 201C     		mov	r0, r4
+  45:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = RED_LED_PIN;
+  65              		.loc 1 45 0
+  66 0022 8023     		mov	r3, #128
+  67              		.loc 1 46 0
+  68 0024 6946     		mov	r1, sp
+  45:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = RED_LED_PIN;
+  69              		.loc 1 45 0
+  70 0026 0093     		str	r3, [sp]
+  71              		.loc 1 46 0
+  72 0028 FFF7FEFF 		bl	GPIO_Init
+  73              	.LVL1:
+  47:../scr/alarm.c **** 
+  48:../scr/alarm.c **** 	/* Configure the GREAN LED */
+  49:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  74              		.loc 1 49 0
+  75 002c 6A46     		mov	r2, sp
+  50:../scr/alarm.c **** 	//GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+  51:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = GREEN_LED_PIN;
+  76              		.loc 1 51 0
+  77 002e 2023     		mov	r3, #32
+  52:../scr/alarm.c **** 	GPIO_Init(GREEN_LED_PORT, &GPIO_InitStructure);
+  78              		.loc 1 52 0
+  79 0030 201C     		mov	r0, r4
+  80 0032 6946     		mov	r1, sp
+  49:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  81              		.loc 1 49 0
+  82 0034 1571     		strb	r5, [r2, #4]
+  51:../scr/alarm.c **** 	GPIO_InitStructure.GPIO_Pin = GREEN_LED_PIN;
+  83              		.loc 1 51 0
+  84 0036 0093     		str	r3, [sp]
+  53:../scr/alarm.c **** }
+  85              		.loc 1 53 0
+  86              		@ sp needed for prologue
+  52:../scr/alarm.c **** 	GPIO_Init(GREEN_LED_PORT, &GPIO_InitStructure);
+  87              		.loc 1 52 0
+  88 0038 FFF7FEFF 		bl	GPIO_Init
+  89              	.LVL2:
+  90              		.loc 1 53 0
+  91 003c 37BD     		pop	{r0, r1, r2, r4, r5, pc}
+  92              	.L3:
+  93 003e C046     		.align	2
+  94              	.L2:
+  95 0040 00040048 		.word	1207960576
+  96              		.cfi_endproc
+  97              	.LFE33:
+  99              		.section	.text.BuzzOff,"ax",%progbits
+ 100              		.align	1
+ 101              		.global	BuzzOff
+ 102              		.code	16
+ 103              		.thumb_func
+ 105              	BuzzOff:
+ 106              	.LFB34:
+  54:../scr/alarm.c **** 
+  55:../scr/alarm.c **** void BuzzOff() {
+ 107              		.loc 1 55 0
+ 108              		.cfi_startproc
+ 109 0000 08B5     		push	{r3, lr}
+ 110              	.LCFI1:
+ 111              		.cfi_def_cfa_offset 8
+ 112              		.cfi_offset 3, -8
+ 113              		.cfi_offset 14, -4
+  56:../scr/alarm.c **** 	GPIO_ResetBits(BUZZ_PORT, BUZZ_PIN);
+ 114              		.loc 1 56 0
+ 115 0002 8021     		mov	r1, #128
+ 116 0004 0248     		ldr	r0, .L5
+ 117 0006 0902     		lsl	r1, r1, #8
+ 118 0008 FFF7FEFF 		bl	GPIO_ResetBits
+ 119              	.LVL3:
+  57:../scr/alarm.c **** }
+ 120              		.loc 1 57 0
+ 121              		@ sp needed for prologue
+ 122 000c 08BD     		pop	{r3, pc}
+ 123              	.L6:
+ 124 000e C046     		.align	2
+ 125              	.L5:
+ 126 0010 00040048 		.word	1207960576
+ 127              		.cfi_endproc
+ 128              	.LFE34:
+ 130              		.section	.text.BuzzOn,"ax",%progbits
+ 131              		.align	1
+ 132              		.global	BuzzOn
+ 133              		.code	16
+ 134              		.thumb_func
+ 136              	BuzzOn:
+ 137              	.LFB35:
+  58:../scr/alarm.c **** 
+  59:../scr/alarm.c **** void BuzzOn() {
+ 138              		.loc 1 59 0
+ 139              		.cfi_startproc
+ 140 0000 08B5     		push	{r3, lr}
+ 141              	.LCFI2:
+ 142              		.cfi_def_cfa_offset 8
+ 143              		.cfi_offset 3, -8
+ 144              		.cfi_offset 14, -4
+  60:../scr/alarm.c **** 	GPIO_SetBits(BUZZ_PORT, BUZZ_PIN);
+ 145              		.loc 1 60 0
+ 146 0002 8021     		mov	r1, #128
+ 147 0004 0248     		ldr	r0, .L8
+ 148 0006 0902     		lsl	r1, r1, #8
+ 149 0008 FFF7FEFF 		bl	GPIO_SetBits
+ 150              	.LVL4:
+  61:../scr/alarm.c **** }
+ 151              		.loc 1 61 0
+ 152              		@ sp needed for prologue
+ 153 000c 08BD     		pop	{r3, pc}
+ 154              	.L9:
+ 155 000e C046     		.align	2
+ 156              	.L8:
+ 157 0010 00040048 		.word	1207960576
+ 158              		.cfi_endproc
+ 159              	.LFE35:
+ 161              		.section	.text.RedLedOn,"ax",%progbits
+ 162              		.align	1
+ 163              		.global	RedLedOn
+ 164              		.code	16
+ 165              		.thumb_func
+ 167              	RedLedOn:
+ 168              	.LFB36:
+  62:../scr/alarm.c **** 
+  63:../scr/alarm.c **** void RedLedOn() {
+ 169              		.loc 1 63 0
+ 170              		.cfi_startproc
+ 171 0000 08B5     		push	{r3, lr}
+ 172              	.LCFI3:
+ 173              		.cfi_def_cfa_offset 8
+ 174              		.cfi_offset 3, -8
+ 175              		.cfi_offset 14, -4
+  64:../scr/alarm.c **** 	GPIO_ResetBits(RED_LED_PORT, RED_LED_PIN);
+ 176              		.loc 1 64 0
+ 177 0002 0248     		ldr	r0, .L11
+ 178 0004 8021     		mov	r1, #128
+ 179 0006 FFF7FEFF 		bl	GPIO_ResetBits
+ 180              	.LVL5:
+  65:../scr/alarm.c **** }
+ 181              		.loc 1 65 0
+ 182              		@ sp needed for prologue
+ 183 000a 08BD     		pop	{r3, pc}
+ 184              	.L12:
+ 185              		.align	2
+ 186              	.L11:
+ 187 000c 00040048 		.word	1207960576
+ 188              		.cfi_endproc
+ 189              	.LFE36:
+ 191              		.section	.text.RedLedOff,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	RedLedOff
+ 194              		.code	16
+ 195              		.thumb_func
+ 197              	RedLedOff:
+ 198              	.LFB37:
+  66:../scr/alarm.c **** 
+  67:../scr/alarm.c **** void RedLedOff() {
+ 199              		.loc 1 67 0
+ 200              		.cfi_startproc
+ 201 0000 08B5     		push	{r3, lr}
+ 202              	.LCFI4:
+ 203              		.cfi_def_cfa_offset 8
+ 204              		.cfi_offset 3, -8
+ 205              		.cfi_offset 14, -4
+  68:../scr/alarm.c **** 	GPIO_SetBits(RED_LED_PORT, RED_LED_PIN);
+ 206              		.loc 1 68 0
+ 207 0002 0248     		ldr	r0, .L14
+ 208 0004 8021     		mov	r1, #128
+ 209 0006 FFF7FEFF 		bl	GPIO_SetBits
+ 210              	.LVL6:
+  69:../scr/alarm.c **** }
+ 211              		.loc 1 69 0
+ 212              		@ sp needed for prologue
+ 213 000a 08BD     		pop	{r3, pc}
+ 214              	.L15:
+ 215              		.align	2
+ 216              	.L14:
+ 217 000c 00040048 		.word	1207960576
+ 218              		.cfi_endproc
+ 219              	.LFE37:
+ 221              		.section	.text.GreenLedOn,"ax",%progbits
+ 222              		.align	1
+ 223              		.global	GreenLedOn
+ 224              		.code	16
+ 225              		.thumb_func
+ 227              	GreenLedOn:
+ 228              	.LFB38:
+  70:../scr/alarm.c **** 
+  71:../scr/alarm.c **** void GreenLedOn() {
+ 229              		.loc 1 71 0
+ 230              		.cfi_startproc
+ 231 0000 08B5     		push	{r3, lr}
+ 232              	.LCFI5:
+ 233              		.cfi_def_cfa_offset 8
+ 234              		.cfi_offset 3, -8
+ 235              		.cfi_offset 14, -4
+  72:../scr/alarm.c **** 	GPIO_ResetBits(GREEN_LED_PORT, GREEN_LED_PIN);
+ 236              		.loc 1 72 0
+ 237 0002 0248     		ldr	r0, .L17
+ 238 0004 2021     		mov	r1, #32
+ 239 0006 FFF7FEFF 		bl	GPIO_ResetBits
+ 240              	.LVL7:
+  73:../scr/alarm.c **** }
+ 241              		.loc 1 73 0
+ 242              		@ sp needed for prologue
+ 243 000a 08BD     		pop	{r3, pc}
+ 244              	.L18:
+ 245              		.align	2
+ 246              	.L17:
+ 247 000c 00040048 		.word	1207960576
+ 248              		.cfi_endproc
+ 249              	.LFE38:
+ 251              		.section	.text.GreenLedOff,"ax",%progbits
+ 252              		.align	1
+ 253              		.global	GreenLedOff
+ 254              		.code	16
+ 255              		.thumb_func
+ 257              	GreenLedOff:
+ 258              	.LFB39:
+  74:../scr/alarm.c **** 
+  75:../scr/alarm.c **** void GreenLedOff() {
+ 259              		.loc 1 75 0
+ 260              		.cfi_startproc
+ 261 0000 08B5     		push	{r3, lr}
+ 262              	.LCFI6:
+ 263              		.cfi_def_cfa_offset 8
+ 264              		.cfi_offset 3, -8
+ 265              		.cfi_offset 14, -4
+  76:../scr/alarm.c **** 	GPIO_SetBits(GREEN_LED_PORT, GREEN_LED_PIN);
+ 266              		.loc 1 76 0
+ 267 0002 0248     		ldr	r0, .L20
+ 268 0004 2021     		mov	r1, #32
+ 269 0006 FFF7FEFF 		bl	GPIO_SetBits
+ 270              	.LVL8:
+  77:../scr/alarm.c **** }
+ 271              		.loc 1 77 0
+ 272              		@ sp needed for prologue
+ 273 000a 08BD     		pop	{r3, pc}
+ 274              	.L21:
+ 275              		.align	2
+ 276              	.L20:
+ 277 000c 00040048 		.word	1207960576
+ 278              		.cfi_endproc
+ 279              	.LFE39:
+ 281              		.section	.text.raise_beep_short,"ax",%progbits
+ 282              		.align	1
+ 283              		.global	raise_beep_short
+ 284              		.code	16
+ 285              		.thumb_func
+ 287              	raise_beep_short:
+ 288              	.LFB40:
+  78:../scr/alarm.c **** 
+  79:../scr/alarm.c **** void raise_beep_short() {
+ 289              		.loc 1 79 0
+ 290              		.cfi_startproc
+  80:../scr/alarm.c **** 	beepStep[0].duration = 30;
+ 291              		.loc 1 80 0
+ 292 0000 074B     		ldr	r3, .L23
+ 293 0002 1E22     		mov	r2, #30
+ 294 0004 1A60     		str	r2, [r3]
+  81:../scr/alarm.c **** 	beepStep[0].type = 1;
+  82:../scr/alarm.c **** 	beepStep[1].duration = 30;
+ 295              		.loc 1 82 0
+ 296 0006 9A60     		str	r2, [r3, #8]
+  81:../scr/alarm.c **** 	beepStep[0].type = 1;
+ 297              		.loc 1 81 0
+ 298 0008 0121     		mov	r1, #1
+  83:../scr/alarm.c **** 	beepStep[1].type = 0;
+ 299              		.loc 1 83 0
+ 300 000a 0022     		mov	r2, #0
+  81:../scr/alarm.c **** 	beepStep[0].type = 1;
+ 301              		.loc 1 81 0
+ 302 000c 5960     		str	r1, [r3, #4]
+ 303              		.loc 1 83 0
+ 304 000e DA60     		str	r2, [r3, #12]
+  84:../scr/alarm.c **** 	beepStepCount = 2;
+ 305              		.loc 1 84 0
+ 306 0010 044B     		ldr	r3, .L23+4
+ 307 0012 0221     		mov	r1, #2
+ 308 0014 1960     		str	r1, [r3]
+  85:../scr/alarm.c **** 	beepStepIdx = 0;
+ 309              		.loc 1 85 0
+ 310 0016 044B     		ldr	r3, .L23+8
+  86:../scr/alarm.c **** 	nextBeepTick = 0;
+  87:../scr/alarm.c **** }
+ 311              		.loc 1 87 0
+ 312              		@ sp needed for prologue
+  85:../scr/alarm.c **** 	beepStepIdx = 0;
+ 313              		.loc 1 85 0
+ 314 0018 1A60     		str	r2, [r3]
+  86:../scr/alarm.c **** 	nextBeepTick = 0;
+ 315              		.loc 1 86 0
+ 316 001a 044B     		ldr	r3, .L23+12
+ 317 001c 1A60     		str	r2, [r3]
+ 318              		.loc 1 87 0
+ 319 001e 7047     		bx	lr
+ 320              	.L24:
+ 321              		.align	2
+ 322              	.L23:
+ 323 0020 00000000 		.word	beepStep
+ 324 0024 00000000 		.word	.LANCHOR0
+ 325 0028 00000000 		.word	.LANCHOR1
+ 326 002c 00000000 		.word	nextBeepTick
+ 327              		.cfi_endproc
+ 328              	.LFE40:
+ 330              		.section	.text.raise_double_beep,"ax",%progbits
+ 331              		.align	1
+ 332              		.global	raise_double_beep
+ 333              		.code	16
+ 334              		.thumb_func
+ 336              	raise_double_beep:
+ 337              	.LFB41:
+  88:../scr/alarm.c **** 
+  89:../scr/alarm.c **** void raise_double_beep() {
+ 338              		.loc 1 89 0
+ 339              		.cfi_startproc
+  90:../scr/alarm.c **** 	beepStep[0].duration = 30;
+ 340              		.loc 1 90 0
+ 341 0000 0A4B     		ldr	r3, .L26
+  91:../scr/alarm.c **** 	beepStep[0].type = 1;
+ 342              		.loc 1 91 0
+ 343 0002 0121     		mov	r1, #1
+  92:../scr/alarm.c **** 	beepStep[1].duration = 20;
+ 344              		.loc 1 92 0
+ 345 0004 1422     		mov	r2, #20
+  90:../scr/alarm.c **** 	beepStep[0].duration = 30;
+ 346              		.loc 1 90 0
+ 347 0006 1E20     		mov	r0, #30
+  91:../scr/alarm.c **** 	beepStep[0].type = 1;
+ 348              		.loc 1 91 0
+ 349 0008 5960     		str	r1, [r3, #4]
+ 350              		.loc 1 92 0
+ 351 000a 9A60     		str	r2, [r3, #8]
+  93:../scr/alarm.c **** 	beepStep[1].type = 0;
+  94:../scr/alarm.c **** 	beepStep[2].duration = 30;
+  95:../scr/alarm.c **** 	beepStep[2].type = 1;
+ 352              		.loc 1 95 0
+ 353 000c 5961     		str	r1, [r3, #20]
+  93:../scr/alarm.c **** 	beepStep[1].type = 0;
+ 354              		.loc 1 93 0
+ 355 000e 0022     		mov	r2, #0
+  96:../scr/alarm.c **** 	beepStep[3].duration = 10;
+ 356              		.loc 1 96 0
+ 357 0010 0A21     		mov	r1, #10
+  90:../scr/alarm.c **** 	beepStep[0].duration = 30;
+ 358              		.loc 1 90 0
+ 359 0012 1860     		str	r0, [r3]
+ 360              		.loc 1 96 0
+ 361 0014 9961     		str	r1, [r3, #24]
+  93:../scr/alarm.c **** 	beepStep[1].type = 0;
+ 362              		.loc 1 93 0
+ 363 0016 DA60     		str	r2, [r3, #12]
+  94:../scr/alarm.c **** 	beepStep[2].duration = 30;
+ 364              		.loc 1 94 0
+ 365 0018 1861     		str	r0, [r3, #16]
+  97:../scr/alarm.c **** 	beepStep[3].type = 0;
+ 366              		.loc 1 97 0
+ 367 001a DA61     		str	r2, [r3, #28]
+  98:../scr/alarm.c **** 	beepStepCount = 4;
+ 368              		.loc 1 98 0
+ 369 001c 044B     		ldr	r3, .L26+4
+ 370 001e 0421     		mov	r1, #4
+ 371 0020 1960     		str	r1, [r3]
+  99:../scr/alarm.c **** 	beepStepIdx = 0;
+ 372              		.loc 1 99 0
+ 373 0022 044B     		ldr	r3, .L26+8
+ 100:../scr/alarm.c **** 	nextBeepTick = 0;
+ 101:../scr/alarm.c **** }
+ 374              		.loc 1 101 0
+ 375              		@ sp needed for prologue
+  99:../scr/alarm.c **** 	beepStepIdx = 0;
+ 376              		.loc 1 99 0
+ 377 0024 1A60     		str	r2, [r3]
+ 100:../scr/alarm.c **** 	nextBeepTick = 0;
+ 378              		.loc 1 100 0
+ 379 0026 044B     		ldr	r3, .L26+12
+ 380 0028 1A60     		str	r2, [r3]
+ 381              		.loc 1 101 0
+ 382 002a 7047     		bx	lr
+ 383              	.L27:
+ 384              		.align	2
+ 385              	.L26:
+ 386 002c 00000000 		.word	beepStep
+ 387 0030 00000000 		.word	.LANCHOR0
+ 388 0034 00000000 		.word	.LANCHOR1
+ 389 0038 00000000 		.word	nextBeepTick
+ 390              		.cfi_endproc
+ 391              	.LFE41:
+ 393              		.section	.text.raise_long_beep,"ax",%progbits
+ 394              		.align	1
+ 395              		.global	raise_long_beep
+ 396              		.code	16
+ 397              		.thumb_func
+ 399              	raise_long_beep:
+ 400              	.LFB42:
+ 102:../scr/alarm.c **** 
+ 103:../scr/alarm.c **** void raise_long_beep() {
+ 401              		.loc 1 103 0
+ 402              		.cfi_startproc
+ 104:../scr/alarm.c **** 	beepStep[0].duration = 50;
+ 403              		.loc 1 104 0
+ 404 0000 084B     		ldr	r3, .L29
+ 405 0002 3222     		mov	r2, #50
+ 406 0004 1A60     		str	r2, [r3]
+ 105:../scr/alarm.c **** 	beepStep[0].type = 1;
+ 407              		.loc 1 105 0
+ 408 0006 0122     		mov	r2, #1
+ 409 0008 5A60     		str	r2, [r3, #4]
+ 106:../scr/alarm.c **** 	beepStep[1].duration = 10;
+ 410              		.loc 1 106 0
+ 411 000a 0A22     		mov	r2, #10
+ 412 000c 9A60     		str	r2, [r3, #8]
+ 107:../scr/alarm.c **** 	beepStep[1].type = 0;
+ 413              		.loc 1 107 0
+ 414 000e 0022     		mov	r2, #0
+ 415 0010 DA60     		str	r2, [r3, #12]
+ 108:../scr/alarm.c **** 	beepStepCount = 2;
+ 416              		.loc 1 108 0
+ 417 0012 054B     		ldr	r3, .L29+4
+ 418 0014 0221     		mov	r1, #2
+ 419 0016 1960     		str	r1, [r3]
+ 109:../scr/alarm.c **** 	beepStepIdx = 0;
+ 420              		.loc 1 109 0
+ 421 0018 044B     		ldr	r3, .L29+8
+ 110:../scr/alarm.c **** 	nextBeepTick = 0;
+ 111:../scr/alarm.c **** }
+ 422              		.loc 1 111 0
+ 423              		@ sp needed for prologue
+ 109:../scr/alarm.c **** 	beepStepIdx = 0;
+ 424              		.loc 1 109 0
+ 425 001a 1A60     		str	r2, [r3]
+ 110:../scr/alarm.c **** 	nextBeepTick = 0;
+ 426              		.loc 1 110 0
+ 427 001c 044B     		ldr	r3, .L29+12
+ 428 001e 1A60     		str	r2, [r3]
+ 429              		.loc 1 111 0
+ 430 0020 7047     		bx	lr
+ 431              	.L30:
+ 432 0022 C046     		.align	2
+ 433              	.L29:
+ 434 0024 00000000 		.word	beepStep
+ 435 0028 00000000 		.word	.LANCHOR0
+ 436 002c 00000000 		.word	.LANCHOR1
+ 437 0030 00000000 		.word	nextBeepTick
+ 438              		.cfi_endproc
+ 439              	.LFE42:
+ 441              		.section	.text.raise_over_speed_alarm,"ax",%progbits
+ 442              		.align	1
+ 443              		.global	raise_over_speed_alarm
+ 444              		.code	16
+ 445              		.thumb_func
+ 447              	raise_over_speed_alarm:
+ 448              	.LFB43:
+ 112:../scr/alarm.c **** 
+ 113:../scr/alarm.c **** void raise_over_speed_alarm(void) {
+ 449              		.loc 1 113 0
+ 450              		.cfi_startproc
+ 451 0000 38B5     		push	{r3, r4, r5, lr}
+ 452              	.LCFI7:
+ 453              		.cfi_def_cfa_offset 16
+ 454              		.cfi_offset 3, -16
+ 455              		.cfi_offset 4, -12
+ 456              		.cfi_offset 5, -8
+ 457              		.cfi_offset 14, -4
+ 114:../scr/alarm.c **** 	if((ulSecCount - lastRaiseAlarm) > ALARM_RAISE_INTERVAL) {
+ 458              		.loc 1 114 0
+ 459 0002 064D     		ldr	r5, .L33
+ 460 0004 064C     		ldr	r4, .L33+4
+ 461 0006 2A68     		ldr	r2, [r5]
+ 462 0008 2368     		ldr	r3, [r4]
+ 463 000a D31A     		sub	r3, r2, r3
+ 464 000c 0A2B     		cmp	r3, #10
+ 465 000e 03D9     		bls	.L31
+ 115:../scr/alarm.c **** 		raise_double_beep();
+ 466              		.loc 1 115 0
+ 467 0010 FFF7FEFF 		bl	raise_double_beep
+ 468              	.LVL9:
+ 116:../scr/alarm.c **** 		lastRaiseAlarm = ulSecCount;
+ 469              		.loc 1 116 0
+ 470 0014 2B68     		ldr	r3, [r5]
+ 471 0016 2360     		str	r3, [r4]
+ 472              	.L31:
+ 117:../scr/alarm.c **** 	}
+ 118:../scr/alarm.c **** }
+ 473              		.loc 1 118 0
+ 474              		@ sp needed for prologue
+ 475 0018 38BD     		pop	{r3, r4, r5, pc}
+ 476              	.L34:
+ 477 001a C046     		.align	2
+ 478              	.L33:
+ 479 001c 00000000 		.word	ulSecCount
+ 480 0020 00000000 		.word	lastRaiseAlarm
+ 481              		.cfi_endproc
+ 482              	.LFE43:
+ 484              		.section	.text.raise_long_run_alarm,"ax",%progbits
+ 485              		.align	1
+ 486              		.global	raise_long_run_alarm
+ 487              		.code	16
+ 488              		.thumb_func
+ 490              	raise_long_run_alarm:
+ 491              	.LFB44:
+ 119:../scr/alarm.c **** 
+ 120:../scr/alarm.c **** void raise_long_run_alarm(void) {
+ 492              		.loc 1 120 0
+ 493              		.cfi_startproc
+ 494 0000 38B5     		push	{r3, r4, r5, lr}
+ 495              	.LCFI8:
+ 496              		.cfi_def_cfa_offset 16
+ 497              		.cfi_offset 3, -16
+ 498              		.cfi_offset 4, -12
+ 499              		.cfi_offset 5, -8
+ 500              		.cfi_offset 14, -4
+ 121:../scr/alarm.c **** 	if((ulSecCount - lastRaiseAlarm) > ALARM_RAISE_INTERVAL) {
+ 501              		.loc 1 121 0
+ 502 0002 064D     		ldr	r5, .L37
+ 503 0004 064C     		ldr	r4, .L37+4
+ 504 0006 2A68     		ldr	r2, [r5]
+ 505 0008 2368     		ldr	r3, [r4]
+ 506 000a D31A     		sub	r3, r2, r3
+ 507 000c 0A2B     		cmp	r3, #10
+ 508 000e 03D9     		bls	.L35
+ 122:../scr/alarm.c **** 		raise_long_beep();
+ 509              		.loc 1 122 0
+ 510 0010 FFF7FEFF 		bl	raise_long_beep
+ 511              	.LVL10:
+ 123:../scr/alarm.c **** 		lastRaiseAlarm = ulSecCount;
+ 512              		.loc 1 123 0
+ 513 0014 2B68     		ldr	r3, [r5]
+ 514 0016 2360     		str	r3, [r4]
+ 515              	.L35:
+ 124:../scr/alarm.c **** 	}
+ 125:../scr/alarm.c **** }
+ 516              		.loc 1 125 0
+ 517              		@ sp needed for prologue
+ 518 0018 38BD     		pop	{r3, r4, r5, pc}
+ 519              	.L38:
+ 520 001a C046     		.align	2
+ 521              	.L37:
+ 522 001c 00000000 		.word	ulSecCount
+ 523 0020 00000000 		.word	lastRaiseAlarm
+ 524              		.cfi_endproc
+ 525              	.LFE44:
+ 527              		.section	.text.raise_over_driving_in_day,"ax",%progbits
+ 528              		.align	1
+ 529              		.global	raise_over_driving_in_day
+ 530              		.code	16
+ 531              		.thumb_func
+ 533              	raise_over_driving_in_day:
+ 534              	.LFB45:
+ 126:../scr/alarm.c **** 
+ 127:../scr/alarm.c **** void raise_over_driving_in_day(void) {
+ 535              		.loc 1 127 0
+ 536              		.cfi_startproc
+ 537 0000 38B5     		push	{r3, r4, r5, lr}
+ 538              	.LCFI9:
+ 539              		.cfi_def_cfa_offset 16
+ 540              		.cfi_offset 3, -16
+ 541              		.cfi_offset 4, -12
+ 542              		.cfi_offset 5, -8
+ 543              		.cfi_offset 14, -4
+ 128:../scr/alarm.c **** 	if((ulSecCount - lastRaiseAlarm) > ALARM_RAISE_INTERVAL) {
+ 544              		.loc 1 128 0
+ 545 0002 064D     		ldr	r5, .L41
+ 546 0004 064C     		ldr	r4, .L41+4
+ 547 0006 2A68     		ldr	r2, [r5]
+ 548 0008 2368     		ldr	r3, [r4]
+ 549 000a D31A     		sub	r3, r2, r3
+ 550 000c 0A2B     		cmp	r3, #10
+ 551 000e 03D9     		bls	.L39
+ 129:../scr/alarm.c **** 		raise_long_beep();
+ 552              		.loc 1 129 0
+ 553 0010 FFF7FEFF 		bl	raise_long_beep
+ 554              	.LVL11:
+ 130:../scr/alarm.c **** 		lastRaiseAlarm = ulSecCount;
+ 555              		.loc 1 130 0
+ 556 0014 2B68     		ldr	r3, [r5]
+ 557 0016 2360     		str	r3, [r4]
+ 558              	.L39:
+ 131:../scr/alarm.c **** 	}
+ 132:../scr/alarm.c **** }
+ 559              		.loc 1 132 0
+ 560              		@ sp needed for prologue
+ 561 0018 38BD     		pop	{r3, r4, r5, pc}
+ 562              	.L42:
+ 563 001a C046     		.align	2
+ 564              	.L41:
+ 565 001c 00000000 		.word	ulSecCount
+ 566 0020 00000000 		.word	lastRaiseAlarm
+ 567              		.cfi_endproc
+ 568              	.LFE45:
+ 570              		.section	.text.blink_green_led,"ax",%progbits
+ 571              		.align	1
+ 572              		.global	blink_green_led
+ 573              		.code	16
+ 574              		.thumb_func
+ 576              	blink_green_led:
+ 577              	.LFB46:
+ 133:../scr/alarm.c **** 
+ 134:../scr/alarm.c **** void blink_green_led(BlinkType_T blinkType) {
+ 578              		.loc 1 134 0
+ 579              		.cfi_startproc
+ 580              	.LVL12:
+ 135:../scr/alarm.c **** 	if(greenLedBlinkType == blinkType) {
+ 581              		.loc 1 135 0
+ 582 0000 1D4B     		ldr	r3, .L52
+ 134:../scr/alarm.c **** void blink_green_led(BlinkType_T blinkType) {
+ 583              		.loc 1 134 0
+ 584 0002 00B5     		push	{lr}
+ 585              	.LCFI10:
+ 586              		.cfi_def_cfa_offset 4
+ 587              		.cfi_offset 14, -4
+ 588              		.loc 1 135 0
+ 589 0004 1A78     		ldrb	r2, [r3]
+ 590 0006 8242     		cmp	r2, r0
+ 591 0008 34D0     		beq	.L43
+ 136:../scr/alarm.c **** 		return;
+ 137:../scr/alarm.c **** 	}
+ 138:../scr/alarm.c **** 	greenLedBlinkType = blinkType;
+ 592              		.loc 1 138 0
+ 593 000a 1870     		strb	r0, [r3]
+ 139:../scr/alarm.c **** 	if(greenLedBlinkType == TYPE_BLINK_DOUBLE) {
+ 594              		.loc 1 139 0
+ 595 000c 0228     		cmp	r0, #2
+ 596 000e 0ED1     		bne	.L46
+ 140:../scr/alarm.c **** 		greenLedStep[0].duration = 10;
+ 597              		.loc 1 140 0
+ 598 0010 1A4B     		ldr	r3, .L52+4
+ 599 0012 0A21     		mov	r1, #10
+ 141:../scr/alarm.c **** 		greenLedStep[0].type = 1;
+ 600              		.loc 1 141 0
+ 601 0014 0120     		mov	r0, #1
+ 602              	.LVL13:
+ 142:../scr/alarm.c **** 		greenLedStep[1].duration = 10;
+ 143:../scr/alarm.c **** 		greenLedStep[1].type = 0;
+ 603              		.loc 1 143 0
+ 604 0016 0022     		mov	r2, #0
+ 140:../scr/alarm.c **** 		greenLedStep[0].duration = 10;
+ 605              		.loc 1 140 0
+ 606 0018 1960     		str	r1, [r3]
+ 142:../scr/alarm.c **** 		greenLedStep[1].duration = 10;
+ 607              		.loc 1 142 0
+ 608 001a 9960     		str	r1, [r3, #8]
+ 144:../scr/alarm.c **** 		greenLedStep[2].duration = 10;
+ 609              		.loc 1 144 0
+ 610 001c 1961     		str	r1, [r3, #16]
+ 145:../scr/alarm.c **** 		greenLedStep[2].type = 1;
+ 146:../scr/alarm.c **** 		greenLedStep[3].duration = 200;
+ 611              		.loc 1 146 0
+ 612 001e C821     		mov	r1, #200
+ 613 0020 9961     		str	r1, [r3, #24]
+ 141:../scr/alarm.c **** 		greenLedStep[0].type = 1;
+ 614              		.loc 1 141 0
+ 615 0022 5860     		str	r0, [r3, #4]
+ 143:../scr/alarm.c **** 		greenLedStep[1].type = 0;
+ 616              		.loc 1 143 0
+ 617 0024 DA60     		str	r2, [r3, #12]
+ 145:../scr/alarm.c **** 		greenLedStep[2].type = 1;
+ 618              		.loc 1 145 0
+ 619 0026 5861     		str	r0, [r3, #20]
+ 147:../scr/alarm.c **** 		greenLedStep[3].type = 0;
+ 620              		.loc 1 147 0
+ 621 0028 DA61     		str	r2, [r3, #28]
+ 148:../scr/alarm.c **** 		greenLedStepCount = 4;
+ 622              		.loc 1 148 0
+ 623 002a 0421     		mov	r1, #4
+ 624 002c 1EE0     		b	.L51
+ 625              	.LVL14:
+ 626              	.L46:
+ 149:../scr/alarm.c **** 		greenLedStepIdx = 0;
+ 150:../scr/alarm.c **** 	} else if(greenLedBlinkType == TYPE_BLINK_FAST) {
+ 627              		.loc 1 150 0
+ 628 002e 0328     		cmp	r0, #3
+ 629 0030 05D1     		bne	.L47
+ 151:../scr/alarm.c **** 		greenLedStep[0].duration = 10;
+ 630              		.loc 1 151 0
+ 631 0032 124B     		ldr	r3, .L52+4
+ 632 0034 0A22     		mov	r2, #10
+ 152:../scr/alarm.c **** 		greenLedStep[0].type = 1;
+ 633              		.loc 1 152 0
+ 634 0036 0121     		mov	r1, #1
+ 151:../scr/alarm.c **** 		greenLedStep[0].duration = 10;
+ 635              		.loc 1 151 0
+ 636 0038 1A60     		str	r2, [r3]
+ 637              		.loc 1 152 0
+ 638 003a 5960     		str	r1, [r3, #4]
+ 639 003c 12E0     		b	.L50
+ 640              	.L47:
+ 153:../scr/alarm.c **** 		greenLedStep[1].duration = 10;
+ 154:../scr/alarm.c **** 		greenLedStep[1].type = 0;
+ 155:../scr/alarm.c **** 		greenLedStepCount = 2;
+ 156:../scr/alarm.c **** 		greenLedStepIdx = 0;
+ 157:../scr/alarm.c **** 	} else if(greenLedBlinkType == TYPE_BLINK_SLOW) {
+ 641              		.loc 1 157 0
+ 642 003e 0428     		cmp	r0, #4
+ 643 0040 06D1     		bne	.L48
+ 644              	.LBB4:
+ 645              	.LBB5:
+ 158:../scr/alarm.c **** 		greenLedStep[0].duration = 180;
+ 646              		.loc 1 158 0
+ 647 0042 0E4B     		ldr	r3, .L52+4
+ 648 0044 B422     		mov	r2, #180
+ 649 0046 1A60     		str	r2, [r3]
+ 159:../scr/alarm.c **** 		greenLedStep[0].type = 1;
+ 650              		.loc 1 159 0
+ 651 0048 0122     		mov	r2, #1
+ 652 004a 5A60     		str	r2, [r3, #4]
+ 160:../scr/alarm.c **** 		greenLedStep[1].duration = 50;
+ 653              		.loc 1 160 0
+ 654 004c 3222     		mov	r2, #50
+ 655 004e 09E0     		b	.L50
+ 656              	.L48:
+ 657              	.LBE5:
+ 658              	.LBE4:
+ 161:../scr/alarm.c **** 		greenLedStep[1].type = 0;
+ 162:../scr/alarm.c **** 		greenLedStepCount = 2;
+ 163:../scr/alarm.c **** 		greenLedStepIdx = 0;
+ 164:../scr/alarm.c **** 	} else if(redLedBlinkType == TYPE_BLINK_ONCE) {
+ 659              		.loc 1 164 0
+ 660 0050 0B4B     		ldr	r3, .L52+8
+ 661 0052 1B78     		ldrb	r3, [r3]
+ 662 0054 052B     		cmp	r3, #5
+ 663 0056 0DD1     		bne	.L43
+ 165:../scr/alarm.c **** 		greenLedStep[0].duration = 30;
+ 664              		.loc 1 165 0
+ 665 0058 084B     		ldr	r3, .L52+4
+ 666 005a 1E22     		mov	r2, #30
+ 667 005c 1A60     		str	r2, [r3]
+ 166:../scr/alarm.c **** 		greenLedStep[0].type = 1;
+ 668              		.loc 1 166 0
+ 669 005e 0122     		mov	r2, #1
+ 670 0060 5A60     		str	r2, [r3, #4]
+ 167:../scr/alarm.c **** 		greenLedStep[1].duration = 20;
+ 671              		.loc 1 167 0
+ 672 0062 1422     		mov	r2, #20
+ 673              	.L50:
+ 674 0064 9A60     		str	r2, [r3, #8]
+ 168:../scr/alarm.c **** 		greenLedStep[1].type = 0;
+ 675              		.loc 1 168 0
+ 676 0066 0022     		mov	r2, #0
+ 677 0068 DA60     		str	r2, [r3, #12]
+ 169:../scr/alarm.c **** 		greenLedStepCount = 2;
+ 678              		.loc 1 169 0
+ 679 006a 0221     		mov	r1, #2
+ 680              	.LVL15:
+ 681              	.L51:
+ 682 006c 054B     		ldr	r3, .L52+12
+ 683 006e 1960     		str	r1, [r3]
+ 170:../scr/alarm.c **** 		greenLedStepIdx = 0;
+ 684              		.loc 1 170 0
+ 685 0070 054B     		ldr	r3, .L52+16
+ 686 0072 1A60     		str	r2, [r3]
+ 687              	.LVL16:
+ 688              	.L43:
+ 171:../scr/alarm.c **** 	}
+ 172:../scr/alarm.c **** }
+ 689              		.loc 1 172 0
+ 690              		@ sp needed for prologue
+ 691 0074 00BD     		pop	{pc}
+ 692              	.L53:
+ 693 0076 C046     		.align	2
+ 694              	.L52:
+ 695 0078 00000000 		.word	greenLedBlinkType
+ 696 007c 00000000 		.word	greenLedStep
+ 697 0080 00000000 		.word	redLedBlinkType
+ 698 0084 00000000 		.word	.LANCHOR2
+ 699 0088 00000000 		.word	.LANCHOR3
+ 700              		.cfi_endproc
+ 701              	.LFE46:
+ 703              		.section	.text.blink_red_led,"ax",%progbits
+ 704              		.align	1
+ 705              		.global	blink_red_led
+ 706              		.code	16
+ 707              		.thumb_func
+ 709              	blink_red_led:
+ 710              	.LFB47:
+ 173:../scr/alarm.c **** 
+ 174:../scr/alarm.c **** void blink_red_led(BlinkType_T blinkType) {
+ 711              		.loc 1 174 0
+ 712              		.cfi_startproc
+ 713              	.LVL17:
+ 175:../scr/alarm.c **** 	if(redLedBlinkType == blinkType) {
+ 714              		.loc 1 175 0
+ 715 0000 1C4B     		ldr	r3, .L63
+ 174:../scr/alarm.c **** void blink_red_led(BlinkType_T blinkType) {
+ 716              		.loc 1 174 0
+ 717 0002 00B5     		push	{lr}
+ 718              	.LCFI11:
+ 719              		.cfi_def_cfa_offset 4
+ 720              		.cfi_offset 14, -4
+ 721              		.loc 1 175 0
+ 722 0004 1A78     		ldrb	r2, [r3]
+ 723 0006 8242     		cmp	r2, r0
+ 724 0008 32D0     		beq	.L54
+ 176:../scr/alarm.c **** 		return;
+ 177:../scr/alarm.c **** 	}
+ 178:../scr/alarm.c **** 	redLedBlinkType = blinkType;
+ 725              		.loc 1 178 0
+ 726 000a 1870     		strb	r0, [r3]
+ 179:../scr/alarm.c **** 	if(redLedBlinkType == TYPE_BLINK_DOUBLE) {
+ 727              		.loc 1 179 0
+ 728 000c 0228     		cmp	r0, #2
+ 729 000e 0ED1     		bne	.L57
+ 180:../scr/alarm.c **** 		redLedStep[0].duration = 10;
+ 730              		.loc 1 180 0
+ 731 0010 194B     		ldr	r3, .L63+4
+ 732 0012 0A21     		mov	r1, #10
+ 181:../scr/alarm.c **** 		redLedStep[0].type = 1;
+ 733              		.loc 1 181 0
+ 734 0014 0120     		mov	r0, #1
+ 735              	.LVL18:
+ 182:../scr/alarm.c **** 		redLedStep[1].duration = 10;
+ 183:../scr/alarm.c **** 		redLedStep[1].type = 0;
+ 736              		.loc 1 183 0
+ 737 0016 0022     		mov	r2, #0
+ 180:../scr/alarm.c **** 		redLedStep[0].duration = 10;
+ 738              		.loc 1 180 0
+ 739 0018 1960     		str	r1, [r3]
+ 182:../scr/alarm.c **** 		redLedStep[1].duration = 10;
+ 740              		.loc 1 182 0
+ 741 001a 9960     		str	r1, [r3, #8]
+ 184:../scr/alarm.c **** 		redLedStep[2].duration = 10;
+ 742              		.loc 1 184 0
+ 743 001c 1961     		str	r1, [r3, #16]
+ 185:../scr/alarm.c **** 		redLedStep[2].type = 1;
+ 186:../scr/alarm.c **** 		redLedStep[3].duration = 200;
+ 744              		.loc 1 186 0
+ 745 001e C821     		mov	r1, #200
+ 746 0020 9961     		str	r1, [r3, #24]
+ 181:../scr/alarm.c **** 		redLedStep[0].type = 1;
+ 747              		.loc 1 181 0
+ 748 0022 5860     		str	r0, [r3, #4]
+ 183:../scr/alarm.c **** 		redLedStep[1].type = 0;
+ 749              		.loc 1 183 0
+ 750 0024 DA60     		str	r2, [r3, #12]
+ 185:../scr/alarm.c **** 		redLedStep[2].type = 1;
+ 751              		.loc 1 185 0
+ 752 0026 5861     		str	r0, [r3, #20]
+ 187:../scr/alarm.c **** 		redLedStep[3].type = 0;
+ 753              		.loc 1 187 0
+ 754 0028 DA61     		str	r2, [r3, #28]
+ 188:../scr/alarm.c **** 		redLedStepCount = 4;
+ 755              		.loc 1 188 0
+ 756 002a 0421     		mov	r1, #4
+ 757 002c 1CE0     		b	.L62
+ 758              	.LVL19:
+ 759              	.L57:
+ 189:../scr/alarm.c **** 		redLedStepIdx = 0;
+ 190:../scr/alarm.c **** 	} else if(redLedBlinkType == TYPE_BLINK_FAST) {
+ 760              		.loc 1 190 0
+ 761 002e 0328     		cmp	r0, #3
+ 762 0030 05D1     		bne	.L58
+ 191:../scr/alarm.c **** 		redLedStep[0].duration = 10;
+ 763              		.loc 1 191 0
+ 764 0032 114B     		ldr	r3, .L63+4
+ 765 0034 0A22     		mov	r2, #10
+ 192:../scr/alarm.c **** 		redLedStep[0].type = 1;
+ 766              		.loc 1 192 0
+ 767 0036 0121     		mov	r1, #1
+ 191:../scr/alarm.c **** 		redLedStep[0].duration = 10;
+ 768              		.loc 1 191 0
+ 769 0038 1A60     		str	r2, [r3]
+ 770              		.loc 1 192 0
+ 771 003a 5960     		str	r1, [r3, #4]
+ 772 003c 10E0     		b	.L61
+ 773              	.L58:
+ 193:../scr/alarm.c **** 		redLedStep[1].duration = 10;
+ 194:../scr/alarm.c **** 		redLedStep[1].type = 0;
+ 195:../scr/alarm.c **** 		redLedStepCount = 2;
+ 196:../scr/alarm.c **** 		redLedStepIdx = 0;
+ 197:../scr/alarm.c **** 	} else if(redLedBlinkType == TYPE_BLINK_SLOW) {
+ 774              		.loc 1 197 0
+ 775 003e 0428     		cmp	r0, #4
+ 776 0040 06D1     		bne	.L59
+ 777              	.LBB8:
+ 778              	.LBB9:
+ 198:../scr/alarm.c **** 		redLedStep[0].duration = 180;
+ 779              		.loc 1 198 0
+ 780 0042 0D4B     		ldr	r3, .L63+4
+ 781 0044 B422     		mov	r2, #180
+ 782 0046 1A60     		str	r2, [r3]
+ 199:../scr/alarm.c **** 		redLedStep[0].type = 1;
+ 783              		.loc 1 199 0
+ 784 0048 0122     		mov	r2, #1
+ 785 004a 5A60     		str	r2, [r3, #4]
+ 200:../scr/alarm.c **** 		redLedStep[1].duration = 50;
+ 786              		.loc 1 200 0
+ 787 004c 3222     		mov	r2, #50
+ 788 004e 07E0     		b	.L61
+ 789              	.L59:
+ 790              	.LBE9:
+ 791              	.LBE8:
+ 201:../scr/alarm.c **** 		redLedStep[1].type = 0;
+ 202:../scr/alarm.c **** 		redLedStepCount = 2;
+ 203:../scr/alarm.c **** 		redLedStepIdx = 0;
+ 204:../scr/alarm.c **** 	} else if(redLedBlinkType == TYPE_BLINK_ONCE) {
+ 792              		.loc 1 204 0
+ 793 0050 0528     		cmp	r0, #5
+ 794 0052 0DD1     		bne	.L54
+ 205:../scr/alarm.c **** 		redLedStep[0].duration = 30;
+ 795              		.loc 1 205 0
+ 796 0054 084B     		ldr	r3, .L63+4
+ 797 0056 1E22     		mov	r2, #30
+ 798 0058 1A60     		str	r2, [r3]
+ 206:../scr/alarm.c **** 		redLedStep[0].type = 1;
+ 799              		.loc 1 206 0
+ 800 005a 0122     		mov	r2, #1
+ 801 005c 5A60     		str	r2, [r3, #4]
+ 207:../scr/alarm.c **** 		redLedStep[1].duration = 20;
+ 802              		.loc 1 207 0
+ 803 005e 1422     		mov	r2, #20
+ 804              	.L61:
+ 805 0060 9A60     		str	r2, [r3, #8]
+ 208:../scr/alarm.c **** 		redLedStep[1].type = 0;
+ 806              		.loc 1 208 0
+ 807 0062 0022     		mov	r2, #0
+ 808 0064 DA60     		str	r2, [r3, #12]
+ 209:../scr/alarm.c **** 		redLedStepCount = 2;
+ 809              		.loc 1 209 0
+ 810 0066 0221     		mov	r1, #2
+ 811              	.LVL20:
+ 812              	.L62:
+ 813 0068 044B     		ldr	r3, .L63+8
+ 814 006a 1960     		str	r1, [r3]
+ 210:../scr/alarm.c **** 		redLedStepIdx = 0;
+ 815              		.loc 1 210 0
+ 816 006c 044B     		ldr	r3, .L63+12
+ 817 006e 1A60     		str	r2, [r3]
+ 818              	.LVL21:
+ 819              	.L54:
+ 211:../scr/alarm.c **** 	}
+ 212:../scr/alarm.c **** }
+ 820              		.loc 1 212 0
+ 821              		@ sp needed for prologue
+ 822 0070 00BD     		pop	{pc}
+ 823              	.L64:
+ 824 0072 C046     		.align	2
+ 825              	.L63:
+ 826 0074 00000000 		.word	redLedBlinkType
+ 827 0078 00000000 		.word	redLedStep
+ 828 007c 00000000 		.word	.LANCHOR4
+ 829 0080 00000000 		.word	.LANCHOR5
+ 830              		.cfi_endproc
+ 831              	.LFE47:
+ 833              		.global	__aeabi_idivmod
+ 834              		.section	.text.process_green_led,"ax",%progbits
+ 835              		.align	1
+ 836              		.global	process_green_led
+ 837              		.code	16
+ 838              		.thumb_func
+ 840              	process_green_led:
+ 841              	.LFB48:
+ 213:../scr/alarm.c **** 
+ 214:../scr/alarm.c **** void process_green_led() {
+ 842              		.loc 1 214 0
+ 843              		.cfi_startproc
+ 215:../scr/alarm.c **** 	if(greenLedBlinkType == TYPE_KEEP_ON) {
+ 844              		.loc 1 215 0
+ 845 0000 1E4B     		ldr	r3, .L73
+ 214:../scr/alarm.c **** void process_green_led() {
+ 846              		.loc 1 214 0
+ 847 0002 70B5     		push	{r4, r5, r6, lr}
+ 848              	.LCFI12:
+ 849              		.cfi_def_cfa_offset 16
+ 850              		.cfi_offset 4, -16
+ 851              		.cfi_offset 5, -12
+ 852              		.cfi_offset 6, -8
+ 853              		.cfi_offset 14, -4
+ 854              		.loc 1 215 0
+ 855 0004 1B78     		ldrb	r3, [r3]
+ 856 0006 012B     		cmp	r3, #1
+ 857 0008 02D1     		bne	.L66
+ 216:../scr/alarm.c **** 		GreenLedOn();
+ 858              		.loc 1 216 0
+ 859 000a FFF7FEFF 		bl	GreenLedOn
+ 860              	.LVL22:
+ 861 000e 34E0     		b	.L65
+ 862              	.L66:
+ 217:../scr/alarm.c **** 	} else if(greenLedBlinkType == TYPE_KEEP_OFF) {
+ 863              		.loc 1 217 0
+ 864 0010 002B     		cmp	r3, #0
+ 865 0012 02D1     		bne	.L68
+ 866              	.L69:
+ 218:../scr/alarm.c **** 		GreenLedOff();
+ 867              		.loc 1 218 0
+ 868 0014 FFF7FEFF 		bl	GreenLedOff
+ 869              	.LVL23:
+ 870 0018 2FE0     		b	.L65
+ 871              	.L68:
+ 219:../scr/alarm.c **** 	} else if(greenLedBlinkType == TYPE_BLINK_DOUBLE ||
+ 872              		.loc 1 219 0
+ 873 001a 023B     		sub	r3, r3, #2
+ 874 001c 032B     		cmp	r3, #3
+ 875 001e F9D8     		bhi	.L69
+ 220:../scr/alarm.c **** 			greenLedBlinkType == TYPE_BLINK_FAST ||
+ 221:../scr/alarm.c **** 			greenLedBlinkType == TYPE_BLINK_SLOW ||
+ 222:../scr/alarm.c **** 			greenLedBlinkType == TYPE_BLINK_ONCE) {
+ 223:../scr/alarm.c **** 		if(ulTickCount > nextGreenTick) {
+ 876              		.loc 1 223 0
+ 877 0020 174B     		ldr	r3, .L73+4
+ 878 0022 184A     		ldr	r2, .L73+8
+ 879 0024 1968     		ldr	r1, [r3]
+ 880 0026 1268     		ldr	r2, [r2]
+ 881 0028 1D1C     		mov	r5, r3
+ 882 002a 9142     		cmp	r1, r2
+ 883 002c 25D9     		bls	.L65
+ 224:../scr/alarm.c **** 			if(greenLedStep[greenLedStepIdx].type) {
+ 884              		.loc 1 224 0
+ 885 002e 164B     		ldr	r3, .L73+12
+ 886 0030 164A     		ldr	r2, .L73+16
+ 887 0032 1868     		ldr	r0, [r3]
+ 888 0034 141C     		mov	r4, r2
+ 889 0036 C100     		lsl	r1, r0, #3
+ 890 0038 5118     		add	r1, r2, r1
+ 891 003a 4968     		ldr	r1, [r1, #4]
+ 892 003c 1E1C     		mov	r6, r3
+ 893 003e 0029     		cmp	r1, #0
+ 894 0040 02D0     		beq	.L70
+ 225:../scr/alarm.c **** 				GreenLedOn();
+ 895              		.loc 1 225 0
+ 896 0042 FFF7FEFF 		bl	GreenLedOn
+ 897              	.LVL24:
+ 898 0046 01E0     		b	.L71
+ 899              	.L70:
+ 226:../scr/alarm.c **** 			} else {
+ 227:../scr/alarm.c **** 				GreenLedOff();
+ 900              		.loc 1 227 0
+ 901 0048 FFF7FEFF 		bl	GreenLedOff
+ 902              	.LVL25:
+ 903              	.L71:
+ 228:../scr/alarm.c **** 			}
+ 229:../scr/alarm.c **** 			nextGreenTick = ulTickCount + greenLedStep[greenLedStepIdx].duration;
+ 904              		.loc 1 229 0
+ 905 004c 3068     		ldr	r0, [r6]
+ 906 004e 2B68     		ldr	r3, [r5]
+ 907 0050 C200     		lsl	r2, r0, #3
+ 908 0052 A258     		ldr	r2, [r4, r2]
+ 230:../scr/alarm.c **** 			if((greenLedStepIdx + 1) >= greenLedStepCount && greenLedBlinkType == TYPE_BLINK_ONCE) {
+ 909              		.loc 1 230 0
+ 910 0054 0130     		add	r0, r0, #1
+ 229:../scr/alarm.c **** 			nextGreenTick = ulTickCount + greenLedStep[greenLedStepIdx].duration;
+ 911              		.loc 1 229 0
+ 912 0056 D218     		add	r2, r2, r3
+ 913 0058 0A4B     		ldr	r3, .L73+8
+ 914 005a 1A60     		str	r2, [r3]
+ 915              		.loc 1 230 0
+ 916 005c 0C4B     		ldr	r3, .L73+20
+ 917 005e 1968     		ldr	r1, [r3]
+ 918 0060 8842     		cmp	r0, r1
+ 919 0062 06DB     		blt	.L72
+ 920              		.loc 1 230 0 is_stmt 0 discriminator 1
+ 921 0064 054B     		ldr	r3, .L73
+ 922 0066 1A78     		ldrb	r2, [r3]
+ 923 0068 052A     		cmp	r2, #5
+ 924 006a 02D1     		bne	.L72
+ 231:../scr/alarm.c **** 				greenLedBlinkType = TYPE_KEEP_OFF;
+ 925              		.loc 1 231 0 is_stmt 1
+ 926 006c 0022     		mov	r2, #0
+ 927 006e 1A70     		strb	r2, [r3]
+ 928 0070 03E0     		b	.L65
+ 929              	.L72:
+ 232:../scr/alarm.c **** 			} else {
+ 233:../scr/alarm.c **** 				greenLedStepIdx = (greenLedStepIdx + 1) % greenLedStepCount;
+ 930              		.loc 1 233 0
+ 931 0072 FFF7FEFF 		bl	__aeabi_idivmod
+ 932              	.LVL26:
+ 933 0076 044B     		ldr	r3, .L73+12
+ 934 0078 1960     		str	r1, [r3]
+ 935              	.L65:
+ 234:../scr/alarm.c **** 			}
+ 235:../scr/alarm.c **** 		}
+ 236:../scr/alarm.c **** 	} else {
+ 237:../scr/alarm.c **** 		GreenLedOff();
+ 238:../scr/alarm.c **** 	}
+ 239:../scr/alarm.c **** }
+ 936              		.loc 1 239 0
+ 937              		@ sp needed for prologue
+ 938 007a 70BD     		pop	{r4, r5, r6, pc}
+ 939              	.L74:
+ 940              		.align	2
+ 941              	.L73:
+ 942 007c 00000000 		.word	greenLedBlinkType
+ 943 0080 00000000 		.word	ulTickCount
+ 944 0084 00000000 		.word	nextGreenTick
+ 945 0088 00000000 		.word	.LANCHOR3
+ 946 008c 00000000 		.word	greenLedStep
+ 947 0090 00000000 		.word	.LANCHOR2
+ 948              		.cfi_endproc
+ 949              	.LFE48:
+ 951              		.section	.text.process_red_led,"ax",%progbits
+ 952              		.align	1
+ 953              		.global	process_red_led
+ 954              		.code	16
+ 955              		.thumb_func
+ 957              	process_red_led:
+ 958              	.LFB49:
+ 240:../scr/alarm.c **** 
+ 241:../scr/alarm.c **** void process_red_led() {
+ 959              		.loc 1 241 0
+ 960              		.cfi_startproc
+ 242:../scr/alarm.c **** 	if(redLedBlinkType == TYPE_KEEP_ON) {
+ 961              		.loc 1 242 0
+ 962 0000 1E4B     		ldr	r3, .L83
+ 241:../scr/alarm.c **** void process_red_led() {
+ 963              		.loc 1 241 0
+ 964 0002 70B5     		push	{r4, r5, r6, lr}
+ 965              	.LCFI13:
+ 966              		.cfi_def_cfa_offset 16
+ 967              		.cfi_offset 4, -16
+ 968              		.cfi_offset 5, -12
+ 969              		.cfi_offset 6, -8
+ 970              		.cfi_offset 14, -4
+ 971              		.loc 1 242 0
+ 972 0004 1B78     		ldrb	r3, [r3]
+ 973 0006 012B     		cmp	r3, #1
+ 974 0008 02D1     		bne	.L76
+ 243:../scr/alarm.c **** 		RedLedOn();
+ 975              		.loc 1 243 0
+ 976 000a FFF7FEFF 		bl	RedLedOn
+ 977              	.LVL27:
+ 978 000e 34E0     		b	.L75
+ 979              	.L76:
+ 244:../scr/alarm.c **** 	} else if(redLedBlinkType == TYPE_KEEP_OFF) {
+ 980              		.loc 1 244 0
+ 981 0010 002B     		cmp	r3, #0
+ 982 0012 02D1     		bne	.L78
+ 983              	.L79:
+ 245:../scr/alarm.c **** 		RedLedOff();
+ 984              		.loc 1 245 0
+ 985 0014 FFF7FEFF 		bl	RedLedOff
+ 986              	.LVL28:
+ 987 0018 2FE0     		b	.L75
+ 988              	.L78:
+ 246:../scr/alarm.c **** 	} else if(redLedBlinkType == TYPE_BLINK_DOUBLE ||
+ 989              		.loc 1 246 0
+ 990 001a 023B     		sub	r3, r3, #2
+ 991 001c 032B     		cmp	r3, #3
+ 992 001e F9D8     		bhi	.L79
+ 247:../scr/alarm.c **** 			redLedBlinkType == TYPE_BLINK_FAST ||
+ 248:../scr/alarm.c **** 			redLedBlinkType == TYPE_BLINK_SLOW ||
+ 249:../scr/alarm.c **** 			redLedBlinkType == TYPE_BLINK_ONCE) {
+ 250:../scr/alarm.c **** 		if(ulTickCount > nextRedTick) {
+ 993              		.loc 1 250 0
+ 994 0020 174B     		ldr	r3, .L83+4
+ 995 0022 184A     		ldr	r2, .L83+8
+ 996 0024 1968     		ldr	r1, [r3]
+ 997 0026 1268     		ldr	r2, [r2]
+ 998 0028 1D1C     		mov	r5, r3
+ 999 002a 9142     		cmp	r1, r2
+ 1000 002c 25D9     		bls	.L75
+ 251:../scr/alarm.c **** 			if(redLedStep[redLedStepIdx].type) {
+ 1001              		.loc 1 251 0
+ 1002 002e 164B     		ldr	r3, .L83+12
+ 1003 0030 164A     		ldr	r2, .L83+16
+ 1004 0032 1868     		ldr	r0, [r3]
+ 1005 0034 141C     		mov	r4, r2
+ 1006 0036 C100     		lsl	r1, r0, #3
+ 1007 0038 5118     		add	r1, r2, r1
+ 1008 003a 4968     		ldr	r1, [r1, #4]
+ 1009 003c 1E1C     		mov	r6, r3
+ 1010 003e 0029     		cmp	r1, #0
+ 1011 0040 02D0     		beq	.L80
+ 252:../scr/alarm.c **** 				RedLedOn();
+ 1012              		.loc 1 252 0
+ 1013 0042 FFF7FEFF 		bl	RedLedOn
+ 1014              	.LVL29:
+ 1015 0046 01E0     		b	.L81
+ 1016              	.L80:
+ 253:../scr/alarm.c **** 			} else {
+ 254:../scr/alarm.c **** 				RedLedOff();
+ 1017              		.loc 1 254 0
+ 1018 0048 FFF7FEFF 		bl	RedLedOff
+ 1019              	.LVL30:
+ 1020              	.L81:
+ 255:../scr/alarm.c **** 			}
+ 256:../scr/alarm.c **** 			nextRedTick = ulTickCount + redLedStep[redLedStepIdx].duration;
+ 1021              		.loc 1 256 0
+ 1022 004c 3068     		ldr	r0, [r6]
+ 1023 004e 2B68     		ldr	r3, [r5]
+ 1024 0050 C200     		lsl	r2, r0, #3
+ 1025 0052 A258     		ldr	r2, [r4, r2]
+ 257:../scr/alarm.c **** 			if((redLedStepIdx + 1) >= redLedStepCount && redLedBlinkType == TYPE_BLINK_ONCE) {
+ 1026              		.loc 1 257 0
+ 1027 0054 0130     		add	r0, r0, #1
+ 256:../scr/alarm.c **** 			nextRedTick = ulTickCount + redLedStep[redLedStepIdx].duration;
+ 1028              		.loc 1 256 0
+ 1029 0056 D218     		add	r2, r2, r3
+ 1030 0058 0A4B     		ldr	r3, .L83+8
+ 1031 005a 1A60     		str	r2, [r3]
+ 1032              		.loc 1 257 0
+ 1033 005c 0C4B     		ldr	r3, .L83+20
+ 1034 005e 1968     		ldr	r1, [r3]
+ 1035 0060 8842     		cmp	r0, r1
+ 1036 0062 06DB     		blt	.L82
+ 1037              		.loc 1 257 0 is_stmt 0 discriminator 1
+ 1038 0064 054B     		ldr	r3, .L83
+ 1039 0066 1A78     		ldrb	r2, [r3]
+ 1040 0068 052A     		cmp	r2, #5
+ 1041 006a 02D1     		bne	.L82
+ 258:../scr/alarm.c **** 				redLedBlinkType = TYPE_KEEP_OFF;
+ 1042              		.loc 1 258 0 is_stmt 1
+ 1043 006c 0022     		mov	r2, #0
+ 1044 006e 1A70     		strb	r2, [r3]
+ 1045 0070 03E0     		b	.L75
+ 1046              	.L82:
+ 259:../scr/alarm.c **** 			} else {
+ 260:../scr/alarm.c **** 				redLedStepIdx = (redLedStepIdx + 1) % redLedStepCount;
+ 1047              		.loc 1 260 0
+ 1048 0072 FFF7FEFF 		bl	__aeabi_idivmod
+ 1049              	.LVL31:
+ 1050 0076 044B     		ldr	r3, .L83+12
+ 1051 0078 1960     		str	r1, [r3]
+ 1052              	.L75:
+ 261:../scr/alarm.c **** 			}
+ 262:../scr/alarm.c **** 		}
+ 263:../scr/alarm.c **** 	} else {
+ 264:../scr/alarm.c **** 		RedLedOff();
+ 265:../scr/alarm.c **** 	}
+ 266:../scr/alarm.c **** }
+ 1053              		.loc 1 266 0
+ 1054              		@ sp needed for prologue
+ 1055 007a 70BD     		pop	{r4, r5, r6, pc}
+ 1056              	.L84:
+ 1057              		.align	2
+ 1058              	.L83:
+ 1059 007c 00000000 		.word	redLedBlinkType
+ 1060 0080 00000000 		.word	ulTickCount
+ 1061 0084 00000000 		.word	nextRedTick
+ 1062 0088 00000000 		.word	.LANCHOR5
+ 1063 008c 00000000 		.word	redLedStep
+ 1064 0090 00000000 		.word	.LANCHOR4
+ 1065              		.cfi_endproc
+ 1066              	.LFE49:
+ 1068              		.section	.text.process_buzz,"ax",%progbits
+ 1069              		.align	1
+ 1070              		.global	process_buzz
+ 1071              		.code	16
+ 1072              		.thumb_func
+ 1074              	process_buzz:
+ 1075              	.LFB50:
+ 267:../scr/alarm.c **** 
+ 268:../scr/alarm.c **** void process_buzz() {
+ 1076              		.loc 1 268 0
+ 1077              		.cfi_startproc
+ 1078 0000 38B5     		push	{r3, r4, r5, lr}
+ 1079              	.LCFI14:
+ 1080              		.cfi_def_cfa_offset 16
+ 1081              		.cfi_offset 3, -16
+ 1082              		.cfi_offset 4, -12
+ 1083              		.cfi_offset 5, -8
+ 1084              		.cfi_offset 14, -4
+ 269:../scr/alarm.c **** 	if(beepStepIdx != -1 && ulTickCount > nextBeepTick && beepStepIdx < beepStepCount) {
+ 1085              		.loc 1 269 0
+ 1086 0002 134B     		ldr	r3, .L92
+ 1087 0004 1B68     		ldr	r3, [r3]
+ 1088 0006 5A1C     		add	r2, r3, #1
+ 1089 0008 20D0     		beq	.L85
+ 1090              		.loc 1 269 0 is_stmt 0 discriminator 1
+ 1091 000a 124A     		ldr	r2, .L92+4
+ 1092 000c 1249     		ldr	r1, .L92+8
+ 1093 000e 1068     		ldr	r0, [r2]
+ 1094 0010 0968     		ldr	r1, [r1]
+ 1095 0012 151C     		mov	r5, r2
+ 1096 0014 8842     		cmp	r0, r1
+ 1097 0016 19D9     		bls	.L85
+ 1098 0018 104A     		ldr	r2, .L92+12
+ 1099 001a 1268     		ldr	r2, [r2]
+ 1100 001c 9342     		cmp	r3, r2
+ 1101 001e 15DA     		bge	.L85
+ 270:../scr/alarm.c **** 		if(beepStep[beepStepIdx].type) {
+ 1102              		.loc 1 270 0 is_stmt 1
+ 1103 0020 0F4A     		ldr	r2, .L92+16
+ 1104 0022 DB00     		lsl	r3, r3, #3
+ 1105 0024 D318     		add	r3, r2, r3
+ 1106 0026 5B68     		ldr	r3, [r3, #4]
+ 1107 0028 141C     		mov	r4, r2
+ 1108 002a 002B     		cmp	r3, #0
+ 1109 002c 02D0     		beq	.L87
+ 271:../scr/alarm.c **** 			BuzzOn();
+ 1110              		.loc 1 271 0
+ 1111 002e FFF7FEFF 		bl	BuzzOn
+ 1112              	.LVL32:
+ 1113 0032 01E0     		b	.L88
+ 1114              	.L87:
+ 272:../scr/alarm.c **** 		} else {
+ 273:../scr/alarm.c **** 			BuzzOff();
+ 1115              		.loc 1 273 0
+ 1116 0034 FFF7FEFF 		bl	BuzzOff
+ 1117              	.LVL33:
+ 1118              	.L88:
+ 274:../scr/alarm.c **** 		}
+ 275:../scr/alarm.c **** 		nextBeepTick = ulTickCount + beepStep[beepStepIdx].duration;
+ 1119              		.loc 1 275 0
+ 1120 0038 054A     		ldr	r2, .L92
+ 1121 003a 2968     		ldr	r1, [r5]
+ 1122 003c 1368     		ldr	r3, [r2]
+ 1123 003e D800     		lsl	r0, r3, #3
+ 1124 0040 2058     		ldr	r0, [r4, r0]
+ 276:../scr/alarm.c **** 		beepStepIdx++;
+ 1125              		.loc 1 276 0
+ 1126 0042 0133     		add	r3, r3, #1
+ 275:../scr/alarm.c **** 		nextBeepTick = ulTickCount + beepStep[beepStepIdx].duration;
+ 1127              		.loc 1 275 0
+ 1128 0044 4018     		add	r0, r0, r1
+ 1129 0046 0449     		ldr	r1, .L92+8
+ 1130              		.loc 1 276 0
+ 1131 0048 1360     		str	r3, [r2]
+ 275:../scr/alarm.c **** 		nextBeepTick = ulTickCount + beepStep[beepStepIdx].duration;
+ 1132              		.loc 1 275 0
+ 1133 004a 0860     		str	r0, [r1]
+ 1134              	.L85:
+ 277:../scr/alarm.c **** 	} else if (beepStepIdx != -1 && beepStepIdx < beepStepCount) { //in beep
+ 278:../scr/alarm.c **** 
+ 279:../scr/alarm.c **** 	} else { //out of beep
+ 280:../scr/alarm.c **** 
+ 281:../scr/alarm.c **** 	}
+ 282:../scr/alarm.c **** }
+ 1135              		.loc 1 282 0
+ 1136              		@ sp needed for prologue
+ 1137 004c 38BD     		pop	{r3, r4, r5, pc}
+ 1138              	.L93:
+ 1139 004e C046     		.align	2
+ 1140              	.L92:
+ 1141 0050 00000000 		.word	.LANCHOR1
+ 1142 0054 00000000 		.word	ulTickCount
+ 1143 0058 00000000 		.word	nextBeepTick
+ 1144 005c 00000000 		.word	.LANCHOR0
+ 1145 0060 00000000 		.word	beepStep
+ 1146              		.cfi_endproc
+ 1147              	.LFE50:
+ 1149              		.section	.text.turn_on_red_led,"ax",%progbits
+ 1150              		.align	1
+ 1151              		.global	turn_on_red_led
+ 1152              		.code	16
+ 1153              		.thumb_func
+ 1155              	turn_on_red_led:
+ 1156              	.LFB51:
+ 283:../scr/alarm.c **** 
+ 284:../scr/alarm.c **** void turn_on_red_led() {
+ 1157              		.loc 1 284 0
+ 1158              		.cfi_startproc
+ 1159 0000 08B5     		push	{r3, lr}
+ 1160              	.LCFI15:
+ 1161              		.cfi_def_cfa_offset 8
+ 1162              		.cfi_offset 3, -8
+ 1163              		.cfi_offset 14, -4
+ 285:../scr/alarm.c **** 	blink_red_led(TYPE_KEEP_ON);
+ 1164              		.loc 1 285 0
+ 1165 0002 0120     		mov	r0, #1
+ 1166 0004 FFF7FEFF 		bl	blink_red_led
+ 1167              	.LVL34:
+ 286:../scr/alarm.c **** }
+ 1168              		.loc 1 286 0
+ 1169              		@ sp needed for prologue
+ 1170 0008 08BD     		pop	{r3, pc}
+ 1171              		.cfi_endproc
+ 1172              	.LFE51:
+ 1174              		.section	.text.turn_off_red_led,"ax",%progbits
+ 1175              		.align	1
+ 1176              		.global	turn_off_red_led
+ 1177              		.code	16
+ 1178              		.thumb_func
+ 1180              	turn_off_red_led:
+ 1181              	.LFB52:
+ 287:../scr/alarm.c **** 
+ 288:../scr/alarm.c **** void turn_off_red_led() {
+ 1182              		.loc 1 288 0
+ 1183              		.cfi_startproc
+ 1184 0000 08B5     		push	{r3, lr}
+ 1185              	.LCFI16:
+ 1186              		.cfi_def_cfa_offset 8
+ 1187              		.cfi_offset 3, -8
+ 1188              		.cfi_offset 14, -4
+ 289:../scr/alarm.c **** 	blink_red_led(TYPE_KEEP_OFF);
+ 1189              		.loc 1 289 0
+ 1190 0002 0020     		mov	r0, #0
+ 1191 0004 FFF7FEFF 		bl	blink_red_led
+ 1192              	.LVL35:
+ 290:../scr/alarm.c **** }
+ 1193              		.loc 1 290 0
+ 1194              		@ sp needed for prologue
+ 1195 0008 08BD     		pop	{r3, pc}
+ 1196              		.cfi_endproc
+ 1197              	.LFE52:
+ 1199              		.section	.text.turn_on_green_led,"ax",%progbits
+ 1200              		.align	1
+ 1201              		.global	turn_on_green_led
+ 1202              		.code	16
+ 1203              		.thumb_func
+ 1205              	turn_on_green_led:
+ 1206              	.LFB53:
+ 291:../scr/alarm.c **** 
+ 292:../scr/alarm.c **** void turn_on_green_led() {
+ 1207              		.loc 1 292 0
+ 1208              		.cfi_startproc
+ 1209 0000 08B5     		push	{r3, lr}
+ 1210              	.LCFI17:
+ 1211              		.cfi_def_cfa_offset 8
+ 1212              		.cfi_offset 3, -8
+ 1213              		.cfi_offset 14, -4
+ 293:../scr/alarm.c **** 	blink_green_led(TYPE_KEEP_ON);
+ 1214              		.loc 1 293 0
+ 1215 0002 0120     		mov	r0, #1
+ 1216 0004 FFF7FEFF 		bl	blink_green_led
+ 1217              	.LVL36:
+ 294:../scr/alarm.c **** }
+ 1218              		.loc 1 294 0
+ 1219              		@ sp needed for prologue
+ 1220 0008 08BD     		pop	{r3, pc}
+ 1221              		.cfi_endproc
+ 1222              	.LFE53:
+ 1224              		.section	.text.turn_off_green_led,"ax",%progbits
+ 1225              		.align	1
+ 1226              		.global	turn_off_green_led
+ 1227              		.code	16
+ 1228              		.thumb_func
+ 1230              	turn_off_green_led:
+ 1231              	.LFB54:
+ 295:../scr/alarm.c **** 
+ 296:../scr/alarm.c **** void turn_off_green_led() {
+ 1232              		.loc 1 296 0
+ 1233              		.cfi_startproc
+ 1234 0000 08B5     		push	{r3, lr}
+ 1235              	.LCFI18:
+ 1236              		.cfi_def_cfa_offset 8
+ 1237              		.cfi_offset 3, -8
+ 1238              		.cfi_offset 14, -4
+ 297:../scr/alarm.c **** 	blink_green_led(TYPE_KEEP_OFF);
+ 1239              		.loc 1 297 0
+ 1240 0002 0020     		mov	r0, #0
+ 1241 0004 FFF7FEFF 		bl	blink_green_led
+ 1242              	.LVL37:
+ 298:../scr/alarm.c **** }
+ 1243              		.loc 1 298 0
+ 1244              		@ sp needed for prologue
+ 1245 0008 08BD     		pop	{r3, pc}
+ 1246              		.cfi_endproc
+ 1247              	.LFE54:
+ 1249              		.section	.text.blink_sd_data_coming,"ax",%progbits
+ 1250              		.align	1
+ 1251              		.global	blink_sd_data_coming
+ 1252              		.code	16
+ 1253              		.thumb_func
+ 1255              	blink_sd_data_coming:
+ 1256              	.LFB55:
+ 299:../scr/alarm.c **** 
+ 300:../scr/alarm.c **** void blink_sd_data_coming() {
+ 1257              		.loc 1 300 0
+ 1258              		.cfi_startproc
+ 1259 0000 08B5     		push	{r3, lr}
+ 1260              	.LCFI19:
+ 1261              		.cfi_def_cfa_offset 8
+ 1262              		.cfi_offset 3, -8
+ 1263              		.cfi_offset 14, -4
+ 301:../scr/alarm.c **** 	blink_red_led(TYPE_BLINK_FAST);
+ 1264              		.loc 1 301 0
+ 1265 0002 0320     		mov	r0, #3
+ 1266 0004 FFF7FEFF 		bl	blink_red_led
+ 1267              	.LVL38:
+ 302:../scr/alarm.c **** }
+ 1268              		.loc 1 302 0
+ 1269              		@ sp needed for prologue
+ 1270 0008 08BD     		pop	{r3, pc}
+ 1271              		.cfi_endproc
+ 1272              	.LFE55:
+ 1274              		.section	.text.blink_valid_gps,"ax",%progbits
+ 1275              		.align	1
+ 1276              		.global	blink_valid_gps
+ 1277              		.code	16
+ 1278              		.thumb_func
+ 1280              	blink_valid_gps:
+ 1281              	.LFB56:
+ 303:../scr/alarm.c **** 
+ 304:../scr/alarm.c **** void blink_valid_gps() {
+ 1282              		.loc 1 304 0
+ 1283              		.cfi_startproc
+ 1284 0000 08B5     		push	{r3, lr}
+ 1285              	.LCFI20:
+ 1286              		.cfi_def_cfa_offset 8
+ 1287              		.cfi_offset 3, -8
+ 1288              		.cfi_offset 14, -4
+ 305:../scr/alarm.c **** 	blink_green_led(TYPE_KEEP_ON);
+ 1289              		.loc 1 305 0
+ 1290 0002 0120     		mov	r0, #1
+ 1291 0004 FFF7FEFF 		bl	blink_green_led
+ 1292              	.LVL39:
+ 306:../scr/alarm.c **** }
+ 1293              		.loc 1 306 0
+ 1294              		@ sp needed for prologue
+ 1295 0008 08BD     		pop	{r3, pc}
+ 1296              		.cfi_endproc
+ 1297              	.LFE56:
+ 1299              		.section	.text.blink_invalid_gps,"ax",%progbits
+ 1300              		.align	1
+ 1301              		.global	blink_invalid_gps
+ 1302              		.code	16
+ 1303              		.thumb_func
+ 1305              	blink_invalid_gps:
+ 1306              	.LFB57:
+ 307:../scr/alarm.c **** 
+ 308:../scr/alarm.c **** void blink_invalid_gps() {
+ 1307              		.loc 1 308 0
+ 1308              		.cfi_startproc
+ 1309 0000 08B5     		push	{r3, lr}
+ 1310              	.LCFI21:
+ 1311              		.cfi_def_cfa_offset 8
+ 1312              		.cfi_offset 3, -8
+ 1313              		.cfi_offset 14, -4
+ 309:../scr/alarm.c **** 	blink_green_led(TYPE_BLINK_SLOW);
+ 1314              		.loc 1 309 0
+ 1315 0002 0420     		mov	r0, #4
+ 1316 0004 FFF7FEFF 		bl	blink_green_led
+ 1317              	.LVL40:
+ 310:../scr/alarm.c **** }
+ 1318              		.loc 1 310 0
+ 1319              		@ sp needed for prologue
+ 1320 0008 08BD     		pop	{r3, pc}
+ 1321              		.cfi_endproc
+ 1322              	.LFE57:
+ 1324              		.section	.text.blink_invalid_card,"ax",%progbits
+ 1325              		.align	1
+ 1326              		.global	blink_invalid_card
+ 1327              		.code	16
+ 1328              		.thumb_func
+ 1330              	blink_invalid_card:
+ 1331              	.LFB58:
+ 311:../scr/alarm.c **** 
+ 312:../scr/alarm.c **** void blink_invalid_card() {
+ 1332              		.loc 1 312 0
+ 1333              		.cfi_startproc
+ 1334 0000 08B5     		push	{r3, lr}
+ 1335              	.LCFI22:
+ 1336              		.cfi_def_cfa_offset 8
+ 1337              		.cfi_offset 3, -8
+ 1338              		.cfi_offset 14, -4
+ 313:../scr/alarm.c **** 	blink_green_led(TYPE_BLINK_DOUBLE);
+ 1339              		.loc 1 313 0
+ 1340 0002 0220     		mov	r0, #2
+ 1341 0004 FFF7FEFF 		bl	blink_green_led
+ 1342              	.LVL41:
+ 314:../scr/alarm.c **** }
+ 1343              		.loc 1 314 0
+ 1344              		@ sp needed for prologue
+ 1345 0008 08BD     		pop	{r3, pc}
+ 1346              		.cfi_endproc
+ 1347              	.LFE58:
+ 1349              		.section	.text.blink_no_x3_output,"ax",%progbits
+ 1350              		.align	1
+ 1351              		.global	blink_no_x3_output
+ 1352              		.code	16
+ 1353              		.thumb_func
+ 1355              	blink_no_x3_output:
+ 1356              	.LFB59:
+ 315:../scr/alarm.c **** 
+ 316:../scr/alarm.c **** void blink_no_x3_output() {
+ 1357              		.loc 1 316 0
+ 1358              		.cfi_startproc
+ 1359 0000 08B5     		push	{r3, lr}
+ 1360              	.LCFI23:
+ 1361              		.cfi_def_cfa_offset 8
+ 1362              		.cfi_offset 3, -8
+ 1363              		.cfi_offset 14, -4
+ 317:../scr/alarm.c **** 	blink_green_led(TYPE_KEEP_OFF);
+ 1364              		.loc 1 317 0
+ 1365 0002 0020     		mov	r0, #0
+ 1366 0004 FFF7FEFF 		bl	blink_green_led
+ 1367              	.LVL42:
+ 318:../scr/alarm.c **** }
+ 1368              		.loc 1 318 0
+ 1369              		@ sp needed for prologue
+ 1370 0008 08BD     		pop	{r3, pc}
+ 1371              		.cfi_endproc
+ 1372              	.LFE59:
+ 1374              		.section	.text.blink_red_led_once,"ax",%progbits
+ 1375              		.align	1
+ 1376              		.global	blink_red_led_once
+ 1377              		.code	16
+ 1378              		.thumb_func
+ 1380              	blink_red_led_once:
+ 1381              	.LFB60:
+ 319:../scr/alarm.c **** 
+ 320:../scr/alarm.c **** void blink_red_led_once() {
+ 1382              		.loc 1 320 0
+ 1383              		.cfi_startproc
+ 1384 0000 08B5     		push	{r3, lr}
+ 1385              	.LCFI24:
+ 1386              		.cfi_def_cfa_offset 8
+ 1387              		.cfi_offset 3, -8
+ 1388              		.cfi_offset 14, -4
+ 321:../scr/alarm.c **** 	blink_red_led(TYPE_BLINK_ONCE);
+ 1389              		.loc 1 321 0
+ 1390 0002 0520     		mov	r0, #5
+ 1391 0004 FFF7FEFF 		bl	blink_red_led
+ 1392              	.LVL43:
+ 322:../scr/alarm.c **** }
+ 1393              		.loc 1 322 0
+ 1394              		@ sp needed for prologue
+ 1395 0008 08BD     		pop	{r3, pc}
+ 1396              		.cfi_endproc
+ 1397              	.LFE60:
+ 1399              		.section	.text.blink_green_led_once,"ax",%progbits
+ 1400              		.align	1
+ 1401              		.global	blink_green_led_once
+ 1402              		.code	16
+ 1403              		.thumb_func
+ 1405              	blink_green_led_once:
+ 1406              	.LFB61:
+ 323:../scr/alarm.c **** 
+ 324:../scr/alarm.c **** void blink_green_led_once() {
+ 1407              		.loc 1 324 0
+ 1408              		.cfi_startproc
+ 1409 0000 08B5     		push	{r3, lr}
+ 1410              	.LCFI25:
+ 1411              		.cfi_def_cfa_offset 8
+ 1412              		.cfi_offset 3, -8
+ 1413              		.cfi_offset 14, -4
+ 325:../scr/alarm.c **** 	blink_green_led(TYPE_BLINK_ONCE);
+ 1414              		.loc 1 325 0
+ 1415 0002 0520     		mov	r0, #5
+ 1416 0004 FFF7FEFF 		bl	blink_green_led
+ 1417              	.LVL44:
+ 326:../scr/alarm.c **** }
+ 1418              		.loc 1 326 0
+ 1419              		@ sp needed for prologue
+ 1420 0008 08BD     		pop	{r3, pc}
+ 1421              		.cfi_endproc
+ 1422              	.LFE61:
+ 1424              		.section	.text.raise_command_coming,"ax",%progbits
+ 1425              		.align	1
+ 1426              		.global	raise_command_coming
+ 1427              		.code	16
+ 1428              		.thumb_func
+ 1430              	raise_command_coming:
+ 1431              	.LFB62:
+ 327:../scr/alarm.c **** 
+ 328:../scr/alarm.c **** void raise_command_coming() {
+ 1432              		.loc 1 328 0
+ 1433              		.cfi_startproc
+ 1434 0000 08B5     		push	{r3, lr}
+ 1435              	.LCFI26:
+ 1436              		.cfi_def_cfa_offset 8
+ 1437              		.cfi_offset 3, -8
+ 1438              		.cfi_offset 14, -4
+ 329:../scr/alarm.c **** 	raise_beep_short();
+ 1439              		.loc 1 329 0
+ 1440 0002 FFF7FEFF 		bl	raise_beep_short
+ 1441              	.LVL45:
+ 330:../scr/alarm.c **** 	blink_red_led_once();
+ 331:../scr/alarm.c **** }
+ 1442              		.loc 1 331 0
+ 1443              		@ sp needed for prologue
+ 330:../scr/alarm.c **** 	blink_red_led_once();
+ 1444              		.loc 1 330 0
+ 1445 0006 FFF7FEFF 		bl	blink_red_led_once
+ 1446              	.LVL46:
+ 1447              		.loc 1 331 0
+ 1448 000a 08BD     		pop	{r3, pc}
+ 1449              		.cfi_endproc
+ 1450              	.LFE62:
+ 1452              		.section	.text.process_alarm_and_led,"ax",%progbits
+ 1453              		.align	1
+ 1454              		.global	process_alarm_and_led
+ 1455              		.code	16
+ 1456              		.thumb_func
+ 1458              	process_alarm_and_led:
+ 1459              	.LFB63:
+ 332:../scr/alarm.c **** 
+ 333:../scr/alarm.c **** void process_alarm_and_led(void) {
+ 1460              		.loc 1 333 0
+ 1461              		.cfi_startproc
+ 1462 0000 08B5     		push	{r3, lr}
+ 1463              	.LCFI27:
+ 1464              		.cfi_def_cfa_offset 8
+ 1465              		.cfi_offset 3, -8
+ 1466              		.cfi_offset 14, -4
+ 334:../scr/alarm.c **** 	process_red_led();
+ 1467              		.loc 1 334 0
+ 1468 0002 FFF7FEFF 		bl	process_red_led
+ 1469              	.LVL47:
+ 335:../scr/alarm.c **** 	process_green_led();
+ 336:../scr/alarm.c **** 	process_buzz();
+ 337:../scr/alarm.c **** }
+ 1470              		.loc 1 337 0
+ 1471              		@ sp needed for prologue
+ 335:../scr/alarm.c **** 	process_green_led();
+ 1472              		.loc 1 335 0
+ 1473 0006 FFF7FEFF 		bl	process_green_led
+ 1474              	.LVL48:
+ 336:../scr/alarm.c **** 	process_buzz();
+ 1475              		.loc 1 336 0
+ 1476 000a FFF7FEFF 		bl	process_buzz
+ 1477              	.LVL49:
+ 1478              		.loc 1 337 0
+ 1479 000e 08BD     		pop	{r3, pc}
+ 1480              		.cfi_endproc
+ 1481              	.LFE63:
+ 1483              		.global	beepStepCount
+ 1484              		.global	beepStepIdx
+ 1485              		.global	redLedStepCount
+ 1486              		.global	greenLedStepCount
+ 1487              		.global	redLedStepIdx
+ 1488              		.global	greenLedStepIdx
+ 1489              		.comm	beepStep,32,4
+ 1490              		.comm	redLedStep,32,4
+ 1491              		.comm	greenLedStep,32,4
+ 1492              		.comm	nextBeepTick,4,4
+ 1493              		.comm	nextRedTick,4,4
+ 1494              		.comm	nextGreenTick,4,4
+ 1495              		.comm	lastRaiseAlarm,4,4
+ 1496              		.comm	greenLedBlinkType,1,1
+ 1497              		.comm	redLedBlinkType,1,1
+ 1498              		.section	.data.redLedStepCount,"aw",%progbits
+ 1499              		.align	2
+ 1500              		.set	.LANCHOR4,. + 0
+ 1503              	redLedStepCount:
+ 1504 0000 05000000 		.word	5
+ 1505              		.section	.bss.redLedStepIdx,"aw",%nobits
+ 1506              		.align	2
+ 1507              		.set	.LANCHOR5,. + 0
+ 1510              	redLedStepIdx:
+ 1511 0000 00000000 		.space	4
+ 1512              		.section	.data.greenLedStepCount,"aw",%progbits
+ 1513              		.align	2
+ 1514              		.set	.LANCHOR2,. + 0
+ 1517              	greenLedStepCount:
+ 1518 0000 05000000 		.word	5
+ 1519              		.section	.data.beepStepIdx,"aw",%progbits
+ 1520              		.align	2
+ 1521              		.set	.LANCHOR1,. + 0
+ 1524              	beepStepIdx:
+ 1525 0000 FFFFFFFF 		.word	-1
+ 1526              		.section	.data.beepStepCount,"aw",%progbits
+ 1527              		.align	2
+ 1528              		.set	.LANCHOR0,. + 0
+ 1531              	beepStepCount:
+ 1532 0000 05000000 		.word	5
+ 1533              		.section	.bss.greenLedStepIdx,"aw",%nobits
+ 1534              		.align	2
+ 1535              		.set	.LANCHOR3,. + 0
+ 1538              	greenLedStepIdx:
+ 1539 0000 00000000 		.space	4
+ 1540              		.text
+ 1541              	.Letext0:
+ 1542              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 1543              		.file 3 "../scr/stm32f0xx.h"
+ 1544              		.file 4 "D:\\EclipseIndigo\\workspace\\cam_hub\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32f0
+ 1545              		.file 5 "../scr/alarm.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 alarm.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:18     .text.GPIO_Init_Buzz:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:23     .text.GPIO_Init_Buzz:00000000 GPIO_Init_Buzz
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:95     .text.GPIO_Init_Buzz:00000040 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:100    .text.BuzzOff:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:105    .text.BuzzOff:00000000 BuzzOff
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:126    .text.BuzzOff:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:131    .text.BuzzOn:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:136    .text.BuzzOn:00000000 BuzzOn
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:157    .text.BuzzOn:00000010 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:162    .text.RedLedOn:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:167    .text.RedLedOn:00000000 RedLedOn
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:187    .text.RedLedOn:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:192    .text.RedLedOff:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:197    .text.RedLedOff:00000000 RedLedOff
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:217    .text.RedLedOff:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:222    .text.GreenLedOn:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:227    .text.GreenLedOn:00000000 GreenLedOn
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:247    .text.GreenLedOn:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:252    .text.GreenLedOff:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:257    .text.GreenLedOff:00000000 GreenLedOff
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:277    .text.GreenLedOff:0000000c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:282    .text.raise_beep_short:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:287    .text.raise_beep_short:00000000 raise_beep_short
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:323    .text.raise_beep_short:00000020 $d
+                            *COM*:00000020 beepStep
+                            *COM*:00000004 nextBeepTick
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:331    .text.raise_double_beep:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:336    .text.raise_double_beep:00000000 raise_double_beep
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:386    .text.raise_double_beep:0000002c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:394    .text.raise_long_beep:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:399    .text.raise_long_beep:00000000 raise_long_beep
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:434    .text.raise_long_beep:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:442    .text.raise_over_speed_alarm:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:447    .text.raise_over_speed_alarm:00000000 raise_over_speed_alarm
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:479    .text.raise_over_speed_alarm:0000001c $d
+                            *COM*:00000004 lastRaiseAlarm
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:485    .text.raise_long_run_alarm:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:490    .text.raise_long_run_alarm:00000000 raise_long_run_alarm
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:522    .text.raise_long_run_alarm:0000001c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:528    .text.raise_over_driving_in_day:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:533    .text.raise_over_driving_in_day:00000000 raise_over_driving_in_day
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:565    .text.raise_over_driving_in_day:0000001c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:571    .text.blink_green_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:576    .text.blink_green_led:00000000 blink_green_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:695    .text.blink_green_led:00000078 $d
+                            *COM*:00000001 greenLedBlinkType
+                            *COM*:00000020 greenLedStep
+                            *COM*:00000001 redLedBlinkType
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:704    .text.blink_red_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:709    .text.blink_red_led:00000000 blink_red_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:826    .text.blink_red_led:00000074 $d
+                            *COM*:00000020 redLedStep
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:835    .text.process_green_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:840    .text.process_green_led:00000000 process_green_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:942    .text.process_green_led:0000007c $d
+                            *COM*:00000004 nextGreenTick
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:952    .text.process_red_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:957    .text.process_red_led:00000000 process_red_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1059   .text.process_red_led:0000007c $d
+                            *COM*:00000004 nextRedTick
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1069   .text.process_buzz:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1074   .text.process_buzz:00000000 process_buzz
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1141   .text.process_buzz:00000050 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1150   .text.turn_on_red_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1155   .text.turn_on_red_led:00000000 turn_on_red_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1175   .text.turn_off_red_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1180   .text.turn_off_red_led:00000000 turn_off_red_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1200   .text.turn_on_green_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1205   .text.turn_on_green_led:00000000 turn_on_green_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1225   .text.turn_off_green_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1230   .text.turn_off_green_led:00000000 turn_off_green_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1250   .text.blink_sd_data_coming:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1255   .text.blink_sd_data_coming:00000000 blink_sd_data_coming
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1275   .text.blink_valid_gps:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1280   .text.blink_valid_gps:00000000 blink_valid_gps
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1300   .text.blink_invalid_gps:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1305   .text.blink_invalid_gps:00000000 blink_invalid_gps
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1325   .text.blink_invalid_card:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1330   .text.blink_invalid_card:00000000 blink_invalid_card
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1350   .text.blink_no_x3_output:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1355   .text.blink_no_x3_output:00000000 blink_no_x3_output
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1375   .text.blink_red_led_once:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1380   .text.blink_red_led_once:00000000 blink_red_led_once
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1400   .text.blink_green_led_once:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1405   .text.blink_green_led_once:00000000 blink_green_led_once
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1425   .text.raise_command_coming:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1430   .text.raise_command_coming:00000000 raise_command_coming
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1453   .text.process_alarm_and_led:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1458   .text.process_alarm_and_led:00000000 process_alarm_and_led
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1531   .data.beepStepCount:00000000 beepStepCount
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1524   .data.beepStepIdx:00000000 beepStepIdx
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1503   .data.redLedStepCount:00000000 redLedStepCount
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1517   .data.greenLedStepCount:00000000 greenLedStepCount
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1510   .bss.redLedStepIdx:00000000 redLedStepIdx
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1538   .bss.greenLedStepIdx:00000000 greenLedStepIdx
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1499   .data.redLedStepCount:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1506   .bss.redLedStepIdx:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1513   .data.greenLedStepCount:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1520   .data.beepStepIdx:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1527   .data.beepStepCount:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccOxmM1C.s:1534   .bss.greenLedStepIdx:00000000 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.90b54cb79624a05a6a75538133d4ee2f
+                           .group:00000000 wm4.config.h.3.0d63d2ebb3a9ab9baf69287178146586
+                           .group:00000000 wm4.stm32f0xx.h.54.2936c65ea497e2b9f6697d244f204f4f
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.491.56b995fdd6b34ccece7fa7ee90a03d09
+                           .group:00000000 wm4.stm32f0xx_adc.h.31.deffd6417c7f5b0940228cd2f9270807
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.ff204b27217b5926452ab2f52b527ff3
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.02fa02b24c01ae505c73e46ccbb612cf
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.alarm.h.33.20c9833bec31b55a8db7b876e9cb205d
+
+UNDEFINED SYMBOLS
+GPIO_Init
+GPIO_ResetBits
+GPIO_SetBits
+ulSecCount
+__aeabi_idivmod
+ulTickCount
