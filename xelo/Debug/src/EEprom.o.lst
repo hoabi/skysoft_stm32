@@ -1,0 +1,398 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"EEprom.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	FLASHStatus
+  19              		.data
+  22              	FLASHStatus:
+  23 0000 05       		.byte	5
+  24              		.text
+  25              		.align	2
+  26              		.global	FlashInit
+  27              		.thumb
+  28              		.thumb_func
+  30              	FlashInit:
+  31              	.LFB55:
+  32              		.file 1 "../src/EEprom.c"
+   1:../src/EEprom.c **** /*
+   2:../src/EEprom.c ****  * EEprom.c
+   3:../src/EEprom.c ****  *
+   4:../src/EEprom.c ****  *  Created on: Feb 16, 2017
+   5:../src/EEprom.c ****  *      Author: ThangNguyen
+   6:../src/EEprom.c ****  */
+   7:../src/EEprom.c **** #include "EEprom.h"
+   8:../src/EEprom.c **** #include <string.h>
+   9:../src/EEprom.c **** #include "xprintf.h"
+  10:../src/EEprom.c **** volatile FLASH_Status FLASHStatus = FLASH_TIMEOUT;
+  11:../src/EEprom.c **** void FlashInit(void) {
+  33              		.loc 1 11 0
+  34              		.cfi_startproc
+  35              		@ args = 0, pretend = 0, frame = 0
+  36              		@ frame_needed = 1, uses_anonymous_args = 0
+  37 0000 80B5     		push	{r7, lr}
+  38              	.LCFI0:
+  39              		.cfi_def_cfa_offset 8
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42 0002 00AF     		add	r7, sp, #0
+  43              	.LCFI1:
+  44              		.cfi_def_cfa_register 7
+  12:../src/EEprom.c **** 	FLASH_UnlockBank1();
+  45              		.loc 1 12 0
+  46 0004 FFF7FEFF 		bl	FLASH_UnlockBank1
+  13:../src/EEprom.c **** 	/*	PageCount = (BANK1_WRITE_END_ADDR - BANK1_WRITE_START_ADDR)
+  14:../src/EEprom.c **** 	 / FLASH_PAGE_SIZE;*/
+  15:../src/EEprom.c **** }
+  47              		.loc 1 15 0
+  48 0008 80BD     		pop	{r7, pc}
+  49              		.cfi_endproc
+  50              	.LFE55:
+  52 000a 00BF     		.align	2
+  53              		.global	flash_wrire_char
+  54              		.thumb
+  55              		.thumb_func
+  57              	flash_wrire_char:
+  58              	.LFB56:
+  16:../src/EEprom.c **** void flash_wrire_char(char c) {
+  59              		.loc 1 16 0
+  60              		.cfi_startproc
+  61              		@ args = 0, pretend = 0, frame = 8
+  62              		@ frame_needed = 1, uses_anonymous_args = 0
+  63 000c 80B5     		push	{r7, lr}
+  64              	.LCFI2:
+  65              		.cfi_def_cfa_offset 8
+  66              		.cfi_offset 7, -8
+  67              		.cfi_offset 14, -4
+  68 000e 82B0     		sub	sp, sp, #8
+  69              	.LCFI3:
+  70              		.cfi_def_cfa_offset 16
+  71 0010 00AF     		add	r7, sp, #0
+  72              	.LCFI4:
+  73              		.cfi_def_cfa_register 7
+  74 0012 0346     		mov	r3, r0
+  75 0014 FB71     		strb	r3, [r7, #7]
+  17:../src/EEprom.c **** 	FLASH_UnlockBank1();
+  76              		.loc 1 17 0
+  77 0016 FFF7FEFF 		bl	FLASH_UnlockBank1
+  18:../src/EEprom.c **** 	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);
+  78              		.loc 1 18 0
+  79 001a 4FF03400 		mov	r0, #52
+  80 001e FFF7FEFF 		bl	FLASH_ClearFlag
+  19:../src/EEprom.c **** 	FLASH_ErasePage(BANK1_WRITE_START_ADDR);
+  81              		.loc 1 19 0
+  82 0022 0648     		ldr	r0, .L3
+  83 0024 FFF7FEFF 		bl	FLASH_ErasePage
+  20:../src/EEprom.c **** 	{
+  21:../src/EEprom.c **** 		FLASH_ProgramHalfWord(BANK1_WRITE_START_ADDR, c);
+  84              		.loc 1 21 0
+  85 0028 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+  86 002a 9BB2     		uxth	r3, r3
+  87 002c 0348     		ldr	r0, .L3
+  88 002e 1946     		mov	r1, r3
+  89 0030 FFF7FEFF 		bl	FLASH_ProgramHalfWord
+  22:../src/EEprom.c **** 	}
+  23:../src/EEprom.c **** }
+  90              		.loc 1 23 0
+  91 0034 07F10807 		add	r7, r7, #8
+  92 0038 BD46     		mov	sp, r7
+  93 003a 80BD     		pop	{r7, pc}
+  94              	.L4:
+  95              		.align	2
+  96              	.L3:
+  97 003c 00F80008 		.word	134281216
+  98              		.cfi_endproc
+  99              	.LFE56:
+ 101              		.align	2
+ 102              		.global	flash_read_char
+ 103              		.thumb
+ 104              		.thumb_func
+ 106              	flash_read_char:
+ 107              	.LFB57:
+  24:../src/EEprom.c **** char flash_read_char(uint32_t add) {
+ 108              		.loc 1 24 0
+ 109              		.cfi_startproc
+ 110              		@ args = 0, pretend = 0, frame = 8
+ 111              		@ frame_needed = 1, uses_anonymous_args = 0
+ 112              		@ link register save eliminated.
+ 113 0040 80B4     		push	{r7}
+ 114              	.LCFI5:
+ 115              		.cfi_def_cfa_offset 4
+ 116              		.cfi_offset 7, -4
+ 117 0042 83B0     		sub	sp, sp, #12
+ 118              	.LCFI6:
+ 119              		.cfi_def_cfa_offset 16
+ 120 0044 00AF     		add	r7, sp, #0
+ 121              	.LCFI7:
+ 122              		.cfi_def_cfa_register 7
+ 123 0046 7860     		str	r0, [r7, #4]
+  25:../src/EEprom.c **** 	return (*(char*) add);
+ 124              		.loc 1 25 0
+ 125 0048 7B68     		ldr	r3, [r7, #4]
+ 126 004a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+  26:../src/EEprom.c **** }
+ 127              		.loc 1 26 0
+ 128 004c 1846     		mov	r0, r3
+ 129 004e 07F10C07 		add	r7, r7, #12
+ 130 0052 BD46     		mov	sp, r7
+ 131 0054 80BC     		pop	{r7}
+ 132 0056 7047     		bx	lr
+ 133              		.cfi_endproc
+ 134              	.LFE57:
+ 136              		.align	2
+ 137              		.global	flash_write_config
+ 138              		.thumb
+ 139              		.thumb_func
+ 141              	flash_write_config:
+ 142              	.LFB58:
+  27:../src/EEprom.c **** void flash_write_config(uint32_t add, char *data, int len) {
+ 143              		.loc 1 27 0
+ 144              		.cfi_startproc
+ 145              		@ args = 0, pretend = 0, frame = 24
+ 146              		@ frame_needed = 1, uses_anonymous_args = 0
+ 147 0058 80B5     		push	{r7, lr}
+ 148              	.LCFI8:
+ 149              		.cfi_def_cfa_offset 8
+ 150              		.cfi_offset 7, -8
+ 151              		.cfi_offset 14, -4
+ 152 005a 86B0     		sub	sp, sp, #24
+ 153              	.LCFI9:
+ 154              		.cfi_def_cfa_offset 32
+ 155 005c 00AF     		add	r7, sp, #0
+ 156              	.LCFI10:
+ 157              		.cfi_def_cfa_register 7
+ 158 005e F860     		str	r0, [r7, #12]
+ 159 0060 B960     		str	r1, [r7, #8]
+ 160 0062 7A60     		str	r2, [r7, #4]
+  28:../src/EEprom.c **** 	FLASH_UnlockBank1();
+ 161              		.loc 1 28 0
+ 162 0064 FFF7FEFF 		bl	FLASH_UnlockBank1
+  29:../src/EEprom.c **** 	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);
+ 163              		.loc 1 29 0
+ 164 0068 4FF03400 		mov	r0, #52
+ 165 006c FFF7FEFF 		bl	FLASH_ClearFlag
+  30:../src/EEprom.c **** 	FLASH_ErasePage(BANK1_WRITE_START_ADDR);
+ 166              		.loc 1 30 0
+ 167 0070 1148     		ldr	r0, .L10
+ 168 0072 FFF7FEFF 		bl	FLASH_ErasePage
+ 169              	.LBB2:
+  31:../src/EEprom.c **** 	for (int i = 0; i < len; i++) {
+ 170              		.loc 1 31 0
+ 171 0076 4FF00003 		mov	r3, #0
+ 172 007a 7B61     		str	r3, [r7, #20]
+ 173 007c 13E0     		b	.L8
+ 174              	.L9:
+  32:../src/EEprom.c **** 		FLASH_ProgramWord(add + i * 4, *data);
+ 175              		.loc 1 32 0 discriminator 2
+ 176 007e 7B69     		ldr	r3, [r7, #20]
+ 177 0080 4FEA8303 		lsl	r3, r3, #2
+ 178 0084 1A46     		mov	r2, r3
+ 179 0086 FB68     		ldr	r3, [r7, #12]
+ 180 0088 D218     		adds	r2, r2, r3
+ 181 008a BB68     		ldr	r3, [r7, #8]
+ 182 008c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 183 008e 1046     		mov	r0, r2
+ 184 0090 1946     		mov	r1, r3
+ 185 0092 FFF7FEFF 		bl	FLASH_ProgramWord
+  33:../src/EEprom.c **** 		data++;
+ 186              		.loc 1 33 0 discriminator 2
+ 187 0096 BB68     		ldr	r3, [r7, #8]
+ 188 0098 03F10103 		add	r3, r3, #1
+ 189 009c BB60     		str	r3, [r7, #8]
+  31:../src/EEprom.c **** 	for (int i = 0; i < len; i++) {
+ 190              		.loc 1 31 0 discriminator 2
+ 191 009e 7B69     		ldr	r3, [r7, #20]
+ 192 00a0 03F10103 		add	r3, r3, #1
+ 193 00a4 7B61     		str	r3, [r7, #20]
+ 194              	.L8:
+  31:../src/EEprom.c **** 	for (int i = 0; i < len; i++) {
+ 195              		.loc 1 31 0 is_stmt 0 discriminator 1
+ 196 00a6 7A69     		ldr	r2, [r7, #20]
+ 197 00a8 7B68     		ldr	r3, [r7, #4]
+ 198 00aa 9A42     		cmp	r2, r3
+ 199 00ac E7DB     		blt	.L9
+ 200              	.LBE2:
+  34:../src/EEprom.c **** 	}
+  35:../src/EEprom.c **** }
+ 201              		.loc 1 35 0 is_stmt 1
+ 202 00ae 07F11807 		add	r7, r7, #24
+ 203 00b2 BD46     		mov	sp, r7
+ 204 00b4 80BD     		pop	{r7, pc}
+ 205              	.L11:
+ 206 00b6 00BF     		.align	2
+ 207              	.L10:
+ 208 00b8 00F80008 		.word	134281216
+ 209              		.cfi_endproc
+ 210              	.LFE58:
+ 212              		.align	2
+ 213              		.global	flash_read_config
+ 214              		.thumb
+ 215              		.thumb_func
+ 217              	flash_read_config:
+ 218              	.LFB59:
+  36:../src/EEprom.c **** char flash_read_config(uint32_t add, char *buff, int len) {
+ 219              		.loc 1 36 0
+ 220              		.cfi_startproc
+ 221              		@ args = 0, pretend = 0, frame = 152
+ 222              		@ frame_needed = 1, uses_anonymous_args = 0
+ 223 00bc 80B5     		push	{r7, lr}
+ 224              	.LCFI11:
+ 225              		.cfi_def_cfa_offset 8
+ 226              		.cfi_offset 7, -8
+ 227              		.cfi_offset 14, -4
+ 228 00be A6B0     		sub	sp, sp, #152
+ 229              	.LCFI12:
+ 230              		.cfi_def_cfa_offset 160
+ 231 00c0 00AF     		add	r7, sp, #0
+ 232              	.LCFI13:
+ 233              		.cfi_def_cfa_register 7
+ 234 00c2 F860     		str	r0, [r7, #12]
+ 235 00c4 B960     		str	r1, [r7, #8]
+ 236 00c6 7A60     		str	r2, [r7, #4]
+  37:../src/EEprom.c **** 	char tempbuff[128] = { 0 };
+ 237              		.loc 1 37 0
+ 238 00c8 07F11402 		add	r2, r7, #20
+ 239 00cc 4FF08003 		mov	r3, #128
+ 240 00d0 1046     		mov	r0, r2
+ 241 00d2 4FF00001 		mov	r1, #0
+ 242 00d6 1A46     		mov	r2, r3
+ 243 00d8 FFF7FEFF 		bl	memset
+  38:../src/EEprom.c **** 	memset(tempbuff, 0, sizeof(tempbuff));
+ 244              		.loc 1 38 0
+ 245 00dc 07F11403 		add	r3, r7, #20
+ 246 00e0 1846     		mov	r0, r3
+ 247 00e2 4FF00001 		mov	r1, #0
+ 248 00e6 4FF08002 		mov	r2, #128
+ 249 00ea FFF7FEFF 		bl	memset
+ 250              	.LBB3:
+  39:../src/EEprom.c **** 	for (int i = 0; i < len; i++) {
+ 251              		.loc 1 39 0
+ 252 00ee 4FF00003 		mov	r3, #0
+ 253 00f2 C7F89430 		str	r3, [r7, #148]
+ 254 00f6 17E0     		b	.L13
+ 255              	.L14:
+  40:../src/EEprom.c **** 		tempbuff[i] = flash_read_char(add + i * 4);
+ 256              		.loc 1 40 0 discriminator 2
+ 257 00f8 D7F89430 		ldr	r3, [r7, #148]
+ 258 00fc 4FEA8303 		lsl	r3, r3, #2
+ 259 0100 1A46     		mov	r2, r3
+ 260 0102 FB68     		ldr	r3, [r7, #12]
+ 261 0104 D318     		adds	r3, r2, r3
+ 262 0106 1846     		mov	r0, r3
+ 263 0108 FFF7FEFF 		bl	flash_read_char
+ 264 010c 0346     		mov	r3, r0
+ 265 010e 1A46     		mov	r2, r3
+ 266 0110 07F11401 		add	r1, r7, #20
+ 267 0114 D7F89430 		ldr	r3, [r7, #148]
+ 268 0118 CB18     		adds	r3, r1, r3
+ 269 011a 1A70     		strb	r2, [r3, #0]
+  39:../src/EEprom.c **** 	for (int i = 0; i < len; i++) {
+ 270              		.loc 1 39 0 discriminator 2
+ 271 011c D7F89430 		ldr	r3, [r7, #148]
+ 272 0120 03F10103 		add	r3, r3, #1
+ 273 0124 C7F89430 		str	r3, [r7, #148]
+ 274              	.L13:
+  39:../src/EEprom.c **** 	for (int i = 0; i < len; i++) {
+ 275              		.loc 1 39 0 is_stmt 0 discriminator 1
+ 276 0128 D7F89420 		ldr	r2, [r7, #148]
+ 277 012c 7B68     		ldr	r3, [r7, #4]
+ 278 012e 9A42     		cmp	r2, r3
+ 279 0130 E2DB     		blt	.L14
+ 280              	.LBE3:
+  41:../src/EEprom.c **** 	}
+  42:../src/EEprom.c **** 	strcpy(buff, tempbuff);
+ 281              		.loc 1 42 0 is_stmt 1
+ 282 0132 07F11403 		add	r3, r7, #20
+ 283 0136 B868     		ldr	r0, [r7, #8]
+ 284 0138 1946     		mov	r1, r3
+ 285 013a FFF7FEFF 		bl	strcpy
+  43:../src/EEprom.c **** 	return 0;
+ 286              		.loc 1 43 0
+ 287 013e 4FF00003 		mov	r3, #0
+  44:../src/EEprom.c **** }
+ 288              		.loc 1 44 0
+ 289 0142 1846     		mov	r0, r3
+ 290 0144 07F19807 		add	r7, r7, #152
+ 291 0148 BD46     		mov	sp, r7
+ 292 014a 80BD     		pop	{r7, pc}
+ 293              		.cfi_endproc
+ 294              	.LFE59:
+ 296              	.Letext0:
+ 297              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 298              		.file 3 "D:\\EclipseIndigo\\workspace\\xelo\\Libraries\\STM32F10x_StdPeriph_Driver\\inc/stm32f10x_
+ 299              		.file 4 "D:\\EclipseIndigo\\workspace\\xelo\\Libraries\\CMSIS\\Include/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 EEprom.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:22     .data:00000000 FLASHStatus
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:25     .text:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:30     .text:00000000 FlashInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:57     .text:0000000c flash_wrire_char
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:97     .text:0000003c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:101    .text:00000040 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:106    .text:00000040 flash_read_char
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:141    .text:00000058 flash_write_config
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:208    .text:000000b8 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:212    .text:000000bc $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccjqoYUh.s:217    .text:000000bc flash_read_config
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.6e5f3786b89b666b3dcc7c4c84d9d480
+                           .group:00000000 wm4.stm32f10x.h.57.69ab29c83f735418a543aa508b559235
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.36d879c1aefb6e578e399a5de749a503
+                           .group:00000000 wm4.stm32f10x.h.532.b2b0c08e77686a45dbc3252d064cb2e1
+                           .group:00000000 wm4.stm32f10x_adc.h.89.9f2b285fa0070185d48a05b61a05798c
+                           .group:00000000 wm4.stm32f10x_bkp.h.31.74a586c036c8ee5d9205c6728cc8d6ab
+                           .group:00000000 wm4.stm32f10x_can.h.31.b14273b95de79d8fbb020ba042473fb1
+                           .group:00000000 wm4.stm32f10x_cec.h.31.29c77e36bfe4567e85f26cdcc60def64
+                           .group:00000000 wm4.stm32f10x_dac.h.31.116c27cadc3b4ee8aa44ed11b14b64ae
+                           .group:00000000 wm4.stm32f10x_dbgmcu.h.31.45f176e9b7a15051b8c69cb2700c78b8
+                           .group:00000000 wm4.stm32f10x_dma.h.31.ef16218235edc52b414c0353f44b4bf0
+                           .group:00000000 wm4.stm32f10x_exti.h.31.b25bcb4f1a2daad39d2d7dfa4e901646
+                           .group:00000000 wm4.stm32f10x_fsmc.h.31.a761d459aa046c2769a99b93e8763ba0
+                           .group:00000000 wm4.stm32f10x_gpio.h.31.0a32659dbac1fc1055c7cbdc248963be
+                           .group:00000000 wm4.stm32f10x_i2c.h.31.93d7dc2d477856f119d957730d4c6f1c
+                           .group:00000000 wm4.stm32f10x_iwdg.h.31.959ae9b7e1d603f1e5ae6468c0fc1624
+                           .group:00000000 wm4.stm32f10x_pwr.h.31.9168b6921e0cf03b467c7ed90861c701
+                           .group:00000000 wm4.stm32f10x_rcc.h.31.2ee3219a25ef4ced658f2fe9d8cd94aa
+                           .group:00000000 wm4.stm32f10x_rtc.h.31.00ba78fc0dbb06b6e6783a1e7fccf5a0
+                           .group:00000000 wm4.stm32f10x_sdio.h.31.37dab89d08b2364a3dfaace444dec7c3
+                           .group:00000000 wm4.stm32f10x_spi.h.31.d2f6e4626887cabe8c98f3a185590a36
+                           .group:00000000 wm4.stm32f10x_tim.h.31.6c06f7f26e0864f9cd59597f46ca2c7c
+                           .group:00000000 wm4.stm32f10x_usart.h.31.28d75d6af05cefbbfa00cf30a7c8a335
+                           .group:00000000 wm4.stm32f10x_wwdg.h.31.4504f930b88ade4f56d1e3f2a11c098b
+                           .group:00000000 wm4.misc.h.31.a89fba2040036f6f8c835a78a213e0cd
+                           .group:00000000 wm4.stm32f10x.h.8356.9fd2fa84655112ac7dfc5c88beeb383d
+                           .group:00000000 wm4.stm32f10x_flash.h.77.969ce41ea63270985475bb296c7a298f
+                           .group:00000000 wm4.EEprom.h.14.7de5f7cea92042dedfef73d719934fd9
+                           .group:00000000 wm4.newlib.h.8.e1d498e57c12962fc6d7be5061a6981a
+                           .group:00000000 wm4.config.h.148.52fe83653334d06815a0c57b59a3e584
+                           .group:00000000 wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04
+                           .group:00000000 wm4._default_types.h.6.1dbd2e581fd590860c7c17f21d147e91
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4.stddef.h.349.31f4c5baff3fa2689010b32028da9c47
+                           .group:00000000 wm4.reent.h.16.58b23a9f0faf0e7f2dfe7e2d33154afd
+                           .group:00000000 wm4.stddef.h.187.9e651b6b8b16e149c1353259404973ea
+                           .group:00000000 wm4.xprintf.h.6.d201a07af5ece6e00f55504afb5b0533
+
+UNDEFINED SYMBOLS
+FLASH_UnlockBank1
+FLASH_ClearFlag
+FLASH_ErasePage
+FLASH_ProgramHalfWord
+FLASH_ProgramWord
+memset
+strcpy

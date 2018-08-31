@@ -1,0 +1,1119 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"stm32f10x_pwr.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	PWR_DeInit
+  20              		.thumb
+  21              		.thumb_func
+  23              	PWR_DeInit:
+  24              	.LFB55:
+  25              		.file 1 "../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c"
+   1:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+   2:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   ******************************************************************************
+   3:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @file    stm32f10x_pwr.c
+   4:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @author  MCD Application Team
+   5:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @version V3.6.1
+   6:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @date    05-March-2012
+   7:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief   This file provides all the PWR firmware functions.
+   8:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   ******************************************************************************
+   9:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @attention
+  10:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *
+  11:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  12:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *
+  13:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * You may not use this file except in compliance with the License.
+  15:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * You may obtain a copy of the License at:
+  16:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *
+  17:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *
+  19:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * Unless required by applicable law or agreed to in writing, software 
+  20:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  21:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * See the License for the specific language governing permissions and
+  23:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * limitations under the License.
+  24:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *
+  25:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   ******************************************************************************
+  26:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  27:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  28:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* Includes ------------------------------------------------------------------*/
+  29:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #include "stm32f10x_pwr.h"
+  30:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #include "stm32f10x_rcc.h"
+  31:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  32:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @addtogroup STM32F10x_StdPeriph_Driver
+  33:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+  34:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  35:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  36:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @defgroup PWR 
+  37:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief PWR driver modules
+  38:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+  39:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */ 
+  40:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  41:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @defgroup PWR_Private_TypesDefinitions
+  42:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+  43:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  44:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  45:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+  46:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @}
+  47:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  48:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  49:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @defgroup PWR_Private_Defines
+  50:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+  51:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  52:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  53:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* --------- PWR registers bit address in the alias region ---------- */
+  54:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define PWR_OFFSET               (PWR_BASE - PERIPH_BASE)
+  55:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  56:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* --- CR Register ---*/
+  57:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  58:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* Alias word address of DBP bit */
+  59:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define CR_OFFSET                (PWR_OFFSET + 0x00)
+  60:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define DBP_BitNumber            0x08
+  61:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define CR_DBP_BB                (PERIPH_BB_BASE + (CR_OFFSET * 32) + (DBP_BitNumber * 4))
+  62:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  63:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* Alias word address of PVDE bit */
+  64:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define PVDE_BitNumber           0x04
+  65:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define CR_PVDE_BB               (PERIPH_BB_BASE + (CR_OFFSET * 32) + (PVDE_BitNumber * 4))
+  66:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  67:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* --- CSR Register ---*/
+  68:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  69:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* Alias word address of EWUP bit */
+  70:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define CSR_OFFSET               (PWR_OFFSET + 0x04)
+  71:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define EWUP_BitNumber           0x08
+  72:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define CSR_EWUP_BB              (PERIPH_BB_BASE + (CSR_OFFSET * 32) + (EWUP_BitNumber * 4))
+  73:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  74:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* ------------------ PWR registers bit mask ------------------------ */
+  75:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  76:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* CR register bit mask */
+  77:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define CR_DS_MASK               ((uint32_t)0xFFFFFFFC)
+  78:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #define CR_PLS_MASK              ((uint32_t)0xFFFFFF1F)
+  79:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  80:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  81:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+  82:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @}
+  83:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  84:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  85:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @defgroup PWR_Private_Macros
+  86:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+  87:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  88:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  89:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+  90:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @}
+  91:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  92:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  93:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @defgroup PWR_Private_Variables
+  94:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+  95:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+  96:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+  97:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+  98:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @}
+  99:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 100:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 101:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @defgroup PWR_Private_FunctionPrototypes
+ 102:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+ 103:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 104:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 105:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 106:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @}
+ 107:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 108:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 109:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /** @defgroup PWR_Private_Functions
+ 110:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @{
+ 111:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 112:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 113:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 114:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Deinitializes the PWR peripheral registers to their default reset values.
+ 115:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  None
+ 116:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 117:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 118:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_DeInit(void)
+ 119:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+  26              		.loc 1 119 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 8
+  33              		.cfi_offset 7, -8
+  34              		.cfi_offset 14, -4
+  35 0002 00AF     		add	r7, sp, #0
+  36              	.LCFI1:
+  37              		.cfi_def_cfa_register 7
+ 120:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, ENABLE);
+  38              		.loc 1 120 0
+  39 0004 4FF08050 		mov	r0, #268435456
+  40 0008 4FF00101 		mov	r1, #1
+  41 000c FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+ 121:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, DISABLE);
+  42              		.loc 1 121 0
+  43 0010 4FF08050 		mov	r0, #268435456
+  44 0014 4FF00001 		mov	r1, #0
+  45 0018 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+ 122:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+  46              		.loc 1 122 0
+  47 001c 80BD     		pop	{r7, pc}
+  48              		.cfi_endproc
+  49              	.LFE55:
+  51 001e 00BF     		.align	2
+  52              		.global	PWR_BackupAccessCmd
+  53              		.thumb
+  54              		.thumb_func
+  56              	PWR_BackupAccessCmd:
+  57              	.LFB56:
+ 123:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 124:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 125:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Enables or disables access to the RTC and backup registers.
+ 126:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  NewState: new state of the access to the RTC and backup registers.
+ 127:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be: ENABLE or DISABLE.
+ 128:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 129:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 130:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_BackupAccessCmd(FunctionalState NewState)
+ 131:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+  58              		.loc 1 131 0
+  59              		.cfi_startproc
+  60              		@ args = 0, pretend = 0, frame = 8
+  61              		@ frame_needed = 1, uses_anonymous_args = 0
+  62              		@ link register save eliminated.
+  63 0020 80B4     		push	{r7}
+  64              	.LCFI2:
+  65              		.cfi_def_cfa_offset 4
+  66              		.cfi_offset 7, -4
+  67 0022 83B0     		sub	sp, sp, #12
+  68              	.LCFI3:
+  69              		.cfi_def_cfa_offset 16
+  70 0024 00AF     		add	r7, sp, #0
+  71              	.LCFI4:
+  72              		.cfi_def_cfa_register 7
+  73 0026 0346     		mov	r3, r0
+  74 0028 FB71     		strb	r3, [r7, #7]
+ 132:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Check the parameters */
+ 133:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 134:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *(__IO uint32_t *) CR_DBP_BB = (uint32_t)NewState;
+  75              		.loc 1 134 0
+  76 002a 044B     		ldr	r3, .L3
+  77 002c FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+  78 002e 1A60     		str	r2, [r3, #0]
+ 135:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+  79              		.loc 1 135 0
+  80 0030 07F10C07 		add	r7, r7, #12
+  81 0034 BD46     		mov	sp, r7
+  82 0036 80BC     		pop	{r7}
+  83 0038 7047     		bx	lr
+  84              	.L4:
+  85 003a 00BF     		.align	2
+  86              	.L3:
+  87 003c 20000E42 		.word	1108213792
+  88              		.cfi_endproc
+  89              	.LFE56:
+  91              		.align	2
+  92              		.global	PWR_PVDCmd
+  93              		.thumb
+  94              		.thumb_func
+  96              	PWR_PVDCmd:
+  97              	.LFB57:
+ 136:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 137:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 138:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Enables or disables the Power Voltage Detector(PVD).
+ 139:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  NewState: new state of the PVD.
+ 140:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be: ENABLE or DISABLE.
+ 141:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 142:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 143:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_PVDCmd(FunctionalState NewState)
+ 144:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+  98              		.loc 1 144 0
+  99              		.cfi_startproc
+ 100              		@ args = 0, pretend = 0, frame = 8
+ 101              		@ frame_needed = 1, uses_anonymous_args = 0
+ 102              		@ link register save eliminated.
+ 103 0040 80B4     		push	{r7}
+ 104              	.LCFI5:
+ 105              		.cfi_def_cfa_offset 4
+ 106              		.cfi_offset 7, -4
+ 107 0042 83B0     		sub	sp, sp, #12
+ 108              	.LCFI6:
+ 109              		.cfi_def_cfa_offset 16
+ 110 0044 00AF     		add	r7, sp, #0
+ 111              	.LCFI7:
+ 112              		.cfi_def_cfa_register 7
+ 113 0046 0346     		mov	r3, r0
+ 114 0048 FB71     		strb	r3, [r7, #7]
+ 145:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Check the parameters */
+ 146:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 147:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *(__IO uint32_t *) CR_PVDE_BB = (uint32_t)NewState;
+ 115              		.loc 1 147 0
+ 116 004a 044B     		ldr	r3, .L6
+ 117 004c FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 118 004e 1A60     		str	r2, [r3, #0]
+ 148:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+ 119              		.loc 1 148 0
+ 120 0050 07F10C07 		add	r7, r7, #12
+ 121 0054 BD46     		mov	sp, r7
+ 122 0056 80BC     		pop	{r7}
+ 123 0058 7047     		bx	lr
+ 124              	.L7:
+ 125 005a 00BF     		.align	2
+ 126              	.L6:
+ 127 005c 10000E42 		.word	1108213776
+ 128              		.cfi_endproc
+ 129              	.LFE57:
+ 131              		.align	2
+ 132              		.global	PWR_PVDLevelConfig
+ 133              		.thumb
+ 134              		.thumb_func
+ 136              	PWR_PVDLevelConfig:
+ 137              	.LFB58:
+ 149:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 150:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 151:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Configures the voltage threshold detected by the Power Voltage Detector(PVD).
+ 152:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  PWR_PVDLevel: specifies the PVD detection level
+ 153:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be one of the following values:
+ 154:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V2: PVD detection level set to 2.2V
+ 155:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V3: PVD detection level set to 2.3V
+ 156:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V4: PVD detection level set to 2.4V
+ 157:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V5: PVD detection level set to 2.5V
+ 158:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V6: PVD detection level set to 2.6V
+ 159:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V7: PVD detection level set to 2.7V
+ 160:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V8: PVD detection level set to 2.8V
+ 161:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_PVDLevel_2V9: PVD detection level set to 2.9V
+ 162:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 163:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 164:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_PVDLevelConfig(uint32_t PWR_PVDLevel)
+ 165:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+ 138              		.loc 1 165 0
+ 139              		.cfi_startproc
+ 140              		@ args = 0, pretend = 0, frame = 16
+ 141              		@ frame_needed = 1, uses_anonymous_args = 0
+ 142              		@ link register save eliminated.
+ 143 0060 80B4     		push	{r7}
+ 144              	.LCFI8:
+ 145              		.cfi_def_cfa_offset 4
+ 146              		.cfi_offset 7, -4
+ 147 0062 85B0     		sub	sp, sp, #20
+ 148              	.LCFI9:
+ 149              		.cfi_def_cfa_offset 24
+ 150 0064 00AF     		add	r7, sp, #0
+ 151              	.LCFI10:
+ 152              		.cfi_def_cfa_register 7
+ 153 0066 7860     		str	r0, [r7, #4]
+ 166:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   uint32_t tmpreg = 0;
+ 154              		.loc 1 166 0
+ 155 0068 4FF00003 		mov	r3, #0
+ 156 006c FB60     		str	r3, [r7, #12]
+ 167:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Check the parameters */
+ 168:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_PWR_PVD_LEVEL(PWR_PVDLevel));
+ 169:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   tmpreg = PWR->CR;
+ 157              		.loc 1 169 0
+ 158 006e 094B     		ldr	r3, .L9
+ 159 0070 1B68     		ldr	r3, [r3, #0]
+ 160 0072 FB60     		str	r3, [r7, #12]
+ 170:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Clear PLS[7:5] bits */
+ 171:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   tmpreg &= CR_PLS_MASK;
+ 161              		.loc 1 171 0
+ 162 0074 FB68     		ldr	r3, [r7, #12]
+ 163 0076 23F0E003 		bic	r3, r3, #224
+ 164 007a FB60     		str	r3, [r7, #12]
+ 172:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Set PLS[7:5] bits according to PWR_PVDLevel value */
+ 173:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   tmpreg |= PWR_PVDLevel;
+ 165              		.loc 1 173 0
+ 166 007c FA68     		ldr	r2, [r7, #12]
+ 167 007e 7B68     		ldr	r3, [r7, #4]
+ 168 0080 1343     		orrs	r3, r3, r2
+ 169 0082 FB60     		str	r3, [r7, #12]
+ 174:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Store the new value */
+ 175:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   PWR->CR = tmpreg;
+ 170              		.loc 1 175 0
+ 171 0084 034B     		ldr	r3, .L9
+ 172 0086 FA68     		ldr	r2, [r7, #12]
+ 173 0088 1A60     		str	r2, [r3, #0]
+ 176:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+ 174              		.loc 1 176 0
+ 175 008a 07F11407 		add	r7, r7, #20
+ 176 008e BD46     		mov	sp, r7
+ 177 0090 80BC     		pop	{r7}
+ 178 0092 7047     		bx	lr
+ 179              	.L10:
+ 180              		.align	2
+ 181              	.L9:
+ 182 0094 00700040 		.word	1073770496
+ 183              		.cfi_endproc
+ 184              	.LFE58:
+ 186              		.align	2
+ 187              		.global	PWR_WakeUpPinCmd
+ 188              		.thumb
+ 189              		.thumb_func
+ 191              	PWR_WakeUpPinCmd:
+ 192              	.LFB59:
+ 177:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 178:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 179:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Enables or disables the WakeUp Pin functionality.
+ 180:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  NewState: new state of the WakeUp Pin functionality.
+ 181:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be: ENABLE or DISABLE.
+ 182:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 183:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 184:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_WakeUpPinCmd(FunctionalState NewState)
+ 185:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+ 193              		.loc 1 185 0
+ 194              		.cfi_startproc
+ 195              		@ args = 0, pretend = 0, frame = 8
+ 196              		@ frame_needed = 1, uses_anonymous_args = 0
+ 197              		@ link register save eliminated.
+ 198 0098 80B4     		push	{r7}
+ 199              	.LCFI11:
+ 200              		.cfi_def_cfa_offset 4
+ 201              		.cfi_offset 7, -4
+ 202 009a 83B0     		sub	sp, sp, #12
+ 203              	.LCFI12:
+ 204              		.cfi_def_cfa_offset 16
+ 205 009c 00AF     		add	r7, sp, #0
+ 206              	.LCFI13:
+ 207              		.cfi_def_cfa_register 7
+ 208 009e 0346     		mov	r3, r0
+ 209 00a0 FB71     		strb	r3, [r7, #7]
+ 186:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Check the parameters */
+ 187:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 188:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *(__IO uint32_t *) CSR_EWUP_BB = (uint32_t)NewState;
+ 210              		.loc 1 188 0
+ 211 00a2 044B     		ldr	r3, .L12
+ 212 00a4 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 213 00a6 1A60     		str	r2, [r3, #0]
+ 189:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+ 214              		.loc 1 189 0
+ 215 00a8 07F10C07 		add	r7, r7, #12
+ 216 00ac BD46     		mov	sp, r7
+ 217 00ae 80BC     		pop	{r7}
+ 218 00b0 7047     		bx	lr
+ 219              	.L13:
+ 220 00b2 00BF     		.align	2
+ 221              	.L12:
+ 222 00b4 A0000E42 		.word	1108213920
+ 223              		.cfi_endproc
+ 224              	.LFE59:
+ 226              		.align	2
+ 227              		.global	PWR_EnterSTOPMode
+ 228              		.thumb
+ 229              		.thumb_func
+ 231              	PWR_EnterSTOPMode:
+ 232              	.LFB60:
+ 190:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 191:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 192:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Enters STOP mode.
+ 193:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  PWR_Regulator: specifies the regulator state in STOP mode.
+ 194:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be one of the following values:
+ 195:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_Regulator_ON: STOP mode with regulator ON
+ 196:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_Regulator_LowPower: STOP mode with regulator in low power mode
+ 197:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  PWR_STOPEntry: specifies if STOP mode in entered with WFI or WFE instruction.
+ 198:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be one of the following values:
+ 199:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_STOPEntry_WFI: enter STOP mode with WFI instruction
+ 200:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_STOPEntry_WFE: enter STOP mode with WFE instruction
+ 201:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 202:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 203:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_EnterSTOPMode(uint32_t PWR_Regulator, uint8_t PWR_STOPEntry)
+ 204:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+ 233              		.loc 1 204 0
+ 234              		.cfi_startproc
+ 235              		@ args = 0, pretend = 0, frame = 16
+ 236              		@ frame_needed = 1, uses_anonymous_args = 0
+ 237              		@ link register save eliminated.
+ 238 00b8 80B4     		push	{r7}
+ 239              	.LCFI14:
+ 240              		.cfi_def_cfa_offset 4
+ 241              		.cfi_offset 7, -4
+ 242 00ba 85B0     		sub	sp, sp, #20
+ 243              	.LCFI15:
+ 244              		.cfi_def_cfa_offset 24
+ 245 00bc 00AF     		add	r7, sp, #0
+ 246              	.LCFI16:
+ 247              		.cfi_def_cfa_register 7
+ 248 00be 7860     		str	r0, [r7, #4]
+ 249 00c0 0B46     		mov	r3, r1
+ 250 00c2 FB70     		strb	r3, [r7, #3]
+ 205:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   uint32_t tmpreg = 0;
+ 251              		.loc 1 205 0
+ 252 00c4 4FF00003 		mov	r3, #0
+ 253 00c8 FB60     		str	r3, [r7, #12]
+ 206:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Check the parameters */
+ 207:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_PWR_REGULATOR(PWR_Regulator));
+ 208:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_PWR_STOP_ENTRY(PWR_STOPEntry));
+ 209:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   
+ 210:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Select the regulator state in STOP mode ---------------------------------*/
+ 211:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   tmpreg = PWR->CR;
+ 254              		.loc 1 211 0
+ 255 00ca 124B     		ldr	r3, .L17
+ 256 00cc 1B68     		ldr	r3, [r3, #0]
+ 257 00ce FB60     		str	r3, [r7, #12]
+ 212:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Clear PDDS and LPDS bits */
+ 213:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   tmpreg &= CR_DS_MASK;
+ 258              		.loc 1 213 0
+ 259 00d0 FB68     		ldr	r3, [r7, #12]
+ 260 00d2 23F00303 		bic	r3, r3, #3
+ 261 00d6 FB60     		str	r3, [r7, #12]
+ 214:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Set LPDS bit according to PWR_Regulator value */
+ 215:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   tmpreg |= PWR_Regulator;
+ 262              		.loc 1 215 0
+ 263 00d8 FA68     		ldr	r2, [r7, #12]
+ 264 00da 7B68     		ldr	r3, [r7, #4]
+ 265 00dc 1343     		orrs	r3, r3, r2
+ 266 00de FB60     		str	r3, [r7, #12]
+ 216:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Store the new value */
+ 217:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   PWR->CR = tmpreg;
+ 267              		.loc 1 217 0
+ 268 00e0 0C4B     		ldr	r3, .L17
+ 269 00e2 FA68     		ldr	r2, [r7, #12]
+ 270 00e4 1A60     		str	r2, [r3, #0]
+ 218:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Set SLEEPDEEP bit of Cortex System Control Register */
+ 219:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   SCB->SCR |= SCB_SCR_SLEEPDEEP;
+ 271              		.loc 1 219 0
+ 272 00e6 0C4B     		ldr	r3, .L17+4
+ 273 00e8 0B4A     		ldr	r2, .L17+4
+ 274 00ea 1269     		ldr	r2, [r2, #16]
+ 275 00ec 42F00402 		orr	r2, r2, #4
+ 276 00f0 1A61     		str	r2, [r3, #16]
+ 220:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   
+ 221:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Select STOP mode entry --------------------------------------------------*/
+ 222:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   if(PWR_STOPEntry == PWR_STOPEntry_WFI)
+ 277              		.loc 1 222 0
+ 278 00f2 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 279 00f4 012B     		cmp	r3, #1
+ 280 00f6 01D1     		bne	.L15
+ 281              	.LBB8:
+ 282              	.LBB9:
+ 283              		.file 2 "D:\\EclipseIndigo\\workspace\\xelo\\Libraries\\CMSIS\\Include/core_cmInstr.h"
+   1:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /**************************************************************************//**
+   2:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @file     core_cmInstr.h
+   3:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @brief    CMSIS Cortex-M Core Instruction Access Header File
+   4:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @version  V2.10
+   5:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @date     19. July 2011
+   6:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+   7:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @note
+   8:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * Copyright (C) 2009-2011 ARM Limited. All rights reserved.
+   9:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+  10:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @par
+  11:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * ARM Limited (ARM) is supplying this software for use with Cortex-M 
+  12:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * processor based microcontrollers.  This file can be freely distributed 
+  13:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * within development tools that are supporting such ARM based processors. 
+  14:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+  15:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @par
+  16:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
+  17:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
+  18:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
+  19:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * ARM SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
+  20:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+  21:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+  22:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  ******************************************************************************/
+  23:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  24:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #ifndef __CORE_CMINSTR_H
+  25:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CORE_CMINSTR_H
+  26:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  27:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  28:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /* ##########################  Core Instruction Access  ######################### */
+  29:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \defgroup CMSIS_Core_InstructionInterface CMSIS Core Instruction Interface
+  30:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   Access to dedicated instructions
+  31:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   @{
+  32:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** */
+  33:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  34:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #if   defined ( __CC_ARM ) /*------------------RealView Compiler -----------------*/
+  35:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /* ARM armcc specific functions */
+  36:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  37:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #if (__ARMCC_VERSION < 400677)
+  38:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   #error "Please use ARM Compiler Toolchain V4.0.677 or later!"
+  39:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+  40:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  41:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  42:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  No Operation
+  43:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  44:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+  45:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  46:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __NOP                             __nop
+  47:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  48:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  49:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Interrupt
+  50:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  51:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+  52:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     until one of a number of events occurs.
+  53:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  54:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __WFI                             __wfi
+  55:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  56:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  57:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Event
+  58:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  59:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+  60:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+  61:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  62:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __WFE                             __wfe
+  63:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  64:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  65:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Send Event
+  66:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  67:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+  68:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  69:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __SEV                             __sev
+  70:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  71:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  72:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Instruction Synchronization Barrier
+  73:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  74:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     Instruction Synchronization Barrier flushes the pipeline in the processor, 
+  75:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     so that all instructions following the ISB are fetched from cache or 
+  76:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     memory, after the instruction has been completed.
+  77:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  78:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __ISB()                           __isb(0xF)
+  79:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  80:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  81:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Data Synchronization Barrier
+  82:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  83:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function acts as a special kind of Data Memory Barrier. 
+  84:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     It completes when all explicit memory accesses before this instruction complete.
+  85:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  86:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __DSB()                           __dsb(0xF)
+  87:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  88:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  89:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Data Memory Barrier
+  90:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  91:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function ensures the apparent order of the explicit memory operations before 
+  92:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     and after the instruction, without ensuring their completion.
+  93:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  94:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __DMB()                           __dmb(0xF)
+  95:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  96:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  97:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order (32 bit)
+  98:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  99:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in integer value.
+ 100:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 101:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 102:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 103:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 104:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __REV                             __rev
+ 105:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 106:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 107:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order (16 bit)
+ 108:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 109:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in two unsigned short values.
+ 110:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 111:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 112:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 113:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 114:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** static __INLINE __ASM uint32_t __REV16(uint32_t value)
+ 115:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 116:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   rev16 r0, r0
+ 117:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   bx lr
+ 118:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 119:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 120:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 121:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order in signed short value
+ 122:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 123:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in a signed short value with sign extension to integer.
+ 124:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 125:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 126:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 127:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 128:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** static __INLINE __ASM int32_t __REVSH(int32_t value)
+ 129:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 130:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   revsh r0, r0
+ 131:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   bx lr
+ 132:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 133:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 134:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 135:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #if       (__CORTEX_M >= 0x03)
+ 136:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 137:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse bit order of value
+ 138:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 139:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the bit order of the given value.
+ 140:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 141:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 142:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 143:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 144:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __RBIT                            __rbit
+ 145:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 146:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 147:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (8 bit)
+ 148:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 149:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 8 bit value.
+ 150:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 151:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 152:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             value of type uint8_t at (*ptr)
+ 153:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 154:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXB(ptr)                     ((uint8_t ) __ldrex(ptr))
+ 155:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 156:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 157:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (16 bit)
+ 158:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 159:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 16 bit values.
+ 160:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 161:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 162:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return        value of type uint16_t at (*ptr)
+ 163:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 164:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXH(ptr)                     ((uint16_t) __ldrex(ptr))
+ 165:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 166:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 167:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (32 bit)
+ 168:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 169:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 32 bit values.
+ 170:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 171:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 172:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return        value of type uint32_t at (*ptr)
+ 173:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 174:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXW(ptr)                     ((uint32_t ) __ldrex(ptr))
+ 175:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 176:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 177:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (8 bit)
+ 178:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 179:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 8 bit values.
+ 180:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 181:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 182:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 183:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 184:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 185:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 186:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXB(value, ptr)              __strex(value, ptr)
+ 187:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 188:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 189:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (16 bit)
+ 190:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 191:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 16 bit values.
+ 192:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 193:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 194:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 195:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 196:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 197:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 198:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXH(value, ptr)              __strex(value, ptr)
+ 199:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 200:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 201:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (32 bit)
+ 202:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 203:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 32 bit values.
+ 204:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 205:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 206:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 207:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 208:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 209:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 210:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXW(value, ptr)              __strex(value, ptr)
+ 211:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 212:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 213:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Remove the exclusive lock
+ 214:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 215:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function removes the exclusive lock which is created by LDREX.
+ 216:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 217:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 218:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CLREX                           __clrex
+ 219:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 220:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 221:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Signed Saturate
+ 222:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 223:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function saturates a signed value.
+ 224:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 225:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 226:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (1..32)
+ 227:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             Saturated value
+ 228:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 229:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __SSAT                            __ssat
+ 230:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 231:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 232:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Unsigned Saturate
+ 233:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 234:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function saturates an unsigned value.
+ 235:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 236:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 237:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (0..31)
+ 238:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             Saturated value
+ 239:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 240:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __USAT                            __usat
+ 241:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 242:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 243:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Count leading zeros
+ 244:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 245:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function counts the number of leading zeros of a data value.
+ 246:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 247:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to count the leading zeros
+ 248:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             number of leading zeros in value
+ 249:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 250:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CLZ                             __clz 
+ 251:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 252:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #endif /* (__CORTEX_M >= 0x03) */
+ 253:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 254:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 255:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 256:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
+ 257:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /* IAR iccarm specific functions */
+ 258:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 259:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #include <cmsis_iar.h>
+ 260:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 261:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 262:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
+ 263:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /* GNU gcc specific functions */
+ 264:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 265:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  No Operation
+ 266:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 267:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+ 268:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 269:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __NOP(void)
+ 270:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 271:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("nop");
+ 272:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 273:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 274:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 275:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Interrupt
+ 276:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 277:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+ 278:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     until one of a number of events occurs.
+ 279:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 280:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __WFI(void)
+ 281:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 282:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfi");
+ 284              		.loc 2 282 0
+ 285              	@ 282 "D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include/core_cmInstr.h" 1
+ 286 00f8 30BF     		wfi
+ 287              	@ 0 "" 2
+ 288              		.thumb
+ 289 00fa 00E0     		b	.L16
+ 290              	.L15:
+ 291              	.LBE9:
+ 292              	.LBE8:
+ 293              	.LBB10:
+ 294              	.LBB11:
+ 283:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 284:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 285:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 286:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Event
+ 287:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 288:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+ 289:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+ 290:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 291:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) static __INLINE void __WFE(void)
+ 292:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 293:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfe");
+ 295              		.loc 2 293 0
+ 296              	@ 293 "D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include/core_cmInstr.h" 1
+ 297 00fc 20BF     		wfe
+ 298              	@ 0 "" 2
+ 299              		.thumb
+ 300              	.L16:
+ 301              	.LBE11:
+ 302              	.LBE10:
+ 223:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   {   
+ 224:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****     /* Request Wait For Interrupt */
+ 225:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****     __WFI();
+ 226:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   }
+ 227:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   else
+ 228:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   {
+ 229:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****     /* Request Wait For Event */
+ 230:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****     __WFE();
+ 231:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   }
+ 232:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   
+ 233:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Reset SLEEPDEEP bit of Cortex System Control Register */
+ 234:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   SCB->SCR &= (uint32_t)~((uint32_t)SCB_SCR_SLEEPDEEP);  
+ 303              		.loc 1 234 0
+ 304 00fe 064B     		ldr	r3, .L17+4
+ 305 0100 054A     		ldr	r2, .L17+4
+ 306 0102 1269     		ldr	r2, [r2, #16]
+ 307 0104 22F00402 		bic	r2, r2, #4
+ 308 0108 1A61     		str	r2, [r3, #16]
+ 235:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+ 309              		.loc 1 235 0
+ 310 010a 07F11407 		add	r7, r7, #20
+ 311 010e BD46     		mov	sp, r7
+ 312 0110 80BC     		pop	{r7}
+ 313 0112 7047     		bx	lr
+ 314              	.L18:
+ 315              		.align	2
+ 316              	.L17:
+ 317 0114 00700040 		.word	1073770496
+ 318 0118 00ED00E0 		.word	-536810240
+ 319              		.cfi_endproc
+ 320              	.LFE60:
+ 322              		.align	2
+ 323              		.global	PWR_EnterSTANDBYMode
+ 324              		.thumb
+ 325              		.thumb_func
+ 327              	PWR_EnterSTANDBYMode:
+ 328              	.LFB61:
+ 236:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 237:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 238:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Enters STANDBY mode.
+ 239:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  None
+ 240:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 241:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 242:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_EnterSTANDBYMode(void)
+ 243:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+ 329              		.loc 1 243 0
+ 330              		.cfi_startproc
+ 331              		@ args = 0, pretend = 0, frame = 0
+ 332              		@ frame_needed = 1, uses_anonymous_args = 0
+ 333              		@ link register save eliminated.
+ 334 011c 80B4     		push	{r7}
+ 335              	.LCFI17:
+ 336              		.cfi_def_cfa_offset 4
+ 337              		.cfi_offset 7, -4
+ 338 011e 00AF     		add	r7, sp, #0
+ 339              	.LCFI18:
+ 340              		.cfi_def_cfa_register 7
+ 244:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Clear Wake-up flag */
+ 245:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   PWR->CR |= PWR_CR_CWUF;
+ 341              		.loc 1 245 0
+ 342 0120 0A4B     		ldr	r3, .L20
+ 343 0122 0A4A     		ldr	r2, .L20
+ 344 0124 1268     		ldr	r2, [r2, #0]
+ 345 0126 42F00402 		orr	r2, r2, #4
+ 346 012a 1A60     		str	r2, [r3, #0]
+ 246:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Select STANDBY mode */
+ 247:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   PWR->CR |= PWR_CR_PDDS;
+ 347              		.loc 1 247 0
+ 348 012c 074B     		ldr	r3, .L20
+ 349 012e 074A     		ldr	r2, .L20
+ 350 0130 1268     		ldr	r2, [r2, #0]
+ 351 0132 42F00202 		orr	r2, r2, #2
+ 352 0136 1A60     		str	r2, [r3, #0]
+ 248:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Set SLEEPDEEP bit of Cortex System Control Register */
+ 249:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   SCB->SCR |= SCB_SCR_SLEEPDEEP;
+ 353              		.loc 1 249 0
+ 354 0138 054B     		ldr	r3, .L20+4
+ 355 013a 054A     		ldr	r2, .L20+4
+ 356 013c 1269     		ldr	r2, [r2, #16]
+ 357 013e 42F00402 		orr	r2, r2, #4
+ 358 0142 1A61     		str	r2, [r3, #16]
+ 359              	.LBB12:
+ 360              	.LBB13:
+ 282:D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfi");
+ 361              		.loc 2 282 0
+ 362              	@ 282 "D:\EclipseIndigo\workspace\xelo\Libraries\CMSIS\Include/core_cmInstr.h" 1
+ 363 0144 30BF     		wfi
+ 364              	@ 0 "" 2
+ 365              		.thumb
+ 366              	.LBE13:
+ 367              	.LBE12:
+ 250:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /* This option is used to ensure that store operations are completed */
+ 251:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #if defined ( __CC_ARM   )
+ 252:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   __force_stores();
+ 253:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** #endif
+ 254:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Request Wait For Interrupt */
+ 255:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   __WFI();
+ 256:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+ 368              		.loc 1 256 0
+ 369 0146 BD46     		mov	sp, r7
+ 370 0148 80BC     		pop	{r7}
+ 371 014a 7047     		bx	lr
+ 372              	.L21:
+ 373              		.align	2
+ 374              	.L20:
+ 375 014c 00700040 		.word	1073770496
+ 376 0150 00ED00E0 		.word	-536810240
+ 377              		.cfi_endproc
+ 378              	.LFE61:
+ 380              		.align	2
+ 381              		.global	PWR_GetFlagStatus
+ 382              		.thumb
+ 383              		.thumb_func
+ 385              	PWR_GetFlagStatus:
+ 386              	.LFB62:
+ 257:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 258:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 259:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Checks whether the specified PWR flag is set or not.
+ 260:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  PWR_FLAG: specifies the flag to check.
+ 261:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be one of the following values:
+ 262:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_FLAG_WU: Wake Up flag
+ 263:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_FLAG_SB: StandBy flag
+ 264:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_FLAG_PVDO: PVD Output
+ 265:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval The new state of PWR_FLAG (SET or RESET).
+ 266:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 267:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** FlagStatus PWR_GetFlagStatus(uint32_t PWR_FLAG)
+ 268:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+ 387              		.loc 1 268 0
+ 388              		.cfi_startproc
+ 389              		@ args = 0, pretend = 0, frame = 16
+ 390              		@ frame_needed = 1, uses_anonymous_args = 0
+ 391              		@ link register save eliminated.
+ 392 0154 80B4     		push	{r7}
+ 393              	.LCFI19:
+ 394              		.cfi_def_cfa_offset 4
+ 395              		.cfi_offset 7, -4
+ 396 0156 85B0     		sub	sp, sp, #20
+ 397              	.LCFI20:
+ 398              		.cfi_def_cfa_offset 24
+ 399 0158 00AF     		add	r7, sp, #0
+ 400              	.LCFI21:
+ 401              		.cfi_def_cfa_register 7
+ 402 015a 7860     		str	r0, [r7, #4]
+ 269:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   FlagStatus bitstatus = RESET;
+ 403              		.loc 1 269 0
+ 404 015c 4FF00003 		mov	r3, #0
+ 405 0160 FB73     		strb	r3, [r7, #15]
+ 270:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Check the parameters */
+ 271:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_PWR_GET_FLAG(PWR_FLAG));
+ 272:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   
+ 273:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   if ((PWR->CSR & PWR_FLAG) != (uint32_t)RESET)
+ 406              		.loc 1 273 0
+ 407 0162 0A4B     		ldr	r3, .L26
+ 408 0164 5A68     		ldr	r2, [r3, #4]
+ 409 0166 7B68     		ldr	r3, [r7, #4]
+ 410 0168 1340     		ands	r3, r3, r2
+ 411 016a 002B     		cmp	r3, #0
+ 412 016c 03D0     		beq	.L23
+ 274:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   {
+ 275:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****     bitstatus = SET;
+ 413              		.loc 1 275 0
+ 414 016e 4FF00103 		mov	r3, #1
+ 415 0172 FB73     		strb	r3, [r7, #15]
+ 416 0174 02E0     		b	.L24
+ 417              	.L23:
+ 276:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   }
+ 277:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   else
+ 278:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   {
+ 279:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****     bitstatus = RESET;
+ 418              		.loc 1 279 0
+ 419 0176 4FF00003 		mov	r3, #0
+ 420 017a FB73     		strb	r3, [r7, #15]
+ 421              	.L24:
+ 280:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   }
+ 281:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Return the flag status */
+ 282:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   return bitstatus;
+ 422              		.loc 1 282 0
+ 423 017c FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 283:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+ 424              		.loc 1 283 0
+ 425 017e 1846     		mov	r0, r3
+ 426 0180 07F11407 		add	r7, r7, #20
+ 427 0184 BD46     		mov	sp, r7
+ 428 0186 80BC     		pop	{r7}
+ 429 0188 7047     		bx	lr
+ 430              	.L27:
+ 431 018a 00BF     		.align	2
+ 432              	.L26:
+ 433 018c 00700040 		.word	1073770496
+ 434              		.cfi_endproc
+ 435              	.LFE62:
+ 437              		.align	2
+ 438              		.global	PWR_ClearFlag
+ 439              		.thumb
+ 440              		.thumb_func
+ 442              	PWR_ClearFlag:
+ 443              	.LFB63:
+ 284:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** 
+ 285:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** /**
+ 286:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @brief  Clears the PWR's pending flags.
+ 287:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @param  PWR_FLAG: specifies the flag to clear.
+ 288:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *   This parameter can be one of the following values:
+ 289:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_FLAG_WU: Wake Up flag
+ 290:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   *     @arg PWR_FLAG_SB: StandBy flag
+ 291:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   * @retval None
+ 292:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   */
+ 293:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** void PWR_ClearFlag(uint32_t PWR_FLAG)
+ 294:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** {
+ 444              		.loc 1 294 0
+ 445              		.cfi_startproc
+ 446              		@ args = 0, pretend = 0, frame = 8
+ 447              		@ frame_needed = 1, uses_anonymous_args = 0
+ 448              		@ link register save eliminated.
+ 449 0190 80B4     		push	{r7}
+ 450              	.LCFI22:
+ 451              		.cfi_def_cfa_offset 4
+ 452              		.cfi_offset 7, -4
+ 453 0192 83B0     		sub	sp, sp, #12
+ 454              	.LCFI23:
+ 455              		.cfi_def_cfa_offset 16
+ 456 0194 00AF     		add	r7, sp, #0
+ 457              	.LCFI24:
+ 458              		.cfi_def_cfa_register 7
+ 459 0196 7860     		str	r0, [r7, #4]
+ 295:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   /* Check the parameters */
+ 296:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   assert_param(IS_PWR_CLEAR_FLAG(PWR_FLAG));
+ 297:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****          
+ 298:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c ****   PWR->CR |=  PWR_FLAG << 2;
+ 460              		.loc 1 298 0
+ 461 0198 064B     		ldr	r3, .L29
+ 462 019a 064A     		ldr	r2, .L29
+ 463 019c 1168     		ldr	r1, [r2, #0]
+ 464 019e 7A68     		ldr	r2, [r7, #4]
+ 465 01a0 4FEA8202 		lsl	r2, r2, #2
+ 466 01a4 0A43     		orrs	r2, r2, r1
+ 467 01a6 1A60     		str	r2, [r3, #0]
+ 299:../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_pwr.c **** }
+ 468              		.loc 1 299 0
+ 469 01a8 07F10C07 		add	r7, r7, #12
+ 470 01ac BD46     		mov	sp, r7
+ 471 01ae 80BC     		pop	{r7}
+ 472 01b0 7047     		bx	lr
+ 473              	.L30:
+ 474 01b2 00BF     		.align	2
+ 475              	.L29:
+ 476 01b4 00700040 		.word	1073770496
+ 477              		.cfi_endproc
+ 478              	.LFE63:
+ 480              	.Letext0:
+ 481              		.file 3 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 482              		.file 4 "D:\\EclipseIndigo\\workspace\\xelo\\Libraries\\CMSIS\\Include/core_cm3.h"
+ 483              		.file 5 "D:\\EclipseIndigo\\workspace\\xelo\\src/stm32f10x.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f10x_pwr.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:18     .text:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:23     .text:00000000 PWR_DeInit
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:56     .text:00000020 PWR_BackupAccessCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:87     .text:0000003c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:91     .text:00000040 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:96     .text:00000040 PWR_PVDCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:127    .text:0000005c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:131    .text:00000060 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:136    .text:00000060 PWR_PVDLevelConfig
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:182    .text:00000094 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:186    .text:00000098 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:191    .text:00000098 PWR_WakeUpPinCmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:222    .text:000000b4 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:226    .text:000000b8 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:231    .text:000000b8 PWR_EnterSTOPMode
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:317    .text:00000114 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:322    .text:0000011c $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:327    .text:0000011c PWR_EnterSTANDBYMode
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:375    .text:0000014c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:380    .text:00000154 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:385    .text:00000154 PWR_GetFlagStatus
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:433    .text:0000018c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:437    .text:00000190 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:442    .text:00000190 PWR_ClearFlag
+C:\Users\THANGN~1\AppData\Local\Temp\ccJPijgb.s:476    .text:000001b4 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.6e5f3786b89b666b3dcc7c4c84d9d480
+                           .group:00000000 wm4.stm32f10x.h.57.69ab29c83f735418a543aa508b559235
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.36d879c1aefb6e578e399a5de749a503
+                           .group:00000000 wm4.stm32f10x.h.532.b2b0c08e77686a45dbc3252d064cb2e1
+                           .group:00000000 wm4.stm32f10x_adc.h.89.9f2b285fa0070185d48a05b61a05798c
+                           .group:00000000 wm4.stm32f10x_bkp.h.31.74a586c036c8ee5d9205c6728cc8d6ab
+                           .group:00000000 wm4.stm32f10x_can.h.31.b14273b95de79d8fbb020ba042473fb1
+                           .group:00000000 wm4.stm32f10x_cec.h.31.29c77e36bfe4567e85f26cdcc60def64
+                           .group:00000000 wm4.stm32f10x_dac.h.31.116c27cadc3b4ee8aa44ed11b14b64ae
+                           .group:00000000 wm4.stm32f10x_dbgmcu.h.31.45f176e9b7a15051b8c69cb2700c78b8
+                           .group:00000000 wm4.stm32f10x_dma.h.31.ef16218235edc52b414c0353f44b4bf0
+                           .group:00000000 wm4.stm32f10x_exti.h.31.b25bcb4f1a2daad39d2d7dfa4e901646
+                           .group:00000000 wm4.stm32f10x_flash.h.31.0203bc95b65c5396b67991e07a675efb
+                           .group:00000000 wm4.stm32f10x_fsmc.h.31.a761d459aa046c2769a99b93e8763ba0
+                           .group:00000000 wm4.stm32f10x_gpio.h.31.0a32659dbac1fc1055c7cbdc248963be
+                           .group:00000000 wm4.stm32f10x_i2c.h.31.93d7dc2d477856f119d957730d4c6f1c
+                           .group:00000000 wm4.stm32f10x_iwdg.h.31.959ae9b7e1d603f1e5ae6468c0fc1624
+                           .group:00000000 wm4.stm32f10x_rcc.h.31.2ee3219a25ef4ced658f2fe9d8cd94aa
+                           .group:00000000 wm4.stm32f10x_rtc.h.31.00ba78fc0dbb06b6e6783a1e7fccf5a0
+                           .group:00000000 wm4.stm32f10x_sdio.h.31.37dab89d08b2364a3dfaace444dec7c3
+                           .group:00000000 wm4.stm32f10x_spi.h.31.d2f6e4626887cabe8c98f3a185590a36
+                           .group:00000000 wm4.stm32f10x_tim.h.31.6c06f7f26e0864f9cd59597f46ca2c7c
+                           .group:00000000 wm4.stm32f10x_usart.h.31.28d75d6af05cefbbfa00cf30a7c8a335
+                           .group:00000000 wm4.stm32f10x_wwdg.h.31.4504f930b88ade4f56d1e3f2a11c098b
+                           .group:00000000 wm4.misc.h.31.a89fba2040036f6f8c835a78a213e0cd
+                           .group:00000000 wm4.stm32f10x.h.8356.9fd2fa84655112ac7dfc5c88beeb383d
+                           .group:00000000 wm4.stm32f10x_pwr.h.64.50606dd35742cd9bf661b95d122418e5
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphResetCmd

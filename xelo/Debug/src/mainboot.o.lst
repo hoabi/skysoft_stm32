@@ -1,0 +1,1079 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"mainboot.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	lastSentToTracker
+  19              		.bss
+  20              		.align	2
+  23              	lastSentToTracker:
+  24 0000 00000000 		.space	4
+  25              		.global	CraskCheck
+  26              		.align	2
+  29              	CraskCheck:
+  30 0004 00000000 		.space	4
+  31              		.global	nextStepSchedule
+  32              		.align	2
+  35              	nextStepSchedule:
+  36 0008 00000000 		.space	4
+  37              		.global	buff_cmd
+  38              		.align	2
+  41              	buff_cmd:
+  42 000c 00000000 		.space	256
+  42      00000000 
+  42      00000000 
+  42      00000000 
+  42      00000000 
+  43              		.global	BLE_buff
+  44              		.align	2
+  47              	BLE_buff:
+  48 010c 00000000 		.space	256
+  48      00000000 
+  48      00000000 
+  48      00000000 
+  48      00000000 
+  49              		.global	data
+  50              		.align	2
+  53              	data:
+  54 020c 00000000 		.space	64
+  54      00000000 
+  54      00000000 
+  54      00000000 
+  54      00000000 
+  55              		.text
+  56              		.align	2
+  57              		.thumb
+  58              		.thumb_func
+  60              	process_command_from_pc:
+  61              	.LFB55:
+  62              		.file 1 "../src/mainboot.c"
+   1:../src/mainboot.c **** /*
+   2:../src/mainboot.c ****  * mainboot.c
+   3:../src/mainboot.c ****  *
+   4:../src/mainboot.c ****  *  Created on: Aug 15, 2012
+   5:../src/mainboot.c ****  *      Author: Admin
+   6:../src/mainboot.c ****  */
+   7:../src/mainboot.c **** 
+   8:../src/mainboot.c **** /* Includes ------------------------------------------------------------------*/
+   9:../src/mainboot.c **** #include "main.h"
+  10:../src/mainboot.c **** #include "command.h"
+  11:../src/mainboot.c **** #include "xprintf.h"
+  12:../src/mainboot.c **** #include <string.h>
+  13:../src/mainboot.c **** #include "HC05.h"
+  14:../src/mainboot.c **** #include <stm32f10x_rtc.h>
+  15:../src/mainboot.c **** #include <time.h>
+  16:../src/mainboot.c **** /* Private typedef -----------------------------------------------------------*/
+  17:../src/mainboot.c **** /* Private define ------------------------------------------------------------*/
+  18:../src/mainboot.c **** /* Private macro -------------------------------------------------------------*/
+  19:../src/mainboot.c **** /* Private variables ---------------------------------------------------------*/
+  20:../src/mainboot.c **** volatile extern uint32_t MiliCount;
+  21:../src/mainboot.c **** volatile extern unsigned long ulTick100;
+  22:../src/mainboot.c **** unsigned long lastSentToTracker = 0;
+  23:../src/mainboot.c **** unsigned long CraskCheck = 0;
+  24:../src/mainboot.c **** unsigned long nextStepSchedule = 0;
+  25:../src/mainboot.c **** char buff_cmd[256] = { 0 };
+  26:../src/mainboot.c **** char BLE_buff[256] = { 0 };
+  27:../src/mainboot.c **** char data[64] = { 0 };
+  28:../src/mainboot.c **** extern uint32_t CLK_count;
+  29:../src/mainboot.c **** extern int PPS;
+  30:../src/mainboot.c **** static void process_command_from_pc(void) {
+  63              		.loc 1 30 0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 1, uses_anonymous_args = 0
+  67 0000 80B5     		push	{r7, lr}
+  68              	.LCFI0:
+  69              		.cfi_def_cfa_offset 8
+  70              		.cfi_offset 7, -8
+  71              		.cfi_offset 14, -4
+  72 0002 00AF     		add	r7, sp, #0
+  73              	.LCFI1:
+  74              		.cfi_def_cfa_register 7
+  31:../src/mainboot.c **** 	if (buff_cmd[0] == '*') {
+  75              		.loc 1 31 0
+  76 0004 074B     		ldr	r3, .L3
+  77 0006 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+  78 0008 2A2B     		cmp	r3, #42
+  79 000a 0AD1     		bne	.L1
+  32:../src/mainboot.c **** 		server_on_command(SKS_CMD_SOURCE_COM1, buff_cmd, sizeof(buff_cmd));
+  80              		.loc 1 32 0
+  81 000c 4FF00100 		mov	r0, #1
+  82 0010 0449     		ldr	r1, .L3
+  83 0012 4FF48072 		mov	r2, #256
+  84 0016 FFF7FEFF 		bl	server_on_command
+  33:../src/mainboot.c **** 		buff_cmd[0] = 0;
+  85              		.loc 1 33 0
+  86 001a 024B     		ldr	r3, .L3
+  87 001c 4FF00002 		mov	r2, #0
+  88 0020 1A70     		strb	r2, [r3, #0]
+  89              	.L1:
+  34:../src/mainboot.c **** 	}
+  35:../src/mainboot.c **** }
+  90              		.loc 1 35 0
+  91 0022 80BD     		pop	{r7, pc}
+  92              	.L4:
+  93              		.align	2
+  94              	.L3:
+  95 0024 00000000 		.word	buff_cmd
+  96              		.cfi_endproc
+  97              	.LFE55:
+  99              		.align	2
+ 100              		.global	taxi_cal
+ 101              		.thumb
+ 102              		.thumb_func
+ 104              	taxi_cal:
+ 105              	.LFB56:
+  36:../src/mainboot.c **** /*static void process_command_from_Blueooth(void) {
+  37:../src/mainboot.c ****  if (buff_cmd[0] == '*') {
+  38:../src/mainboot.c ****  server_on_command(SKS_CMD_SOURCE_COM2, buff_cmd, sizeof(buff_cmd));
+  39:../src/mainboot.c ****  buff_cmd[0] = 0;
+  40:../src/mainboot.c ****  }
+  41:../src/mainboot.c ****  }*/
+  42:../src/mainboot.c **** int taxi_cal(void) {
+ 106              		.loc 1 42 0
+ 107              		.cfi_startproc
+ 108              		@ args = 0, pretend = 0, frame = 8
+ 109              		@ frame_needed = 1, uses_anonymous_args = 0
+ 110              		@ link register save eliminated.
+ 111 0028 80B4     		push	{r7}
+ 112              	.LCFI2:
+ 113              		.cfi_def_cfa_offset 4
+ 114              		.cfi_offset 7, -4
+ 115 002a 83B0     		sub	sp, sp, #12
+ 116              	.LCFI3:
+ 117              		.cfi_def_cfa_offset 16
+ 118 002c 00AF     		add	r7, sp, #0
+ 119              	.LCFI4:
+ 120              		.cfi_def_cfa_register 7
+  43:../src/mainboot.c **** 	int distane = 0;
+ 121              		.loc 1 43 0
+ 122 002e 4FF00003 		mov	r3, #0
+ 123 0032 7B60     		str	r3, [r7, #4]
+  44:../src/mainboot.c **** 	distane = (int) CLK_count * 100 / 2560;
+ 124              		.loc 1 44 0
+ 125 0034 0A4B     		ldr	r3, .L7
+ 126 0036 1B68     		ldr	r3, [r3, #0]
+ 127 0038 4FF06402 		mov	r2, #100
+ 128 003c 02FB03F3 		mul	r3, r2, r3
+ 129 0040 084A     		ldr	r2, .L7+4
+ 130 0042 82FB0312 		smull	r1, r2, r2, r3
+ 131 0046 4FEAA222 		asr	r2, r2, #10
+ 132 004a 4FEAE373 		asr	r3, r3, #31
+ 133 004e D31A     		subs	r3, r2, r3
+ 134 0050 7B60     		str	r3, [r7, #4]
+  45:../src/mainboot.c **** 	return distane;
+ 135              		.loc 1 45 0
+ 136 0052 7B68     		ldr	r3, [r7, #4]
+  46:../src/mainboot.c **** }
+ 137              		.loc 1 46 0
+ 138 0054 1846     		mov	r0, r3
+ 139 0056 07F10C07 		add	r7, r7, #12
+ 140 005a BD46     		mov	sp, r7
+ 141 005c 80BC     		pop	{r7}
+ 142 005e 7047     		bx	lr
+ 143              	.L8:
+ 144              		.align	2
+ 145              	.L7:
+ 146 0060 00000000 		.word	CLK_count
+ 147 0064 67666666 		.word	1717986919
+ 148              		.cfi_endproc
+ 149              	.LFE56:
+ 151              		.section	.rodata
+ 152              		.align	2
+ 153              	.LC0:
+ 154 0000 2A53532C 		.ascii	"*SS,0000000001,BLE,123123,1,%d,%d,%d#\015\012\000"
+ 154      30303030 
+ 154      30303030 
+ 154      30312C42 
+ 154      4C452C31 
+ 155              		.text
+ 156              		.align	2
+ 157              		.global	process_data
+ 158              		.thumb
+ 159              		.thumb_func
+ 161              	process_data:
+ 162              	.LFB57:
+  47:../src/mainboot.c **** void process_data(void) {
+ 163              		.loc 1 47 0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 8
+ 166              		@ frame_needed = 1, uses_anonymous_args = 0
+ 167 0068 90B5     		push	{r4, r7, lr}
+ 168              	.LCFI5:
+ 169              		.cfi_def_cfa_offset 12
+ 170              		.cfi_offset 4, -12
+ 171              		.cfi_offset 7, -8
+ 172              		.cfi_offset 14, -4
+ 173 006a 85B0     		sub	sp, sp, #20
+ 174              	.LCFI6:
+ 175              		.cfi_def_cfa_offset 32
+ 176 006c 02AF     		add	r7, sp, #8
+ 177              	.LCFI7:
+ 178              		.cfi_def_cfa 7, 24
+  48:../src/mainboot.c **** 	int v = 0;
+ 179              		.loc 1 48 0
+ 180 006e 4FF00003 		mov	r3, #0
+ 181 0072 7B60     		str	r3, [r7, #4]
+  49:../src/mainboot.c **** 	v = PPS * 36000 / 2560;
+ 182              		.loc 1 49 0
+ 183 0074 1A4B     		ldr	r3, .L10
+ 184 0076 1B68     		ldr	r3, [r3, #0]
+ 185 0078 48F6A042 		movw	r2, #36000
+ 186 007c 02FB03F3 		mul	r3, r2, r3
+ 187 0080 184A     		ldr	r2, .L10+4
+ 188 0082 82FB0312 		smull	r1, r2, r2, r3
+ 189 0086 4FEAA222 		asr	r2, r2, #10
+ 190 008a 4FEAE373 		asr	r3, r3, #31
+ 191 008e D31A     		subs	r3, r2, r3
+ 192 0090 7B60     		str	r3, [r7, #4]
+  50:../src/mainboot.c **** 	memset(data, 0, sizeof(data));
+ 193              		.loc 1 50 0
+ 194 0092 1548     		ldr	r0, .L10+8
+ 195 0094 4FF00001 		mov	r1, #0
+ 196 0098 4FF04002 		mov	r2, #64
+ 197 009c FFF7FEFF 		bl	memset
+  51:../src/mainboot.c **** 	usnprintf(data, 43, "*SS,0000000001,BLE,123123,1,%d,%d,%d#\r\n", taxi_cal(),
+ 198              		.loc 1 51 0
+ 199 00a0 FFF7FEFF 		bl	taxi_cal
+ 200 00a4 0446     		mov	r4, r0
+  52:../src/mainboot.c **** 			PPS * 36000 / 2560, CLK_count);
+ 201              		.loc 1 52 0
+ 202 00a6 0E4B     		ldr	r3, .L10
+ 203 00a8 1B68     		ldr	r3, [r3, #0]
+ 204 00aa 48F6A042 		movw	r2, #36000
+ 205 00ae 02FB03F3 		mul	r3, r2, r3
+  51:../src/mainboot.c **** 	usnprintf(data, 43, "*SS,0000000001,BLE,123123,1,%d,%d,%d#\r\n", taxi_cal(),
+ 206              		.loc 1 51 0
+ 207 00b2 0C4A     		ldr	r2, .L10+4
+ 208 00b4 82FB0312 		smull	r1, r2, r2, r3
+ 209 00b8 4FEAA222 		asr	r2, r2, #10
+ 210 00bc 4FEAE373 		asr	r3, r3, #31
+ 211 00c0 D21A     		subs	r2, r2, r3
+ 212 00c2 0A4B     		ldr	r3, .L10+12
+ 213 00c4 1B68     		ldr	r3, [r3, #0]
+ 214 00c6 0092     		str	r2, [sp, #0]
+ 215 00c8 0193     		str	r3, [sp, #4]
+ 216 00ca 0748     		ldr	r0, .L10+8
+ 217 00cc 4FF02B01 		mov	r1, #43
+ 218 00d0 074A     		ldr	r2, .L10+16
+ 219 00d2 2346     		mov	r3, r4
+ 220 00d4 FFF7FEFF 		bl	usnprintf
+  53:../src/mainboot.c **** }
+ 221              		.loc 1 53 0
+ 222 00d8 07F10C07 		add	r7, r7, #12
+ 223 00dc BD46     		mov	sp, r7
+ 224 00de 90BD     		pop	{r4, r7, pc}
+ 225              	.L11:
+ 226              		.align	2
+ 227              	.L10:
+ 228 00e0 00000000 		.word	PPS
+ 229 00e4 67666666 		.word	1717986919
+ 230 00e8 00000000 		.word	data
+ 231 00ec 00000000 		.word	CLK_count
+ 232 00f0 00000000 		.word	.LC0
+ 233              		.cfi_endproc
+ 234              	.LFE57:
+ 236              		.align	2
+ 237              		.global	Time_Regulate
+ 238              		.thumb
+ 239              		.thumb_func
+ 241              	Time_Regulate:
+ 242              	.LFB58:
+  54:../src/mainboot.c **** 
+  55:../src/mainboot.c **** /**
+  56:../src/mainboot.c ****  * @brief  Returns the time entered by user, using Hyperterminal.
+  57:../src/mainboot.c ****  * @param  None
+  58:../src/mainboot.c ****  * @retval Current time RTC counter value
+  59:../src/mainboot.c ****  */
+  60:../src/mainboot.c **** uint32_t Time_Regulate(void) {
+ 243              		.loc 1 60 0
+ 244              		.cfi_startproc
+ 245              		@ args = 0, pretend = 0, frame = 16
+ 246              		@ frame_needed = 1, uses_anonymous_args = 0
+ 247              		@ link register save eliminated.
+ 248 00f4 80B4     		push	{r7}
+ 249              	.LCFI8:
+ 250              		.cfi_def_cfa_offset 4
+ 251              		.cfi_offset 7, -4
+ 252 00f6 85B0     		sub	sp, sp, #20
+ 253              	.LCFI9:
+ 254              		.cfi_def_cfa_offset 24
+ 255 00f8 00AF     		add	r7, sp, #0
+ 256              	.LCFI10:
+ 257              		.cfi_def_cfa_register 7
+  61:../src/mainboot.c **** 	uint32_t Tmp_HH = 11, Tmp_MM = 11, Tmp_SS = 11;
+ 258              		.loc 1 61 0
+ 259 00fa 4FF00B03 		mov	r3, #11
+ 260 00fe FB60     		str	r3, [r7, #12]
+ 261 0100 4FF00B03 		mov	r3, #11
+ 262 0104 BB60     		str	r3, [r7, #8]
+ 263 0106 4FF00B03 		mov	r3, #11
+ 264 010a 7B60     		str	r3, [r7, #4]
+  62:../src/mainboot.c **** 	return ((Tmp_HH * 3600 + Tmp_MM * 60 + Tmp_SS));
+ 265              		.loc 1 62 0
+ 266 010c FB68     		ldr	r3, [r7, #12]
+ 267 010e 4FF46162 		mov	r2, #3600
+ 268 0112 02FB03F1 		mul	r1, r2, r3
+ 269 0116 BA68     		ldr	r2, [r7, #8]
+ 270 0118 1346     		mov	r3, r2
+ 271 011a 4FEA0313 		lsl	r3, r3, #4
+ 272 011e 9B1A     		subs	r3, r3, r2
+ 273 0120 4FEA8303 		lsl	r3, r3, #2
+ 274 0124 CA18     		adds	r2, r1, r3
+ 275 0126 7B68     		ldr	r3, [r7, #4]
+ 276 0128 D318     		adds	r3, r2, r3
+  63:../src/mainboot.c **** }
+ 277              		.loc 1 63 0
+ 278 012a 1846     		mov	r0, r3
+ 279 012c 07F11407 		add	r7, r7, #20
+ 280 0130 BD46     		mov	sp, r7
+ 281 0132 80BC     		pop	{r7}
+ 282 0134 7047     		bx	lr
+ 283              		.cfi_endproc
+ 284              	.LFE58:
+ 286 0136 00BF     		.align	2
+ 287              		.global	Time_Adjust
+ 288              		.thumb
+ 289              		.thumb_func
+ 291              	Time_Adjust:
+ 292              	.LFB59:
+  64:../src/mainboot.c **** 
+  65:../src/mainboot.c **** /**
+  66:../src/mainboot.c ****  * @brief  Adjusts time.
+  67:../src/mainboot.c ****  * @param  None
+  68:../src/mainboot.c ****  * @retval None
+  69:../src/mainboot.c ****  */
+  70:../src/mainboot.c **** void Time_Adjust(void) {
+ 293              		.loc 1 70 0
+ 294              		.cfi_startproc
+ 295              		@ args = 0, pretend = 0, frame = 0
+ 296              		@ frame_needed = 1, uses_anonymous_args = 0
+ 297 0138 80B5     		push	{r7, lr}
+ 298              	.LCFI11:
+ 299              		.cfi_def_cfa_offset 8
+ 300              		.cfi_offset 7, -8
+ 301              		.cfi_offset 14, -4
+ 302 013a 00AF     		add	r7, sp, #0
+ 303              	.LCFI12:
+ 304              		.cfi_def_cfa_register 7
+  71:../src/mainboot.c **** 	/* Wait until last write operation on RTC registers has finished */
+  72:../src/mainboot.c **** 	RTC_WaitForLastTask();
+ 305              		.loc 1 72 0
+ 306 013c FFF7FEFF 		bl	RTC_WaitForLastTask
+  73:../src/mainboot.c **** 	/* Change the current time */
+  74:../src/mainboot.c **** 	RTC_SetCounter(Time_Regulate());
+ 307              		.loc 1 74 0
+ 308 0140 FFF7FEFF 		bl	Time_Regulate
+ 309 0144 0346     		mov	r3, r0
+ 310 0146 1846     		mov	r0, r3
+ 311 0148 FFF7FEFF 		bl	RTC_SetCounter
+  75:../src/mainboot.c **** 	/* Wait until last write operation on RTC registers has finished */
+  76:../src/mainboot.c **** 	RTC_WaitForLastTask();
+ 312              		.loc 1 76 0
+ 313 014c FFF7FEFF 		bl	RTC_WaitForLastTask
+  77:../src/mainboot.c **** }
+ 314              		.loc 1 77 0
+ 315 0150 80BD     		pop	{r7, pc}
+ 316              		.cfi_endproc
+ 317              	.LFE59:
+ 319              		.section	.rodata
+ 320              		.align	2
+ 321              	.LC1:
+ 322 0028 25730A0D 		.ascii	"%s\012\015\000"
+ 322      00
+ 323              		.text
+ 324 0152 00BF     		.align	2
+ 325              		.global	Time_Display
+ 326              		.thumb
+ 327              		.thumb_func
+ 329              	Time_Display:
+ 330              	.LFB60:
+  78:../src/mainboot.c **** 
+  79:../src/mainboot.c **** /**
+  80:../src/mainboot.c ****  * @brief  Displays the current time.
+  81:../src/mainboot.c ****  * @param  TimeVar: RTC counter value.
+  82:../src/mainboot.c ****  * @retval None
+  83:../src/mainboot.c ****  */
+  84:../src/mainboot.c **** void Time_Display(uint32_t TimeVar) {
+ 331              		.loc 1 84 0
+ 332              		.cfi_startproc
+ 333              		@ args = 0, pretend = 0, frame = 16
+ 334              		@ frame_needed = 1, uses_anonymous_args = 0
+ 335 0154 80B5     		push	{r7, lr}
+ 336              	.LCFI13:
+ 337              		.cfi_def_cfa_offset 8
+ 338              		.cfi_offset 7, -8
+ 339              		.cfi_offset 14, -4
+ 340 0156 84B0     		sub	sp, sp, #16
+ 341              	.LCFI14:
+ 342              		.cfi_def_cfa_offset 24
+ 343 0158 00AF     		add	r7, sp, #0
+ 344              	.LCFI15:
+ 345              		.cfi_def_cfa_register 7
+ 346 015a 7860     		str	r0, [r7, #4]
+  85:../src/mainboot.c **** 	//uint32_t THH = 0, TMM = 0, TSS = 0;
+  86:../src/mainboot.c **** 	time_t epoch = 0;
+ 347              		.loc 1 86 0
+ 348 015c 4FF00003 		mov	r3, #0
+ 349 0160 FB60     		str	r3, [r7, #12]
+  87:../src/mainboot.c **** 	epoch = RTC_GetCounter();
+ 350              		.loc 1 87 0
+ 351 0162 FFF7FEFF 		bl	RTC_GetCounter
+ 352 0166 0346     		mov	r3, r0
+ 353 0168 FB60     		str	r3, [r7, #12]
+  88:../src/mainboot.c **** 	xprintf("%s\n\r", asctime(localtime(&epoch)));
+ 354              		.loc 1 88 0
+ 355 016a 07F10C03 		add	r3, r7, #12
+ 356 016e 1846     		mov	r0, r3
+ 357 0170 FFF7FEFF 		bl	localtime
+ 358 0174 0346     		mov	r3, r0
+ 359 0176 1846     		mov	r0, r3
+ 360 0178 FFF7FEFF 		bl	asctime
+ 361 017c 0346     		mov	r3, r0
+ 362 017e 0448     		ldr	r0, .L16
+ 363 0180 1946     		mov	r1, r3
+ 364 0182 FFF7FEFF 		bl	xprintf
+  89:../src/mainboot.c **** }
+ 365              		.loc 1 89 0
+ 366 0186 07F11007 		add	r7, r7, #16
+ 367 018a BD46     		mov	sp, r7
+ 368 018c 80BD     		pop	{r7, pc}
+ 369              	.L17:
+ 370 018e 00BF     		.align	2
+ 371              	.L16:
+ 372 0190 28000000 		.word	.LC1
+ 373              		.cfi_endproc
+ 374              	.LFE60:
+ 376              		.align	2
+ 377              		.global	Time_Show
+ 378              		.thumb
+ 379              		.thumb_func
+ 381              	Time_Show:
+ 382              	.LFB61:
+  90:../src/mainboot.c **** 
+  91:../src/mainboot.c **** /**
+  92:../src/mainboot.c ****  * @brief  Shows the current time (HH:MM:SS) on the Hyperterminal.
+  93:../src/mainboot.c ****  * @param  None
+  94:../src/mainboot.c ****  * @retval None
+  95:../src/mainboot.c ****  */
+  96:../src/mainboot.c **** void Time_Show(void) {
+ 383              		.loc 1 96 0
+ 384              		.cfi_startproc
+ 385              		@ args = 0, pretend = 0, frame = 0
+ 386              		@ frame_needed = 1, uses_anonymous_args = 0
+ 387              		@ link register save eliminated.
+ 388 0194 80B4     		push	{r7}
+ 389              	.LCFI16:
+ 390              		.cfi_def_cfa_offset 4
+ 391              		.cfi_offset 7, -4
+ 392 0196 00AF     		add	r7, sp, #0
+ 393              	.LCFI17:
+ 394              		.cfi_def_cfa_register 7
+  97:../src/mainboot.c **** 	/*	printf("\n\r");
+  98:../src/mainboot.c **** 
+  99:../src/mainboot.c **** 	 Infinite loop
+ 100:../src/mainboot.c **** 	 while (1) {
+ 101:../src/mainboot.c **** 	 If 1s has been elapsed
+ 102:../src/mainboot.c **** 	 if (TimeDisplay == 1) {
+ 103:../src/mainboot.c **** 	 Display current time
+ 104:../src/mainboot.c **** 	 Time_Display(RTC_GetCounter());
+ 105:../src/mainboot.c **** 	 TimeDisplay = 0;
+ 106:../src/mainboot.c **** 	 }
+ 107:../src/mainboot.c **** 	 }*/
+ 108:../src/mainboot.c **** }
+ 395              		.loc 1 108 0
+ 396 0198 BD46     		mov	sp, r7
+ 397 019a 80BC     		pop	{r7}
+ 398 019c 7047     		bx	lr
+ 399              		.cfi_endproc
+ 400              	.LFE61:
+ 402 019e 00BF     		.align	2
+ 403              		.global	RTC_Configuration
+ 404              		.thumb
+ 405              		.thumb_func
+ 407              	RTC_Configuration:
+ 408              	.LFB62:
+ 109:../src/mainboot.c **** void RTC_Configuration(void) {
+ 409              		.loc 1 109 0
+ 410              		.cfi_startproc
+ 411              		@ args = 0, pretend = 0, frame = 0
+ 412              		@ frame_needed = 1, uses_anonymous_args = 0
+ 413 01a0 80B5     		push	{r7, lr}
+ 414              	.LCFI18:
+ 415              		.cfi_def_cfa_offset 8
+ 416              		.cfi_offset 7, -8
+ 417              		.cfi_offset 14, -4
+ 418 01a2 00AF     		add	r7, sp, #0
+ 419              	.LCFI19:
+ 420              		.cfi_def_cfa_register 7
+ 110:../src/mainboot.c **** 	/* Enable PWR and BKP clocks */
+ 111:../src/mainboot.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+ 421              		.loc 1 111 0
+ 422 01a4 4FF0C050 		mov	r0, #402653184
+ 423 01a8 4FF00101 		mov	r1, #1
+ 424 01ac FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 112:../src/mainboot.c **** 
+ 113:../src/mainboot.c **** 	/* Allow access to BKP Domain */
+ 114:../src/mainboot.c **** 	PWR_BackupAccessCmd(ENABLE);
+ 425              		.loc 1 114 0
+ 426 01b0 4FF00100 		mov	r0, #1
+ 427 01b4 FFF7FEFF 		bl	PWR_BackupAccessCmd
+ 115:../src/mainboot.c **** 
+ 116:../src/mainboot.c **** 	/* Reset Backup Domain */
+ 117:../src/mainboot.c **** 	BKP_DeInit();
+ 428              		.loc 1 117 0
+ 429 01b8 FFF7FEFF 		bl	BKP_DeInit
+ 118:../src/mainboot.c **** 
+ 119:../src/mainboot.c **** 	/* Enable LSE */
+ 120:../src/mainboot.c **** 	RCC_LSEConfig(RCC_LSE_ON);
+ 430              		.loc 1 120 0
+ 431 01bc 4FF00100 		mov	r0, #1
+ 432 01c0 FFF7FEFF 		bl	RCC_LSEConfig
+ 121:../src/mainboot.c **** 	/* Wait till LSE is ready */
+ 122:../src/mainboot.c **** 	//xprintf("gohere1\n\r");
+ 123:../src/mainboot.c **** 	while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET) {
+ 433              		.loc 1 123 0
+ 434 01c4 00BF     		nop
+ 435              	.L20:
+ 436              		.loc 1 123 0 is_stmt 0 discriminator 1
+ 437 01c6 4FF04100 		mov	r0, #65
+ 438 01ca FFF7FEFF 		bl	RCC_GetFlagStatus
+ 439 01ce 0346     		mov	r3, r0
+ 440 01d0 002B     		cmp	r3, #0
+ 441 01d2 F8D0     		beq	.L20
+ 124:../src/mainboot.c **** 
+ 125:../src/mainboot.c **** 	}
+ 126:../src/mainboot.c **** 	//xprintf("gohere2\n\r");
+ 127:../src/mainboot.c **** 	/* Select LSE as RTC Clock Source */
+ 128:../src/mainboot.c **** 	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
+ 442              		.loc 1 128 0 is_stmt 1
+ 443 01d4 4FF48070 		mov	r0, #256
+ 444 01d8 FFF7FEFF 		bl	RCC_RTCCLKConfig
+ 129:../src/mainboot.c **** 
+ 130:../src/mainboot.c **** 	/* Enable RTC Clock */
+ 131:../src/mainboot.c **** 	RCC_RTCCLKCmd(ENABLE);
+ 445              		.loc 1 131 0
+ 446 01dc 4FF00100 		mov	r0, #1
+ 447 01e0 FFF7FEFF 		bl	RCC_RTCCLKCmd
+ 132:../src/mainboot.c **** 
+ 133:../src/mainboot.c **** 	/* Wait for RTC registers synchronization */
+ 134:../src/mainboot.c **** 	RTC_WaitForSynchro();
+ 448              		.loc 1 134 0
+ 449 01e4 FFF7FEFF 		bl	RTC_WaitForSynchro
+ 135:../src/mainboot.c **** 
+ 136:../src/mainboot.c **** 	/* Wait until last write operation on RTC registers has finished */
+ 137:../src/mainboot.c **** 	RTC_WaitForLastTask();
+ 450              		.loc 1 137 0
+ 451 01e8 FFF7FEFF 		bl	RTC_WaitForLastTask
+ 138:../src/mainboot.c **** 
+ 139:../src/mainboot.c **** 	/* Enable the RTC Second */
+ 140:../src/mainboot.c **** 	//RTC_ITConfig(RTC_IT_SEC, ENABLE);
+ 141:../src/mainboot.c **** 	/* Wait until last write operation on RTC registers has finished */
+ 142:../src/mainboot.c **** 	RTC_WaitForLastTask();
+ 452              		.loc 1 142 0
+ 453 01ec FFF7FEFF 		bl	RTC_WaitForLastTask
+ 143:../src/mainboot.c **** 
+ 144:../src/mainboot.c **** 	/* Set RTC prescaler: set RTC period to 1sec */
+ 145:../src/mainboot.c **** 	RTC_SetPrescaler(32767); /* RTC period = RTCCLK/RTC_PR = (32.768 KHz)/(32767+1) */
+ 454              		.loc 1 145 0
+ 455 01f0 47F6FF70 		movw	r0, #32767
+ 456 01f4 FFF7FEFF 		bl	RTC_SetPrescaler
+ 146:../src/mainboot.c **** 
+ 147:../src/mainboot.c **** 	/* Wait until last write operation on RTC registers has finished */
+ 148:../src/mainboot.c **** 	RTC_WaitForLastTask();
+ 457              		.loc 1 148 0
+ 458 01f8 FFF7FEFF 		bl	RTC_WaitForLastTask
+ 149:../src/mainboot.c **** }
+ 459              		.loc 1 149 0
+ 460 01fc 80BD     		pop	{r7, pc}
+ 461              		.cfi_endproc
+ 462              	.LFE62:
+ 464              		.section	.rodata
+ 465 002d 000000   		.align	2
+ 466              	.LC2:
+ 467 0030 4572726F 		.ascii	"Error: unable to make time using mktime\012\000"
+ 467      723A2075 
+ 467      6E61626C 
+ 467      6520746F 
+ 467      206D616B 
+ 468              		.text
+ 469 01fe 00BF     		.align	2
+ 470              		.global	set_time_RTC
+ 471              		.thumb
+ 472              		.thumb_func
+ 474              	set_time_RTC:
+ 475              	.LFB63:
+ 150:../src/mainboot.c **** void set_time_RTC(void) {
+ 476              		.loc 1 150 0
+ 477              		.cfi_startproc
+ 478              		@ args = 0, pretend = 0, frame = 48
+ 479              		@ frame_needed = 1, uses_anonymous_args = 0
+ 480 0200 80B5     		push	{r7, lr}
+ 481              	.LCFI20:
+ 482              		.cfi_def_cfa_offset 8
+ 483              		.cfi_offset 7, -8
+ 484              		.cfi_offset 14, -4
+ 485 0202 8CB0     		sub	sp, sp, #48
+ 486              	.LCFI21:
+ 487              		.cfi_def_cfa_offset 56
+ 488 0204 00AF     		add	r7, sp, #0
+ 489              	.LCFI22:
+ 490              		.cfi_def_cfa_register 7
+ 151:../src/mainboot.c **** 	time_t ret;
+ 152:../src/mainboot.c **** 	struct tm info;
+ 153:../src/mainboot.c **** 
+ 154:../src/mainboot.c **** 	info.tm_year = 2017 - 1900;
+ 491              		.loc 1 154 0
+ 492 0206 4FF07503 		mov	r3, #117
+ 493 020a 7B61     		str	r3, [r7, #20]
+ 155:../src/mainboot.c **** 	info.tm_mon = 12 - 1;
+ 494              		.loc 1 155 0
+ 495 020c 4FF00B03 		mov	r3, #11
+ 496 0210 3B61     		str	r3, [r7, #16]
+ 156:../src/mainboot.c **** 	info.tm_mday = 19;
+ 497              		.loc 1 156 0
+ 498 0212 4FF01303 		mov	r3, #19
+ 499 0216 FB60     		str	r3, [r7, #12]
+ 157:../src/mainboot.c **** 	info.tm_hour = 9;
+ 500              		.loc 1 157 0
+ 501 0218 4FF00903 		mov	r3, #9
+ 502 021c BB60     		str	r3, [r7, #8]
+ 158:../src/mainboot.c **** 	info.tm_min = 45;
+ 503              		.loc 1 158 0
+ 504 021e 4FF02D03 		mov	r3, #45
+ 505 0222 7B60     		str	r3, [r7, #4]
+ 159:../src/mainboot.c **** 	info.tm_sec = 0;
+ 506              		.loc 1 159 0
+ 507 0224 4FF00003 		mov	r3, #0
+ 508 0228 3B60     		str	r3, [r7, #0]
+ 160:../src/mainboot.c **** 	info.tm_isdst = -1;
+ 509              		.loc 1 160 0
+ 510 022a 4FF0FF33 		mov	r3, #-1
+ 511 022e 3B62     		str	r3, [r7, #32]
+ 161:../src/mainboot.c **** 
+ 162:../src/mainboot.c **** 	ret = mktime(&info);
+ 512              		.loc 1 162 0
+ 513 0230 3B46     		mov	r3, r7
+ 514 0232 1846     		mov	r0, r3
+ 515 0234 FFF7FEFF 		bl	mktime
+ 516 0238 F862     		str	r0, [r7, #44]
+ 163:../src/mainboot.c **** 	if (ret == -1) {
+ 517              		.loc 1 163 0
+ 518 023a FB6A     		ldr	r3, [r7, #44]
+ 519 023c B3F1FF3F 		cmp	r3, #-1
+ 520 0240 03D1     		bne	.L22
+ 164:../src/mainboot.c **** 		xprintf("Error: unable to make time using mktime\n");
+ 521              		.loc 1 164 0
+ 522 0242 0848     		ldr	r0, .L24
+ 523 0244 FFF7FEFF 		bl	xprintf
+ 524 0248 07E0     		b	.L21
+ 525              	.L22:
+ 165:../src/mainboot.c **** 	} else {
+ 166:../src/mainboot.c **** 		/* Wait until last write operation on RTC registers has finished */
+ 167:../src/mainboot.c **** 		RTC_WaitForLastTask();
+ 526              		.loc 1 167 0
+ 527 024a FFF7FEFF 		bl	RTC_WaitForLastTask
+ 168:../src/mainboot.c **** 		/* Change the current time */
+ 169:../src/mainboot.c **** 		RTC_SetCounter(ret);
+ 528              		.loc 1 169 0
+ 529 024e FB6A     		ldr	r3, [r7, #44]
+ 530 0250 1846     		mov	r0, r3
+ 531 0252 FFF7FEFF 		bl	RTC_SetCounter
+ 170:../src/mainboot.c **** 		/* Wait until last write operation on RTC registers has finished */
+ 171:../src/mainboot.c **** 		RTC_WaitForLastTask();
+ 532              		.loc 1 171 0
+ 533 0256 FFF7FEFF 		bl	RTC_WaitForLastTask
+ 534              	.L21:
+ 172:../src/mainboot.c **** 	}
+ 173:../src/mainboot.c **** }
+ 535              		.loc 1 173 0
+ 536 025a 07F13007 		add	r7, r7, #48
+ 537 025e BD46     		mov	sp, r7
+ 538 0260 80BD     		pop	{r7, pc}
+ 539              	.L25:
+ 540 0262 00BF     		.align	2
+ 541              	.L24:
+ 542 0264 30000000 		.word	.LC2
+ 543              		.cfi_endproc
+ 544              	.LFE63:
+ 546              		.section	.rodata
+ 547 0059 000000   		.align	2
+ 548              	.LC3:
+ 549 005c 0D0A0A20 		.ascii	"\015\012\012 RTC not yet configured....\000"
+ 549      52544320 
+ 549      6E6F7420 
+ 549      79657420 
+ 549      636F6E66 
+ 550 007b 00       		.align	2
+ 551              	.LC4:
+ 552 007c 0D0A2052 		.ascii	"\015\012 RTC configured....\000"
+ 552      54432063 
+ 552      6F6E6669 
+ 552      67757265 
+ 552      642E2E2E 
+ 553 0092 0000     		.align	2
+ 554              	.LC5:
+ 555 0094 0D0A0A20 		.ascii	"\015\012\012 Power On Reset occurred....\000"
+ 555      506F7765 
+ 555      72204F6E 
+ 555      20526573 
+ 555      6574206F 
+ 556              		.align	2
+ 557              	.LC6:
+ 558 00b4 0D0A0A20 		.ascii	"\015\012\012 External Reset occurred....\000"
+ 558      45787465 
+ 558      726E616C 
+ 558      20526573 
+ 558      6574206F 
+ 559              		.align	2
+ 560              	.LC7:
+ 561 00d4 0D0A204E 		.ascii	"\015\012 No need to configure RTC....\000"
+ 561      6F206E65 
+ 561      65642074 
+ 561      6F20636F 
+ 561      6E666967 
+ 562              		.align	2
+ 563              	.LC8:
+ 564 00f4 25642C25 		.ascii	"%d,%d,%d,%d\012\015\000"
+ 564      642C2564 
+ 564      2C25640A 
+ 564      0D00
+ 565 0102 0000     		.text
+ 566              		.align	2
+ 567              		.global	Main_Menu
+ 568              		.thumb
+ 569              		.thumb_func
+ 571              	Main_Menu:
+ 572              	.LFB64:
+ 174:../src/mainboot.c **** void Main_Menu(void) {
+ 573              		.loc 1 174 0
+ 574              		.cfi_startproc
+ 575              		@ args = 0, pretend = 0, frame = 0
+ 576              		@ frame_needed = 1, uses_anonymous_args = 0
+ 577 0268 90B5     		push	{r4, r7, lr}
+ 578              	.LCFI23:
+ 579              		.cfi_def_cfa_offset 12
+ 580              		.cfi_offset 4, -12
+ 581              		.cfi_offset 7, -8
+ 582              		.cfi_offset 14, -4
+ 583 026a 83B0     		sub	sp, sp, #12
+ 584              	.LCFI24:
+ 585              		.cfi_def_cfa_offset 24
+ 586 026c 02AF     		add	r7, sp, #8
+ 587              	.LCFI25:
+ 588              		.cfi_def_cfa 7, 16
+ 175:../src/mainboot.c **** 	int vx;
+ 176:../src/mainboot.c **** 	if (BKP_ReadBackupRegister(BKP_DR1) != 0xA5A6) {
+ 589              		.loc 1 176 0
+ 590 026e 4FF00400 		mov	r0, #4
+ 591 0272 FFF7FEFF 		bl	BKP_ReadBackupRegister
+ 592 0276 0346     		mov	r3, r0
+ 593 0278 1A46     		mov	r2, r3
+ 594 027a 4AF2A653 		movw	r3, #42406
+ 595 027e 9A42     		cmp	r2, r3
+ 596 0280 10D0     		beq	.L27
+ 177:../src/mainboot.c **** 		/* Backup data register value is not correct or not yet programmed (when
+ 178:../src/mainboot.c **** 		 the first time the program is executed) */
+ 179:../src/mainboot.c **** 
+ 180:../src/mainboot.c **** 		xprintf("\r\n\n RTC not yet configured....");
+ 597              		.loc 1 180 0
+ 598 0282 3548     		ldr	r0, .L34
+ 599 0284 FFF7FEFF 		bl	xprintf
+ 181:../src/mainboot.c **** 
+ 182:../src/mainboot.c **** 		/* RTC Configuration */
+ 183:../src/mainboot.c **** 		RTC_Configuration();
+ 600              		.loc 1 183 0
+ 601 0288 FFF7FEFF 		bl	RTC_Configuration
+ 184:../src/mainboot.c **** 
+ 185:../src/mainboot.c **** 		xprintf("\r\n RTC configured....");
+ 602              		.loc 1 185 0
+ 603 028c 3348     		ldr	r0, .L34+4
+ 604 028e FFF7FEFF 		bl	xprintf
+ 186:../src/mainboot.c **** 
+ 187:../src/mainboot.c **** 		/* Adjust time by values entered by the user on the hyperterminal */
+ 188:../src/mainboot.c **** 		//Time_Adjust();
+ 189:../src/mainboot.c **** 		set_time_RTC();
+ 605              		.loc 1 189 0
+ 606 0292 FFF7FEFF 		bl	set_time_RTC
+ 190:../src/mainboot.c **** 		BKP_WriteBackupRegister(BKP_DR1, 0xA5A6);
+ 607              		.loc 1 190 0
+ 608 0296 4FF00400 		mov	r0, #4
+ 609 029a 4AF2A651 		movw	r1, #42406
+ 610 029e FFF7FEFF 		bl	BKP_WriteBackupRegister
+ 611 02a2 21E0     		b	.L28
+ 612              	.L27:
+ 191:../src/mainboot.c **** 	} else {
+ 192:../src/mainboot.c **** 		/* Check if the Power On Reset flag is set */
+ 193:../src/mainboot.c **** 		if (RCC_GetFlagStatus(RCC_FLAG_PORRST) != RESET) {
+ 613              		.loc 1 193 0
+ 614 02a4 4FF07B00 		mov	r0, #123
+ 615 02a8 FFF7FEFF 		bl	RCC_GetFlagStatus
+ 616 02ac 0346     		mov	r3, r0
+ 617 02ae 002B     		cmp	r3, #0
+ 618 02b0 03D0     		beq	.L29
+ 194:../src/mainboot.c **** 			xprintf("\r\n\n Power On Reset occurred....");
+ 619              		.loc 1 194 0
+ 620 02b2 2B48     		ldr	r0, .L34+8
+ 621 02b4 FFF7FEFF 		bl	xprintf
+ 622 02b8 09E0     		b	.L30
+ 623              	.L29:
+ 195:../src/mainboot.c **** 		}
+ 196:../src/mainboot.c **** 		/* Check if the Pin Reset flag is set */
+ 197:../src/mainboot.c **** 		else if (RCC_GetFlagStatus(RCC_FLAG_PINRST) != RESET) {
+ 624              		.loc 1 197 0
+ 625 02ba 4FF07A00 		mov	r0, #122
+ 626 02be FFF7FEFF 		bl	RCC_GetFlagStatus
+ 627 02c2 0346     		mov	r3, r0
+ 628 02c4 002B     		cmp	r3, #0
+ 629 02c6 02D0     		beq	.L30
+ 198:../src/mainboot.c **** 			xprintf("\r\n\n External Reset occurred....");
+ 630              		.loc 1 198 0
+ 631 02c8 2648     		ldr	r0, .L34+12
+ 632 02ca FFF7FEFF 		bl	xprintf
+ 633              	.L30:
+ 199:../src/mainboot.c **** 		}
+ 200:../src/mainboot.c **** 
+ 201:../src/mainboot.c **** 		xprintf("\r\n No need to configure RTC....");
+ 634              		.loc 1 201 0
+ 635 02ce 2648     		ldr	r0, .L34+16
+ 636 02d0 FFF7FEFF 		bl	xprintf
+ 202:../src/mainboot.c **** 		/* Wait for RTC registers synchronization */
+ 203:../src/mainboot.c **** 		RTC_WaitForSynchro();
+ 637              		.loc 1 203 0
+ 638 02d4 FFF7FEFF 		bl	RTC_WaitForSynchro
+ 204:../src/mainboot.c **** 
+ 205:../src/mainboot.c **** 		/* Enable the RTC Second */
+ 206:../src/mainboot.c **** 		RTC_ITConfig(RTC_IT_SEC, ENABLE);
+ 639              		.loc 1 206 0
+ 640 02d8 4FF00100 		mov	r0, #1
+ 641 02dc 4FF00101 		mov	r1, #1
+ 642 02e0 FFF7FEFF 		bl	RTC_ITConfig
+ 207:../src/mainboot.c **** 		/* Wait until last write operation on RTC registers has finished */
+ 208:../src/mainboot.c **** 		RTC_WaitForLastTask();
+ 643              		.loc 1 208 0
+ 644 02e4 FFF7FEFF 		bl	RTC_WaitForLastTask
+ 645              	.L28:
+ 209:../src/mainboot.c **** 	}
+ 210:../src/mainboot.c **** 	RCC_ClearFlag();
+ 646              		.loc 1 210 0
+ 647 02e8 FFF7FEFF 		bl	RCC_ClearFlag
+ 648 02ec 00E0     		b	.L32
+ 649              	.L33:
+ 211:../src/mainboot.c **** 	while (1) {
+ 212:../src/mainboot.c **** 		process_command_from_pc();
+ 213:../src/mainboot.c **** 		if (lastSentToTracker < MiliCount) {
+ 214:../src/mainboot.c **** 			process_data();
+ 215:../src/mainboot.c **** 			HC05_SendData(data);
+ 216:../src/mainboot.c **** 			xprintf("%d,%d,%d,%d\n\r", taxi_cal(), PPS, CLK_count,
+ 217:../src/mainboot.c **** 					PPS * 36000 / 2560);
+ 218:../src/mainboot.c **** 			Time_Display(RTC_GetCounter());
+ 219:../src/mainboot.c **** 			lastSentToTracker = MiliCount + 1000;
+ 220:../src/mainboot.c **** 		}
+ 221:../src/mainboot.c **** 
+ 222:../src/mainboot.c **** 	}
+ 650              		.loc 1 222 0
+ 651 02ee 00BF     		nop
+ 652              	.L32:
+ 212:../src/mainboot.c **** 		process_command_from_pc();
+ 653              		.loc 1 212 0
+ 654 02f0 FFF786FE 		bl	process_command_from_pc
+ 213:../src/mainboot.c **** 		if (lastSentToTracker < MiliCount) {
+ 655              		.loc 1 213 0
+ 656 02f4 1D4B     		ldr	r3, .L34+20
+ 657 02f6 1A68     		ldr	r2, [r3, #0]
+ 658 02f8 1D4B     		ldr	r3, .L34+24
+ 659 02fa 1B68     		ldr	r3, [r3, #0]
+ 660 02fc 9A42     		cmp	r2, r3
+ 661 02fe F6D2     		bcs	.L33
+ 214:../src/mainboot.c **** 			process_data();
+ 662              		.loc 1 214 0
+ 663 0300 FFF7FEFF 		bl	process_data
+ 215:../src/mainboot.c **** 			HC05_SendData(data);
+ 664              		.loc 1 215 0
+ 665 0304 1B48     		ldr	r0, .L34+28
+ 666 0306 FFF7FEFF 		bl	HC05_SendData
+ 216:../src/mainboot.c **** 			xprintf("%d,%d,%d,%d\n\r", taxi_cal(), PPS, CLK_count,
+ 667              		.loc 1 216 0
+ 668 030a FFF7FEFF 		bl	taxi_cal
+ 669 030e 0146     		mov	r1, r0
+ 670 0310 194B     		ldr	r3, .L34+32
+ 671 0312 1A68     		ldr	r2, [r3, #0]
+ 672 0314 194B     		ldr	r3, .L34+36
+ 673 0316 1C68     		ldr	r4, [r3, #0]
+ 217:../src/mainboot.c **** 					PPS * 36000 / 2560);
+ 674              		.loc 1 217 0
+ 675 0318 174B     		ldr	r3, .L34+32
+ 676 031a 1B68     		ldr	r3, [r3, #0]
+ 677 031c 48F6A040 		movw	r0, #36000
+ 678 0320 00FB03F3 		mul	r3, r0, r3
+ 216:../src/mainboot.c **** 			xprintf("%d,%d,%d,%d\n\r", taxi_cal(), PPS, CLK_count,
+ 679              		.loc 1 216 0
+ 680 0324 1648     		ldr	r0, .L34+40
+ 681 0326 80FB03C0 		smull	ip, r0, r0, r3
+ 682 032a 4FEAA020 		asr	r0, r0, #10
+ 683 032e 4FEAE373 		asr	r3, r3, #31
+ 684 0332 C31A     		subs	r3, r0, r3
+ 685 0334 0093     		str	r3, [sp, #0]
+ 686 0336 1348     		ldr	r0, .L34+44
+ 687 0338 2346     		mov	r3, r4
+ 688 033a FFF7FEFF 		bl	xprintf
+ 218:../src/mainboot.c **** 			Time_Display(RTC_GetCounter());
+ 689              		.loc 1 218 0
+ 690 033e FFF7FEFF 		bl	RTC_GetCounter
+ 691 0342 0346     		mov	r3, r0
+ 692 0344 1846     		mov	r0, r3
+ 693 0346 FFF7FEFF 		bl	Time_Display
+ 219:../src/mainboot.c **** 			lastSentToTracker = MiliCount + 1000;
+ 694              		.loc 1 219 0
+ 695 034a 094B     		ldr	r3, .L34+24
+ 696 034c 1B68     		ldr	r3, [r3, #0]
+ 697 034e 03F57A72 		add	r2, r3, #1000
+ 698 0352 064B     		ldr	r3, .L34+20
+ 699 0354 1A60     		str	r2, [r3, #0]
+ 700              		.loc 1 222 0
+ 701 0356 CAE7     		b	.L33
+ 702              	.L35:
+ 703              		.align	2
+ 704              	.L34:
+ 705 0358 5C000000 		.word	.LC3
+ 706 035c 7C000000 		.word	.LC4
+ 707 0360 94000000 		.word	.LC5
+ 708 0364 B4000000 		.word	.LC6
+ 709 0368 D4000000 		.word	.LC7
+ 710 036c 00000000 		.word	lastSentToTracker
+ 711 0370 00000000 		.word	MiliCount
+ 712 0374 00000000 		.word	data
+ 713 0378 00000000 		.word	PPS
+ 714 037c 00000000 		.word	CLK_count
+ 715 0380 67666666 		.word	1717986919
+ 716 0384 F4000000 		.word	.LC8
+ 717              		.cfi_endproc
+ 718              	.LFE64:
+ 720              	.Letext0:
+ 721              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 722              		.file 3 "D:\\EclipseIndigo\\workspace\\xelo\\src/stm32f10x.h"
+ 723              		.file 4 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 724              		.file 5 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 725              		.file 6 "D:\\EclipseIndigo\\workspace\\xelo\\Libraries\\CMSIS\\Include/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 mainboot.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:23     .bss:00000000 lastSentToTracker
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:20     .bss:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:29     .bss:00000004 CraskCheck
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:35     .bss:00000008 nextStepSchedule
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:41     .bss:0000000c buff_cmd
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:47     .bss:0000010c BLE_buff
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:53     .bss:0000020c data
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:56     .text:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:60     .text:00000000 process_command_from_pc
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:95     .text:00000024 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:99     .text:00000028 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:104    .text:00000028 taxi_cal
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:146    .text:00000060 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:152    .rodata:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:156    .text:00000068 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:161    .text:00000068 process_data
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:228    .text:000000e0 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:236    .text:000000f4 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:241    .text:000000f4 Time_Regulate
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:291    .text:00000138 Time_Adjust
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:329    .text:00000154 Time_Display
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:372    .text:00000190 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:376    .text:00000194 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:381    .text:00000194 Time_Show
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:407    .text:000001a0 RTC_Configuration
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:474    .text:00000200 set_time_RTC
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:542    .text:00000264 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:566    .text:00000268 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:571    .text:00000268 Main_Menu
+C:\Users\THANGN~1\AppData\Local\Temp\ccF2lYT4.s:705    .text:00000358 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.6e5f3786b89b666b3dcc7c4c84d9d480
+                           .group:00000000 wm4.command.h.9.24416aff08501a78dcd3e4f187f8295f
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.xprintf.h.6.d201a07af5ece6e00f55504afb5b0533
+                           .group:00000000 wm4.newlib.h.8.e1d498e57c12962fc6d7be5061a6981a
+                           .group:00000000 wm4.config.h.148.52fe83653334d06815a0c57b59a3e584
+                           .group:00000000 wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04
+                           .group:00000000 wm4._default_types.h.6.1dbd2e581fd590860c7c17f21d147e91
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4.stddef.h.349.31f4c5baff3fa2689010b32028da9c47
+                           .group:00000000 wm4.reent.h.16.58b23a9f0faf0e7f2dfe7e2d33154afd
+                           .group:00000000 wm4.stddef.h.187.9e651b6b8b16e149c1353259404973ea
+                           .group:00000000 wm4.stm32f10x.h.57.69ab29c83f735418a543aa508b559235
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.36d879c1aefb6e578e399a5de749a503
+                           .group:00000000 wm4.stm32f10x.h.532.b2b0c08e77686a45dbc3252d064cb2e1
+                           .group:00000000 wm4.stm32f10x_adc.h.89.9f2b285fa0070185d48a05b61a05798c
+                           .group:00000000 wm4.stm32f10x_bkp.h.31.74a586c036c8ee5d9205c6728cc8d6ab
+                           .group:00000000 wm4.stm32f10x_can.h.31.b14273b95de79d8fbb020ba042473fb1
+                           .group:00000000 wm4.stm32f10x_cec.h.31.29c77e36bfe4567e85f26cdcc60def64
+                           .group:00000000 wm4.stm32f10x_dac.h.31.116c27cadc3b4ee8aa44ed11b14b64ae
+                           .group:00000000 wm4.stm32f10x_dbgmcu.h.31.45f176e9b7a15051b8c69cb2700c78b8
+                           .group:00000000 wm4.stm32f10x_dma.h.31.ef16218235edc52b414c0353f44b4bf0
+                           .group:00000000 wm4.stm32f10x_exti.h.31.b25bcb4f1a2daad39d2d7dfa4e901646
+                           .group:00000000 wm4.stm32f10x_flash.h.31.0203bc95b65c5396b67991e07a675efb
+                           .group:00000000 wm4.stm32f10x_fsmc.h.31.a761d459aa046c2769a99b93e8763ba0
+                           .group:00000000 wm4.stm32f10x_gpio.h.31.0a32659dbac1fc1055c7cbdc248963be
+                           .group:00000000 wm4.stm32f10x_i2c.h.31.93d7dc2d477856f119d957730d4c6f1c
+                           .group:00000000 wm4.stm32f10x_iwdg.h.31.959ae9b7e1d603f1e5ae6468c0fc1624
+                           .group:00000000 wm4.stm32f10x_pwr.h.31.9168b6921e0cf03b467c7ed90861c701
+                           .group:00000000 wm4.stm32f10x_rcc.h.31.2ee3219a25ef4ced658f2fe9d8cd94aa
+                           .group:00000000 wm4.stm32f10x_sdio.h.31.37dab89d08b2364a3dfaace444dec7c3
+                           .group:00000000 wm4.stm32f10x_spi.h.31.d2f6e4626887cabe8c98f3a185590a36
+                           .group:00000000 wm4.stm32f10x_tim.h.31.6c06f7f26e0864f9cd59597f46ca2c7c
+                           .group:00000000 wm4.stm32f10x_usart.h.31.28d75d6af05cefbbfa00cf30a7c8a335
+                           .group:00000000 wm4.stm32f10x_wwdg.h.31.4504f930b88ade4f56d1e3f2a11c098b
+                           .group:00000000 wm4.misc.h.31.a89fba2040036f6f8c835a78a213e0cd
+                           .group:00000000 wm4.stm32f10x.h.8356.9fd2fa84655112ac7dfc5c88beeb383d
+                           .group:00000000 wm4.stm32f10x_rtc.h.64.fb43f578fb8e8a986bfbace5bbe63174
+                           .group:00000000 wm4.time.h.2.9857e62ad6ac99431e29d58067232314
+                           .group:00000000 wm4.time.h.33.7f5d132454e7bf35c22009dbda1491ee
+                           .group:00000000 wm4.stddef.h.235.d9f4f80b8c4429535175712282cda6a6
+                           .group:00000000 wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9
+                           .group:00000000 wm4.stddef.h.40.cf962ebbec441b3ac67502735f0765db
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.80.f2bfdfeee9f340633702c07fad9b5e01
+                           .group:00000000 wm4.time.h.199.86a924f58be8b6c7bbcf58ec9b75ac50
+
+UNDEFINED SYMBOLS
+server_on_command
+CLK_count
+memset
+usnprintf
+PPS
+RTC_WaitForLastTask
+RTC_SetCounter
+RTC_GetCounter
+localtime
+asctime
+xprintf
+RCC_APB1PeriphClockCmd
+PWR_BackupAccessCmd
+BKP_DeInit
+RCC_LSEConfig
+RCC_GetFlagStatus
+RCC_RTCCLKConfig
+RCC_RTCCLKCmd
+RTC_WaitForSynchro
+RTC_SetPrescaler
+mktime
+BKP_ReadBackupRegister
+BKP_WriteBackupRegister
+RTC_ITConfig
+RCC_ClearFlag
+HC05_SendData
+MiliCount

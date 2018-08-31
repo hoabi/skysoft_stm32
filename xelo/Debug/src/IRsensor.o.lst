@@ -1,0 +1,226 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"IRsensor.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	TurnOffLed
+  20              		.thumb
+  21              		.thumb_func
+  23              	TurnOffLed:
+  24              	.LFB55:
+  25              		.file 1 "../src/IRsensor.c"
+   1:../src/IRsensor.c **** /*
+   2:../src/IRsensor.c ****  * IRsensor.c
+   3:../src/IRsensor.c ****  *
+   4:../src/IRsensor.c ****  *  Created on: Dec 6, 2017
+   5:../src/IRsensor.c ****  *      Author: ThangNguyen
+   6:../src/IRsensor.c ****  */
+   7:../src/IRsensor.c **** #include <IRsensor.h>
+   8:../src/IRsensor.c **** void TurnOffLed(void) {
+  26              		.loc 1 8 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 80B5     		push	{r7, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 8
+  33              		.cfi_offset 7, -8
+  34              		.cfi_offset 14, -4
+  35 0002 00AF     		add	r7, sp, #0
+  36              	.LCFI1:
+  37              		.cfi_def_cfa_register 7
+   9:../src/IRsensor.c **** 	LED1_off;
+  38              		.loc 1 9 0
+  39 0004 0A48     		ldr	r0, .L2
+  40 0006 4FF00801 		mov	r1, #8
+  41 000a FFF7FEFF 		bl	GPIO_ResetBits
+  10:../src/IRsensor.c **** 	LED2_off;
+  42              		.loc 1 10 0
+  43 000e 0848     		ldr	r0, .L2
+  44 0010 4FF08001 		mov	r1, #128
+  45 0014 FFF7FEFF 		bl	GPIO_ResetBits
+  11:../src/IRsensor.c **** 	LED3_off;
+  46              		.loc 1 11 0
+  47 0018 0648     		ldr	r0, .L2+4
+  48 001a 4FF00201 		mov	r1, #2
+  49 001e FFF7FEFF 		bl	GPIO_ResetBits
+  12:../src/IRsensor.c **** 	LED4_off;
+  50              		.loc 1 12 0
+  51 0022 0448     		ldr	r0, .L2+4
+  52 0024 4FF48051 		mov	r1, #4096
+  53 0028 FFF7FEFF 		bl	GPIO_ResetBits
+  13:../src/IRsensor.c **** }
+  54              		.loc 1 13 0
+  55 002c 80BD     		pop	{r7, pc}
+  56              	.L3:
+  57 002e 00BF     		.align	2
+  58              	.L2:
+  59 0030 00080140 		.word	1073809408
+  60 0034 000C0140 		.word	1073810432
+  61              		.cfi_endproc
+  62              	.LFE55:
+  64              		.align	2
+  65              		.global	Check_Unuse_IRsesor
+  66              		.thumb
+  67              		.thumb_func
+  69              	Check_Unuse_IRsesor:
+  70              	.LFB56:
+  14:../src/IRsensor.c **** int Check_Unuse_IRsesor(void) {
+  71              		.loc 1 14 0
+  72              		.cfi_startproc
+  73              		@ args = 0, pretend = 0, frame = 8
+  74              		@ frame_needed = 1, uses_anonymous_args = 0
+  75 0038 80B5     		push	{r7, lr}
+  76              	.LCFI2:
+  77              		.cfi_def_cfa_offset 8
+  78              		.cfi_offset 7, -8
+  79              		.cfi_offset 14, -4
+  80 003a 82B0     		sub	sp, sp, #8
+  81              	.LCFI3:
+  82              		.cfi_def_cfa_offset 16
+  83 003c 00AF     		add	r7, sp, #0
+  84              	.LCFI4:
+  85              		.cfi_def_cfa_register 7
+  15:../src/IRsensor.c **** 	int val = 0;
+  86              		.loc 1 15 0
+  87 003e 4FF00003 		mov	r3, #0
+  88 0042 7B60     		str	r3, [r7, #4]
+  16:../src/IRsensor.c **** 	val = val & 0x00;
+  89              		.loc 1 16 0
+  90 0044 4FF00003 		mov	r3, #0
+  91 0048 7B60     		str	r3, [r7, #4]
+  17:../src/IRsensor.c **** 	if (GPIO_ReadInputDataBit(UnUse1_port, UnUse1_pin)) {
+  92              		.loc 1 17 0
+  93 004a 1A48     		ldr	r0, .L10
+  94 004c 4FF00201 		mov	r1, #2
+  95 0050 FFF7FEFF 		bl	GPIO_ReadInputDataBit
+  96 0054 0346     		mov	r3, r0
+  97 0056 002B     		cmp	r3, #0
+  98 0058 03D0     		beq	.L5
+  18:../src/IRsensor.c **** 		val += 1;
+  99              		.loc 1 18 0
+ 100 005a 7B68     		ldr	r3, [r7, #4]
+ 101 005c 03F10103 		add	r3, r3, #1
+ 102 0060 7B60     		str	r3, [r7, #4]
+ 103              	.L5:
+  19:../src/IRsensor.c **** 	}
+  20:../src/IRsensor.c **** 	if (GPIO_ReadInputDataBit(UnUse2_port, UnUse2_pin)) {
+ 104              		.loc 1 20 0
+ 105 0062 1448     		ldr	r0, .L10
+ 106 0064 4FF02001 		mov	r1, #32
+ 107 0068 FFF7FEFF 		bl	GPIO_ReadInputDataBit
+ 108 006c 0346     		mov	r3, r0
+ 109 006e 002B     		cmp	r3, #0
+ 110 0070 03D0     		beq	.L6
+  21:../src/IRsensor.c **** 		val += 2;
+ 111              		.loc 1 21 0
+ 112 0072 7B68     		ldr	r3, [r7, #4]
+ 113 0074 03F10203 		add	r3, r3, #2
+ 114 0078 7B60     		str	r3, [r7, #4]
+ 115              	.L6:
+  22:../src/IRsensor.c **** 	}
+  23:../src/IRsensor.c **** 	if (GPIO_ReadInputDataBit(UnUse3_port, UnUse3_pin)) {
+ 116              		.loc 1 23 0
+ 117 007a 0F48     		ldr	r0, .L10+4
+ 118 007c 4FF02001 		mov	r1, #32
+ 119 0080 FFF7FEFF 		bl	GPIO_ReadInputDataBit
+ 120 0084 0346     		mov	r3, r0
+ 121 0086 002B     		cmp	r3, #0
+ 122 0088 03D0     		beq	.L7
+  24:../src/IRsensor.c **** 		val += 4;
+ 123              		.loc 1 24 0
+ 124 008a 7B68     		ldr	r3, [r7, #4]
+ 125 008c 03F10403 		add	r3, r3, #4
+ 126 0090 7B60     		str	r3, [r7, #4]
+ 127              	.L7:
+  25:../src/IRsensor.c **** 	}
+  26:../src/IRsensor.c **** 	if (GPIO_ReadInputDataBit(UnUse4_port, UnUse4_pin)) {
+ 128              		.loc 1 26 0
+ 129 0092 0A48     		ldr	r0, .L10+8
+ 130 0094 4FF48061 		mov	r1, #1024
+ 131 0098 FFF7FEFF 		bl	GPIO_ReadInputDataBit
+ 132 009c 0346     		mov	r3, r0
+ 133 009e 002B     		cmp	r3, #0
+ 134 00a0 03D0     		beq	.L9
+  27:../src/IRsensor.c **** 		val += 8;
+ 135              		.loc 1 27 0
+ 136 00a2 7B68     		ldr	r3, [r7, #4]
+ 137 00a4 03F10803 		add	r3, r3, #8
+ 138 00a8 7B60     		str	r3, [r7, #4]
+ 139              	.L9:
+  28:../src/IRsensor.c **** 	}
+  29:../src/IRsensor.c **** }
+ 140              		.loc 1 29 0
+ 141 00aa 1846     		mov	r0, r3
+ 142 00ac 07F10807 		add	r7, r7, #8
+ 143 00b0 BD46     		mov	sp, r7
+ 144 00b2 80BD     		pop	{r7, pc}
+ 145              	.L11:
+ 146              		.align	2
+ 147              	.L10:
+ 148 00b4 00080140 		.word	1073809408
+ 149 00b8 00100140 		.word	1073811456
+ 150 00bc 000C0140 		.word	1073810432
+ 151              		.cfi_endproc
+ 152              	.LFE56:
+ 154              	.Letext0:
+ 155              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 156              		.file 3 "D:\\EclipseIndigo\\workspace\\xelo\\src/stm32f10x.h"
+ 157              		.file 4 "D:\\EclipseIndigo\\workspace\\xelo\\Libraries\\CMSIS\\Include/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 IRsensor.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccKPO21q.s:18     .text:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccKPO21q.s:23     .text:00000000 TurnOffLed
+C:\Users\THANGN~1\AppData\Local\Temp\ccKPO21q.s:59     .text:00000030 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccKPO21q.s:64     .text:00000038 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccKPO21q.s:69     .text:00000038 Check_Unuse_IRsesor
+C:\Users\THANGN~1\AppData\Local\Temp\ccKPO21q.s:148    .text:000000b4 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.6e5f3786b89b666b3dcc7c4c84d9d480
+                           .group:00000000 wm4.stm32f10x.h.57.69ab29c83f735418a543aa508b559235
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.36d879c1aefb6e578e399a5de749a503
+                           .group:00000000 wm4.stm32f10x.h.532.b2b0c08e77686a45dbc3252d064cb2e1
+                           .group:00000000 wm4.stm32f10x_adc.h.89.9f2b285fa0070185d48a05b61a05798c
+                           .group:00000000 wm4.stm32f10x_bkp.h.31.74a586c036c8ee5d9205c6728cc8d6ab
+                           .group:00000000 wm4.stm32f10x_can.h.31.b14273b95de79d8fbb020ba042473fb1
+                           .group:00000000 wm4.stm32f10x_cec.h.31.29c77e36bfe4567e85f26cdcc60def64
+                           .group:00000000 wm4.stm32f10x_dac.h.31.116c27cadc3b4ee8aa44ed11b14b64ae
+                           .group:00000000 wm4.stm32f10x_dbgmcu.h.31.45f176e9b7a15051b8c69cb2700c78b8
+                           .group:00000000 wm4.stm32f10x_dma.h.31.ef16218235edc52b414c0353f44b4bf0
+                           .group:00000000 wm4.stm32f10x_exti.h.31.b25bcb4f1a2daad39d2d7dfa4e901646
+                           .group:00000000 wm4.stm32f10x_flash.h.31.0203bc95b65c5396b67991e07a675efb
+                           .group:00000000 wm4.stm32f10x_fsmc.h.31.a761d459aa046c2769a99b93e8763ba0
+                           .group:00000000 wm4.stm32f10x_i2c.h.31.93d7dc2d477856f119d957730d4c6f1c
+                           .group:00000000 wm4.stm32f10x_iwdg.h.31.959ae9b7e1d603f1e5ae6468c0fc1624
+                           .group:00000000 wm4.stm32f10x_pwr.h.31.9168b6921e0cf03b467c7ed90861c701
+                           .group:00000000 wm4.stm32f10x_rcc.h.31.2ee3219a25ef4ced658f2fe9d8cd94aa
+                           .group:00000000 wm4.stm32f10x_rtc.h.31.00ba78fc0dbb06b6e6783a1e7fccf5a0
+                           .group:00000000 wm4.stm32f10x_sdio.h.31.37dab89d08b2364a3dfaace444dec7c3
+                           .group:00000000 wm4.stm32f10x_spi.h.31.d2f6e4626887cabe8c98f3a185590a36
+                           .group:00000000 wm4.stm32f10x_tim.h.31.6c06f7f26e0864f9cd59597f46ca2c7c
+                           .group:00000000 wm4.stm32f10x_usart.h.31.28d75d6af05cefbbfa00cf30a7c8a335
+                           .group:00000000 wm4.stm32f10x_wwdg.h.31.4504f930b88ade4f56d1e3f2a11c098b
+                           .group:00000000 wm4.misc.h.31.a89fba2040036f6f8c835a78a213e0cd
+                           .group:00000000 wm4.stm32f10x.h.8356.9fd2fa84655112ac7dfc5c88beeb383d
+                           .group:00000000 wm4.stm32f10x_gpio.h.52.33b8d40a96981382536f00f9bf7c2992
+                           .group:00000000 wm4.IRsensor.h.11.1b42bea74888aac25844e526811ae7fe
+
+UNDEFINED SYMBOLS
+GPIO_ResetBits
+GPIO_ReadInputDataBit

@@ -1,0 +1,1610 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"HC05.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	last_check_time
+  19              		.bss
+  20              		.align	2
+  23              	last_check_time:
+  24 0000 00000000 		.space	4
+  25              		.text
+  26              		.align	2
+  27              		.global	UART4_PutC
+  28              		.thumb
+  29              		.thumb_func
+  31              	UART4_PutC:
+  32              	.LFB55:
+  33              		.file 1 "../src/HC05.c"
+   1:../src/HC05.c **** /*
+   2:../src/HC05.c ****  * HC05.c
+   3:../src/HC05.c ****  *
+   4:../src/HC05.c ****  *  Created on: Oct 31, 2017
+   5:../src/HC05.c ****  *      Author: ThangNguyen
+   6:../src/HC05.c ****  */
+   7:../src/HC05.c **** #include "HC05.h"
+   8:../src/HC05.c **** #include "xprintf.h"
+   9:../src/HC05.c **** #include <string.h>
+  10:../src/HC05.c **** #include <stdint.h>
+  11:../src/HC05.c **** #include <stm32f10x_usart.h>
+  12:../src/HC05.c **** #include <main.h>
+  13:../src/HC05.c **** #include "delay.h"
+  14:../src/HC05.c **** #define HC05_PIO9_port GPIOB
+  15:../src/HC05.c **** #define HC05_PIO9_pin GPIO_Pin_15
+  16:../src/HC05.c **** #define HC05_DIS	GPIO_ResetBits(GPIOB, GPIO_Pin_14)
+  17:../src/HC05.c **** #define HC05_EN		GPIO_SetBits(GPIOB, GPIO_Pin_14)
+  18:../src/HC05.c **** extern uint32_t MiliCount;
+  19:../src/HC05.c **** uint32_t last_check_time = 0;
+  20:../src/HC05.c **** extern char BLE_buff_temp[256];
+  21:../src/HC05.c **** extern int BLE_buff_idx;
+  22:../src/HC05.c **** void UART4_PutC(uint8_t C) {
+  34              		.loc 1 22 0
+  35              		.cfi_startproc
+  36              		@ args = 0, pretend = 0, frame = 8
+  37              		@ frame_needed = 1, uses_anonymous_args = 0
+  38 0000 80B5     		push	{r7, lr}
+  39              	.LCFI0:
+  40              		.cfi_def_cfa_offset 8
+  41              		.cfi_offset 7, -8
+  42              		.cfi_offset 14, -4
+  43 0002 82B0     		sub	sp, sp, #8
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 16
+  46 0004 00AF     		add	r7, sp, #0
+  47              	.LCFI2:
+  48              		.cfi_def_cfa_register 7
+  49 0006 0346     		mov	r3, r0
+  50 0008 FB71     		strb	r3, [r7, #7]
+  23:../src/HC05.c **** 	while (USART_GetFlagStatus(UART4, USART_FLAG_TXE) == RESET) {
+  51              		.loc 1 23 0
+  52 000a 00BF     		nop
+  53              	.L2:
+  54              		.loc 1 23 0 is_stmt 0 discriminator 1
+  55 000c 0848     		ldr	r0, .L3
+  56 000e 4FF08001 		mov	r1, #128
+  57 0012 FFF7FEFF 		bl	USART_GetFlagStatus
+  58 0016 0346     		mov	r3, r0
+  59 0018 002B     		cmp	r3, #0
+  60 001a F7D0     		beq	.L2
+  24:../src/HC05.c **** 	}
+  25:../src/HC05.c **** 	USART_SendData(UART4, C);
+  61              		.loc 1 25 0 is_stmt 1
+  62 001c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+  63 001e 9BB2     		uxth	r3, r3
+  64 0020 0348     		ldr	r0, .L3
+  65 0022 1946     		mov	r1, r3
+  66 0024 FFF7FEFF 		bl	USART_SendData
+  26:../src/HC05.c **** }
+  67              		.loc 1 26 0
+  68 0028 07F10807 		add	r7, r7, #8
+  69 002c BD46     		mov	sp, r7
+  70 002e 80BD     		pop	{r7, pc}
+  71              	.L4:
+  72              		.align	2
+  73              	.L3:
+  74 0030 004C0040 		.word	1073761280
+  75              		.cfi_endproc
+  76              	.LFE55:
+  78              		.align	2
+  79              		.global	UART4_PutS
+  80              		.thumb
+  81              		.thumb_func
+  83              	UART4_PutS:
+  84              	.LFB56:
+  27:../src/HC05.c **** void UART4_PutS(char *S) {
+  85              		.loc 1 27 0
+  86              		.cfi_startproc
+  87              		@ args = 0, pretend = 0, frame = 8
+  88              		@ frame_needed = 1, uses_anonymous_args = 0
+  89 0034 80B5     		push	{r7, lr}
+  90              	.LCFI3:
+  91              		.cfi_def_cfa_offset 8
+  92              		.cfi_offset 7, -8
+  93              		.cfi_offset 14, -4
+  94 0036 82B0     		sub	sp, sp, #8
+  95              	.LCFI4:
+  96              		.cfi_def_cfa_offset 16
+  97 0038 00AF     		add	r7, sp, #0
+  98              	.LCFI5:
+  99              		.cfi_def_cfa_register 7
+ 100 003a 7860     		str	r0, [r7, #4]
+  28:../src/HC05.c **** 	while (*S != '\0') {
+ 101              		.loc 1 28 0
+ 102 003c 08E0     		b	.L6
+ 103              	.L7:
+  29:../src/HC05.c **** 		UART4_PutC(*S);
+ 104              		.loc 1 29 0
+ 105 003e 7B68     		ldr	r3, [r7, #4]
+ 106 0040 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 107 0042 1846     		mov	r0, r3
+ 108 0044 FFF7FEFF 		bl	UART4_PutC
+  30:../src/HC05.c **** 		S++;
+ 109              		.loc 1 30 0
+ 110 0048 7B68     		ldr	r3, [r7, #4]
+ 111 004a 03F10103 		add	r3, r3, #1
+ 112 004e 7B60     		str	r3, [r7, #4]
+ 113              	.L6:
+  28:../src/HC05.c **** 	while (*S != '\0') {
+ 114              		.loc 1 28 0 discriminator 1
+ 115 0050 7B68     		ldr	r3, [r7, #4]
+ 116 0052 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 117 0054 002B     		cmp	r3, #0
+ 118 0056 F2D1     		bne	.L7
+  31:../src/HC05.c **** 	}
+  32:../src/HC05.c **** }
+ 119              		.loc 1 32 0
+ 120 0058 07F10807 		add	r7, r7, #8
+ 121 005c BD46     		mov	sp, r7
+ 122 005e 80BD     		pop	{r7, pc}
+ 123              		.cfi_endproc
+ 124              	.LFE56:
+ 126              		.align	2
+ 127              		.global	UART4_getC
+ 128              		.thumb
+ 129              		.thumb_func
+ 131              	UART4_getC:
+ 132              	.LFB57:
+  33:../src/HC05.c **** char UART4_getC(void) {
+ 133              		.loc 1 33 0
+ 134              		.cfi_startproc
+ 135              		@ args = 0, pretend = 0, frame = 8
+ 136              		@ frame_needed = 1, uses_anonymous_args = 0
+ 137 0060 80B5     		push	{r7, lr}
+ 138              	.LCFI6:
+ 139              		.cfi_def_cfa_offset 8
+ 140              		.cfi_offset 7, -8
+ 141              		.cfi_offset 14, -4
+ 142 0062 82B0     		sub	sp, sp, #8
+ 143              	.LCFI7:
+ 144              		.cfi_def_cfa_offset 16
+ 145 0064 00AF     		add	r7, sp, #0
+ 146              	.LCFI8:
+ 147              		.cfi_def_cfa_register 7
+  34:../src/HC05.c **** 	char C = 0;
+ 148              		.loc 1 34 0
+ 149 0066 4FF00003 		mov	r3, #0
+ 150 006a FB71     		strb	r3, [r7, #7]
+  35:../src/HC05.c **** 	int time_out = 0;
+ 151              		.loc 1 35 0
+ 152 006c 4FF00003 		mov	r3, #0
+ 153 0070 3B60     		str	r3, [r7, #0]
+  36:../src/HC05.c **** 	time_out = MiliCount + 1;
+ 154              		.loc 1 36 0
+ 155 0072 104B     		ldr	r3, .L12
+ 156 0074 1B68     		ldr	r3, [r3, #0]
+ 157 0076 03F10103 		add	r3, r3, #1
+ 158 007a 3B60     		str	r3, [r7, #0]
+  37:../src/HC05.c **** 	while (USART_GetFlagStatus(UART4, USART_FLAG_RXNE) != SET) {
+ 159              		.loc 1 37 0
+ 160 007c 07E0     		b	.L9
+ 161              	.L11:
+  38:../src/HC05.c **** 		if (time_out < MiliCount)
+ 162              		.loc 1 38 0
+ 163 007e 3A68     		ldr	r2, [r7, #0]
+ 164 0080 0C4B     		ldr	r3, .L12
+ 165 0082 1B68     		ldr	r3, [r3, #0]
+ 166 0084 9A42     		cmp	r2, r3
+ 167 0086 02D2     		bcs	.L9
+  39:../src/HC05.c **** 			return 0x0;
+ 168              		.loc 1 39 0
+ 169 0088 4FF00003 		mov	r3, #0
+ 170 008c 0DE0     		b	.L10
+ 171              	.L9:
+  37:../src/HC05.c **** 	while (USART_GetFlagStatus(UART4, USART_FLAG_RXNE) != SET) {
+ 172              		.loc 1 37 0 discriminator 1
+ 173 008e 0A48     		ldr	r0, .L12+4
+ 174 0090 4FF02001 		mov	r1, #32
+ 175 0094 FFF7FEFF 		bl	USART_GetFlagStatus
+ 176 0098 0346     		mov	r3, r0
+ 177 009a 012B     		cmp	r3, #1
+ 178 009c EFD1     		bne	.L11
+  40:../src/HC05.c **** 	}
+  41:../src/HC05.c **** 	C = USART_ReceiveData(UART4);
+ 179              		.loc 1 41 0
+ 180 009e 0648     		ldr	r0, .L12+4
+ 181 00a0 FFF7FEFF 		bl	USART_ReceiveData
+ 182 00a4 0346     		mov	r3, r0
+ 183 00a6 FB71     		strb	r3, [r7, #7]
+  42:../src/HC05.c **** 	return C;
+ 184              		.loc 1 42 0
+ 185 00a8 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 186              	.L10:
+  43:../src/HC05.c **** }
+ 187              		.loc 1 43 0
+ 188 00aa 1846     		mov	r0, r3
+ 189 00ac 07F10807 		add	r7, r7, #8
+ 190 00b0 BD46     		mov	sp, r7
+ 191 00b2 80BD     		pop	{r7, pc}
+ 192              	.L13:
+ 193              		.align	2
+ 194              	.L12:
+ 195 00b4 00000000 		.word	MiliCount
+ 196 00b8 004C0040 		.word	1073761280
+ 197              		.cfi_endproc
+ 198              	.LFE57:
+ 200              		.align	2
+ 201              		.global	UART4_getS
+ 202              		.thumb
+ 203              		.thumb_func
+ 205              	UART4_getS:
+ 206              	.LFB58:
+  44:../src/HC05.c **** void UART4_getS(char *S) {
+ 207              		.loc 1 44 0
+ 208              		.cfi_startproc
+ 209              		@ args = 0, pretend = 0, frame = 16
+ 210              		@ frame_needed = 1, uses_anonymous_args = 0
+ 211 00bc 80B5     		push	{r7, lr}
+ 212              	.LCFI9:
+ 213              		.cfi_def_cfa_offset 8
+ 214              		.cfi_offset 7, -8
+ 215              		.cfi_offset 14, -4
+ 216 00be 84B0     		sub	sp, sp, #16
+ 217              	.LCFI10:
+ 218              		.cfi_def_cfa_offset 24
+ 219 00c0 00AF     		add	r7, sp, #0
+ 220              	.LCFI11:
+ 221              		.cfi_def_cfa_register 7
+ 222 00c2 7860     		str	r0, [r7, #4]
+  45:../src/HC05.c **** 	int time_out = MiliCount + 1;
+ 223              		.loc 1 45 0
+ 224 00c4 154B     		ldr	r3, .L21
+ 225 00c6 1B68     		ldr	r3, [r3, #0]
+ 226 00c8 03F10103 		add	r3, r3, #1
+ 227 00cc FB60     		str	r3, [r7, #12]
+  46:../src/HC05.c **** 	char Cchar;
+  47:../src/HC05.c **** 	while (1) {
+  48:../src/HC05.c **** 		while (USART_GetFlagStatus(UART4, USART_FLAG_RXNE) != SET) {
+ 228              		.loc 1 48 0
+ 229 00ce 04E0     		b	.L15
+ 230              	.L17:
+  49:../src/HC05.c **** 			if (time_out < MiliCount) {
+ 231              		.loc 1 49 0
+ 232 00d0 FA68     		ldr	r2, [r7, #12]
+ 233 00d2 124B     		ldr	r3, .L21
+ 234 00d4 1B68     		ldr	r3, [r3, #0]
+ 235 00d6 9A42     		cmp	r2, r3
+ 236 00d8 1AD3     		bcc	.L20
+ 237              	.L15:
+  48:../src/HC05.c **** 		while (USART_GetFlagStatus(UART4, USART_FLAG_RXNE) != SET) {
+ 238              		.loc 1 48 0 discriminator 1
+ 239 00da 1148     		ldr	r0, .L21+4
+ 240 00dc 4FF02001 		mov	r1, #32
+ 241 00e0 FFF7FEFF 		bl	USART_GetFlagStatus
+ 242 00e4 0346     		mov	r3, r0
+ 243 00e6 012B     		cmp	r3, #1
+ 244 00e8 F2D1     		bne	.L17
+  50:../src/HC05.c **** 				return;
+  51:../src/HC05.c **** 			}
+  52:../src/HC05.c **** 		}
+  53:../src/HC05.c **** 		Cchar = USART_ReceiveData(UART4);
+ 245              		.loc 1 53 0
+ 246 00ea 0D48     		ldr	r0, .L21+4
+ 247 00ec FFF7FEFF 		bl	USART_ReceiveData
+ 248 00f0 0346     		mov	r3, r0
+ 249 00f2 FB72     		strb	r3, [r7, #11]
+  54:../src/HC05.c **** 		*S = Cchar;
+ 250              		.loc 1 54 0
+ 251 00f4 7B68     		ldr	r3, [r7, #4]
+ 252 00f6 FA7A     		ldrb	r2, [r7, #11]
+ 253 00f8 1A70     		strb	r2, [r3, #0]
+  55:../src/HC05.c **** 		S++;
+ 254              		.loc 1 55 0
+ 255 00fa 7B68     		ldr	r3, [r7, #4]
+ 256 00fc 03F10103 		add	r3, r3, #1
+ 257 0100 7B60     		str	r3, [r7, #4]
+  56:../src/HC05.c **** 		time_out = MiliCount + 1;
+ 258              		.loc 1 56 0
+ 259 0102 064B     		ldr	r3, .L21
+ 260 0104 1B68     		ldr	r3, [r3, #0]
+ 261 0106 03F10103 		add	r3, r3, #1
+ 262 010a FB60     		str	r3, [r7, #12]
+  57:../src/HC05.c **** 	}
+ 263              		.loc 1 57 0
+ 264 010c 00BF     		nop
+  48:../src/HC05.c **** 		while (USART_GetFlagStatus(UART4, USART_FLAG_RXNE) != SET) {
+ 265              		.loc 1 48 0
+ 266 010e E4E7     		b	.L15
+ 267              	.L20:
+  50:../src/HC05.c **** 				return;
+ 268              		.loc 1 50 0
+ 269 0110 00BF     		nop
+ 270              	.L19:
+  58:../src/HC05.c **** 
+  59:../src/HC05.c **** }
+ 271              		.loc 1 59 0
+ 272 0112 07F11007 		add	r7, r7, #16
+ 273 0116 BD46     		mov	sp, r7
+ 274 0118 80BD     		pop	{r7, pc}
+ 275              	.L22:
+ 276 011a 00BF     		.align	2
+ 277              	.L21:
+ 278 011c 00000000 		.word	MiliCount
+ 279 0120 004C0040 		.word	1073761280
+ 280              		.cfi_endproc
+ 281              	.LFE58:
+ 283              		.align	2
+ 284              		.global	HC05_Get_Connected
+ 285              		.thumb
+ 286              		.thumb_func
+ 288              	HC05_Get_Connected:
+ 289              	.LFB59:
+  60:../src/HC05.c **** int HC05_Get_Connected(void) {
+ 290              		.loc 1 60 0
+ 291              		.cfi_startproc
+ 292              		@ args = 0, pretend = 0, frame = 0
+ 293              		@ frame_needed = 1, uses_anonymous_args = 0
+ 294 0124 80B5     		push	{r7, lr}
+ 295              	.LCFI12:
+ 296              		.cfi_def_cfa_offset 8
+ 297              		.cfi_offset 7, -8
+ 298              		.cfi_offset 14, -4
+ 299 0126 00AF     		add	r7, sp, #0
+ 300              	.LCFI13:
+ 301              		.cfi_def_cfa_register 7
+  61:../src/HC05.c **** 	if (GPIO_ReadInputDataBit(HC05_PIO9_port, HC05_PIO9_pin)) {
+ 302              		.loc 1 61 0
+ 303 0128 0748     		ldr	r0, .L26
+ 304 012a 4FF40041 		mov	r1, #32768
+ 305 012e FFF7FEFF 		bl	GPIO_ReadInputDataBit
+ 306 0132 0346     		mov	r3, r0
+ 307 0134 002B     		cmp	r3, #0
+ 308 0136 02D0     		beq	.L24
+  62:../src/HC05.c **** 		return 1;
+ 309              		.loc 1 62 0
+ 310 0138 4FF00103 		mov	r3, #1
+ 311 013c 01E0     		b	.L25
+ 312              	.L24:
+  63:../src/HC05.c **** 	} else {
+  64:../src/HC05.c **** 		return 0;
+ 313              		.loc 1 64 0
+ 314 013e 4FF00003 		mov	r3, #0
+ 315              	.L25:
+  65:../src/HC05.c **** 	}
+  66:../src/HC05.c **** 
+  67:../src/HC05.c **** }
+ 316              		.loc 1 67 0
+ 317 0142 1846     		mov	r0, r3
+ 318 0144 80BD     		pop	{r7, pc}
+ 319              	.L27:
+ 320 0146 00BF     		.align	2
+ 321              	.L26:
+ 322 0148 000C0140 		.word	1073810432
+ 323              		.cfi_endproc
+ 324              	.LFE59:
+ 326              		.section	.rodata
+ 327              		.align	2
+ 328              	.LC0:
+ 329 0000 4F4B0A0D 		.ascii	"OK\012\015\000"
+ 329      00
+ 330              		.text
+ 331              		.align	2
+ 332              		.global	HC05_TestOk
+ 333              		.thumb
+ 334              		.thumb_func
+ 336              	HC05_TestOk:
+ 337              	.LFB60:
+  68:../src/HC05.c **** int HC05_TestOk(void) {
+ 338              		.loc 1 68 0
+ 339              		.cfi_startproc
+ 340              		@ args = 0, pretend = 0, frame = 8
+ 341              		@ frame_needed = 1, uses_anonymous_args = 0
+ 342 014c 80B5     		push	{r7, lr}
+ 343              	.LCFI14:
+ 344              		.cfi_def_cfa_offset 8
+ 345              		.cfi_offset 7, -8
+ 346              		.cfi_offset 14, -4
+ 347 014e 82B0     		sub	sp, sp, #8
+ 348              	.LCFI15:
+ 349              		.cfi_def_cfa_offset 16
+ 350 0150 00AF     		add	r7, sp, #0
+ 351              	.LCFI16:
+ 352              		.cfi_def_cfa_register 7
+  69:../src/HC05.c **** 	char str[5] = { 0 };
+ 353              		.loc 1 69 0
+ 354 0152 4FF00003 		mov	r3, #0
+ 355 0156 3B60     		str	r3, [r7, #0]
+ 356 0158 4FF00003 		mov	r3, #0
+ 357 015c 3B71     		strb	r3, [r7, #4]
+  70:../src/HC05.c **** 	UART4_getS(str);
+ 358              		.loc 1 70 0
+ 359 015e 3B46     		mov	r3, r7
+ 360 0160 1846     		mov	r0, r3
+ 361 0162 FFF7FEFF 		bl	UART4_getS
+  71:../src/HC05.c **** 	if (strcmp(str, "OK\n\r")) {
+ 362              		.loc 1 71 0
+ 363 0166 3B46     		mov	r3, r7
+ 364 0168 1846     		mov	r0, r3
+ 365 016a 0849     		ldr	r1, .L32
+ 366 016c FFF7FEFF 		bl	strcmp
+ 367 0170 0346     		mov	r3, r0
+ 368 0172 002B     		cmp	r3, #0
+ 369 0174 02D0     		beq	.L29
+  72:../src/HC05.c **** 		return 1;
+ 370              		.loc 1 72 0
+ 371 0176 4FF00103 		mov	r3, #1
+ 372 017a 01E0     		b	.L31
+ 373              	.L29:
+  73:../src/HC05.c **** 	} else {
+  74:../src/HC05.c **** 		return 0;
+ 374              		.loc 1 74 0
+ 375 017c 4FF00003 		mov	r3, #0
+ 376              	.L31:
+  75:../src/HC05.c **** 	}
+  76:../src/HC05.c **** }
+ 377              		.loc 1 76 0
+ 378 0180 1846     		mov	r0, r3
+ 379 0182 07F10807 		add	r7, r7, #8
+ 380 0186 BD46     		mov	sp, r7
+ 381 0188 80BD     		pop	{r7, pc}
+ 382              	.L33:
+ 383 018a 00BF     		.align	2
+ 384              	.L32:
+ 385 018c 00000000 		.word	.LC0
+ 386              		.cfi_endproc
+ 387              	.LFE60:
+ 389              		.section	.rodata
+ 390 0005 000000   		.align	2
+ 391              	.LC1:
+ 392 0008 41540A0D 		.ascii	"AT\012\015\000"
+ 392      00
+ 393              		.text
+ 394              		.align	2
+ 395              		.global	HC05_check
+ 396              		.thumb
+ 397              		.thumb_func
+ 399              	HC05_check:
+ 400              	.LFB61:
+  77:../src/HC05.c **** int HC05_check(void) {
+ 401              		.loc 1 77 0
+ 402              		.cfi_startproc
+ 403              		@ args = 0, pretend = 0, frame = 0
+ 404              		@ frame_needed = 1, uses_anonymous_args = 0
+ 405 0190 80B5     		push	{r7, lr}
+ 406              	.LCFI17:
+ 407              		.cfi_def_cfa_offset 8
+ 408              		.cfi_offset 7, -8
+ 409              		.cfi_offset 14, -4
+ 410 0192 00AF     		add	r7, sp, #0
+ 411              	.LCFI18:
+ 412              		.cfi_def_cfa_register 7
+  78:../src/HC05.c **** 	HC05_EN;
+ 413              		.loc 1 78 0
+ 414 0194 2048     		ldr	r0, .L42
+ 415 0196 4FF48041 		mov	r1, #16384
+ 416 019a FFF7FEFF 		bl	GPIO_SetBits
+  79:../src/HC05.c **** 	HC05_Reset();
+ 417              		.loc 1 79 0
+ 418 019e FFF7FEFF 		bl	HC05_Reset
+  80:../src/HC05.c **** 	memset(BLE_buff_temp, 0, sizeof(BLE_buff_temp)); //clear buff
+ 419              		.loc 1 80 0
+ 420 01a2 1E48     		ldr	r0, .L42+4
+ 421 01a4 4FF00001 		mov	r1, #0
+ 422 01a8 4FF48072 		mov	r2, #256
+ 423 01ac FFF7FEFF 		bl	memset
+  81:../src/HC05.c **** 	BLE_buff_idx = 0; //reset index
+ 424              		.loc 1 81 0
+ 425 01b0 1B4B     		ldr	r3, .L42+8
+ 426 01b2 4FF00002 		mov	r2, #0
+ 427 01b6 1A60     		str	r2, [r3, #0]
+  82:../src/HC05.c **** 	UART4_PutS("AT\n\r"); //send AT
+ 428              		.loc 1 82 0
+ 429 01b8 1A48     		ldr	r0, .L42+12
+ 430 01ba FFF7FEFF 		bl	UART4_PutS
+  83:../src/HC05.c **** 	last_check_time = MiliCount + 5; //set timeout point
+ 431              		.loc 1 83 0
+ 432 01be 1A4B     		ldr	r3, .L42+16
+ 433 01c0 1B68     		ldr	r3, [r3, #0]
+ 434 01c2 03F10502 		add	r2, r3, #5
+ 435 01c6 194B     		ldr	r3, .L42+20
+ 436 01c8 1A60     		str	r2, [r3, #0]
+  84:../src/HC05.c **** 	//waiting for response
+  85:../src/HC05.c **** 	while (BLE_buff_temp[0] == 0) {
+ 437              		.loc 1 85 0
+ 438 01ca 05E0     		b	.L35
+ 439              	.L37:
+  86:../src/HC05.c **** 		if (last_check_time < MiliCount)
+ 440              		.loc 1 86 0
+ 441 01cc 174B     		ldr	r3, .L42+20
+ 442 01ce 1A68     		ldr	r2, [r3, #0]
+ 443 01d0 154B     		ldr	r3, .L42+16
+ 444 01d2 1B68     		ldr	r3, [r3, #0]
+ 445 01d4 9A42     		cmp	r2, r3
+ 446 01d6 04D3     		bcc	.L41
+ 447              	.L35:
+  85:../src/HC05.c **** 	while (BLE_buff_temp[0] == 0) {
+ 448              		.loc 1 85 0 discriminator 1
+ 449 01d8 104B     		ldr	r3, .L42+4
+ 450 01da 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 451 01dc 002B     		cmp	r3, #0
+ 452 01de F5D0     		beq	.L37
+ 453 01e0 00E0     		b	.L36
+ 454              	.L41:
+  87:../src/HC05.c **** 			break; //time out
+ 455              		.loc 1 87 0
+ 456 01e2 00BF     		nop
+ 457              	.L36:
+  88:../src/HC05.c **** 	}
+  89:../src/HC05.c **** 	HC05_DIS;
+ 458              		.loc 1 89 0
+ 459 01e4 0C48     		ldr	r0, .L42
+ 460 01e6 4FF48041 		mov	r1, #16384
+ 461 01ea FFF7FEFF 		bl	GPIO_ResetBits
+  90:../src/HC05.c **** 	if (BLE_buff_temp[0] != 0) {
+ 462              		.loc 1 90 0
+ 463 01ee 0B4B     		ldr	r3, .L42+4
+ 464 01f0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 465 01f2 002B     		cmp	r3, #0
+ 466 01f4 0CD0     		beq	.L38
+  91:../src/HC05.c **** 		if (strcmp(BLE_buff_temp, "OK\n\r")) {
+ 467              		.loc 1 91 0
+ 468 01f6 0948     		ldr	r0, .L42+4
+ 469 01f8 0D49     		ldr	r1, .L42+24
+ 470 01fa FFF7FEFF 		bl	strcmp
+ 471 01fe 0346     		mov	r3, r0
+ 472 0200 002B     		cmp	r3, #0
+ 473 0202 02D0     		beq	.L39
+  92:../src/HC05.c **** 			return 1; //ok
+ 474              		.loc 1 92 0
+ 475 0204 4FF00103 		mov	r3, #1
+ 476 0208 04E0     		b	.L40
+ 477              	.L39:
+  93:../src/HC05.c **** 		} else {
+  94:../src/HC05.c **** 			return 0; //fail
+ 478              		.loc 1 94 0
+ 479 020a 4FF00003 		mov	r3, #0
+ 480 020e 01E0     		b	.L40
+ 481              	.L38:
+  95:../src/HC05.c **** 		}
+  96:../src/HC05.c **** 	} else
+  97:../src/HC05.c **** 		return -1; //no response
+ 482              		.loc 1 97 0
+ 483 0210 4FF0FF33 		mov	r3, #-1
+ 484              	.L40:
+  98:../src/HC05.c **** 
+  99:../src/HC05.c **** }
+ 485              		.loc 1 99 0
+ 486 0214 1846     		mov	r0, r3
+ 487 0216 80BD     		pop	{r7, pc}
+ 488              	.L43:
+ 489              		.align	2
+ 490              	.L42:
+ 491 0218 000C0140 		.word	1073810432
+ 492 021c 00000000 		.word	BLE_buff_temp
+ 493 0220 00000000 		.word	BLE_buff_idx
+ 494 0224 08000000 		.word	.LC1
+ 495 0228 00000000 		.word	MiliCount
+ 496 022c 00000000 		.word	last_check_time
+ 497 0230 00000000 		.word	.LC0
+ 498              		.cfi_endproc
+ 499              	.LFE61:
+ 501              		.section	.rodata
+ 502 000d 000000   		.align	2
+ 503              	.LC2:
+ 504 0010 41542B52 		.ascii	"AT+RESET\012\015\000"
+ 504      45534554 
+ 504      0A0D00
+ 505              		.text
+ 506              		.align	2
+ 507              		.global	HC05_Reset
+ 508              		.thumb
+ 509              		.thumb_func
+ 511              	HC05_Reset:
+ 512              	.LFB62:
+ 100:../src/HC05.c **** int HC05_Reset(void) {
+ 513              		.loc 1 100 0
+ 514              		.cfi_startproc
+ 515              		@ args = 0, pretend = 0, frame = 0
+ 516              		@ frame_needed = 1, uses_anonymous_args = 0
+ 517 0234 80B5     		push	{r7, lr}
+ 518              	.LCFI19:
+ 519              		.cfi_def_cfa_offset 8
+ 520              		.cfi_offset 7, -8
+ 521              		.cfi_offset 14, -4
+ 522 0236 00AF     		add	r7, sp, #0
+ 523              	.LCFI20:
+ 524              		.cfi_def_cfa_register 7
+ 101:../src/HC05.c **** 	memset(BLE_buff_temp, 0, sizeof(BLE_buff_temp)); //clear buff
+ 525              		.loc 1 101 0
+ 526 0238 1748     		ldr	r0, .L50
+ 527 023a 4FF00001 		mov	r1, #0
+ 528 023e 4FF48072 		mov	r2, #256
+ 529 0242 FFF7FEFF 		bl	memset
+ 102:../src/HC05.c **** 	BLE_buff_idx = 0; //reset index
+ 530              		.loc 1 102 0
+ 531 0246 154B     		ldr	r3, .L50+4
+ 532 0248 4FF00002 		mov	r2, #0
+ 533 024c 1A60     		str	r2, [r3, #0]
+ 103:../src/HC05.c **** 	UART4_PutS("AT+RESET\n\r"); //send AT
+ 534              		.loc 1 103 0
+ 535 024e 1448     		ldr	r0, .L50+8
+ 536 0250 FFF7FEFF 		bl	UART4_PutS
+ 104:../src/HC05.c **** 	last_check_time = MiliCount + 100; //set timeout point
+ 537              		.loc 1 104 0
+ 538 0254 134B     		ldr	r3, .L50+12
+ 539 0256 1B68     		ldr	r3, [r3, #0]
+ 540 0258 03F16402 		add	r2, r3, #100
+ 541 025c 124B     		ldr	r3, .L50+16
+ 542 025e 1A60     		str	r2, [r3, #0]
+ 543 0260 00E0     		b	.L46
+ 544              	.L49:
+ 105:../src/HC05.c **** 	//waiting for response
+ 106:../src/HC05.c **** 	while (1) {
+ 107:../src/HC05.c **** 		if (last_check_time < MiliCount || BLE_buff_temp[BLE_buff_idx] == 0x0a)
+ 108:../src/HC05.c **** 			break;
+ 109:../src/HC05.c **** 	}
+ 545              		.loc 1 109 0
+ 546 0262 00BF     		nop
+ 547              	.L46:
+ 107:../src/HC05.c **** 		if (last_check_time < MiliCount || BLE_buff_temp[BLE_buff_idx] == 0x0a)
+ 548              		.loc 1 107 0
+ 549 0264 104B     		ldr	r3, .L50+16
+ 550 0266 1A68     		ldr	r2, [r3, #0]
+ 551 0268 0E4B     		ldr	r3, .L50+12
+ 552 026a 1B68     		ldr	r3, [r3, #0]
+ 553 026c 9A42     		cmp	r2, r3
+ 554 026e 05D3     		bcc	.L45
+ 107:../src/HC05.c **** 		if (last_check_time < MiliCount || BLE_buff_temp[BLE_buff_idx] == 0x0a)
+ 555              		.loc 1 107 0 is_stmt 0 discriminator 1
+ 556 0270 0A4B     		ldr	r3, .L50+4
+ 557 0272 1B68     		ldr	r3, [r3, #0]
+ 558 0274 084A     		ldr	r2, .L50
+ 559 0276 D35C     		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 560 0278 0A2B     		cmp	r3, #10
+ 561 027a F2D1     		bne	.L49
+ 562              	.L45:
+ 110:../src/HC05.c **** 	if (strcmp(BLE_buff_temp, "OK\n\r")) {
+ 563              		.loc 1 110 0 is_stmt 1
+ 564 027c 0648     		ldr	r0, .L50
+ 565 027e 0B49     		ldr	r1, .L50+20
+ 566 0280 FFF7FEFF 		bl	strcmp
+ 567 0284 0346     		mov	r3, r0
+ 568 0286 002B     		cmp	r3, #0
+ 569 0288 02D0     		beq	.L47
+ 111:../src/HC05.c **** 		return 1; //ok
+ 570              		.loc 1 111 0
+ 571 028a 4FF00103 		mov	r3, #1
+ 572 028e 01E0     		b	.L48
+ 573              	.L47:
+ 112:../src/HC05.c **** 	} else {
+ 113:../src/HC05.c **** 		return 0; //fail
+ 574              		.loc 1 113 0
+ 575 0290 4FF00003 		mov	r3, #0
+ 576              	.L48:
+ 114:../src/HC05.c **** 	}
+ 115:../src/HC05.c **** }
+ 577              		.loc 1 115 0
+ 578 0294 1846     		mov	r0, r3
+ 579 0296 80BD     		pop	{r7, pc}
+ 580              	.L51:
+ 581              		.align	2
+ 582              	.L50:
+ 583 0298 00000000 		.word	BLE_buff_temp
+ 584 029c 00000000 		.word	BLE_buff_idx
+ 585 02a0 10000000 		.word	.LC2
+ 586 02a4 00000000 		.word	MiliCount
+ 587 02a8 00000000 		.word	last_check_time
+ 588 02ac 00000000 		.word	.LC0
+ 589              		.cfi_endproc
+ 590              	.LFE62:
+ 592              		.section	.rodata
+ 593 001b 00       		.align	2
+ 594              	.LC3:
+ 595 001c 41542B50 		.ascii	"AT+PSWD=%s\015\012\000"
+ 595      5357443D 
+ 595      25730D0A 
+ 595      00
+ 596 0029 000000   		.align	2
+ 597              	.LC4:
+ 598 002c 4F4B0D0A 		.ascii	"OK\015\012\000"
+ 598      00
+ 599 0031 000000   		.align	2
+ 600              	.LC5:
+ 601 0034 41542B52 		.ascii	"AT+RESET\015\012\000"
+ 601      45534554 
+ 601      0D0A00
+ 602              		.text
+ 603              		.align	2
+ 604              		.global	HC05_SetPassword
+ 605              		.thumb
+ 606              		.thumb_func
+ 608              	HC05_SetPassword:
+ 609              	.LFB63:
+ 116:../src/HC05.c **** int HC05_SetPassword(char *str) {
+ 610              		.loc 1 116 0
+ 611              		.cfi_startproc
+ 612              		@ args = 0, pretend = 0, frame = 72
+ 613              		@ frame_needed = 1, uses_anonymous_args = 0
+ 614 02b0 80B5     		push	{r7, lr}
+ 615              	.LCFI21:
+ 616              		.cfi_def_cfa_offset 8
+ 617              		.cfi_offset 7, -8
+ 618              		.cfi_offset 14, -4
+ 619 02b2 92B0     		sub	sp, sp, #72
+ 620              	.LCFI22:
+ 621              		.cfi_def_cfa_offset 80
+ 622 02b4 00AF     		add	r7, sp, #0
+ 623              	.LCFI23:
+ 624              		.cfi_def_cfa_register 7
+ 625 02b6 7860     		str	r0, [r7, #4]
+ 117:../src/HC05.c **** 	char data[64] = { 0 };
+ 626              		.loc 1 117 0
+ 627 02b8 07F10802 		add	r2, r7, #8
+ 628 02bc 4FF04003 		mov	r3, #64
+ 629 02c0 1046     		mov	r0, r2
+ 630 02c2 4FF00001 		mov	r1, #0
+ 631 02c6 1A46     		mov	r2, r3
+ 632 02c8 FFF7FEFF 		bl	memset
+ 118:../src/HC05.c **** 	HC05_EN;
+ 633              		.loc 1 118 0
+ 634 02cc 3148     		ldr	r0, .L59
+ 635 02ce 4FF48041 		mov	r1, #16384
+ 636 02d2 FFF7FEFF 		bl	GPIO_SetBits
+ 119:../src/HC05.c **** 	delay_ms(100);
+ 637              		.loc 1 119 0
+ 638 02d6 4FF06400 		mov	r0, #100
+ 639 02da FFF7FEFF 		bl	delay_ms
+ 120:../src/HC05.c **** 	//UART4_PutS("AT+RESET\r\n");
+ 121:../src/HC05.c **** 	//delay_ms(100);
+ 122:../src/HC05.c **** 	memset(BLE_buff_temp, 0, sizeof(BLE_buff_temp)); //clear buff
+ 640              		.loc 1 122 0
+ 641 02de 2E48     		ldr	r0, .L59+4
+ 642 02e0 4FF00001 		mov	r1, #0
+ 643 02e4 4FF48072 		mov	r2, #256
+ 644 02e8 FFF7FEFF 		bl	memset
+ 123:../src/HC05.c **** 	BLE_buff_idx = 0; //reset index
+ 645              		.loc 1 123 0
+ 646 02ec 2B4B     		ldr	r3, .L59+8
+ 647 02ee 4FF00002 		mov	r2, #0
+ 648 02f2 1A60     		str	r2, [r3, #0]
+ 124:../src/HC05.c **** 	usnprintf(data, strlen(str) + strlen("AT+PSWD=\r\n"), "AT+PSWD=%s\r\n",
+ 649              		.loc 1 124 0
+ 650 02f4 7868     		ldr	r0, [r7, #4]
+ 651 02f6 FFF7FEFF 		bl	strlen
+ 652 02fa 0346     		mov	r3, r0
+ 653 02fc 03F10A03 		add	r3, r3, #10
+ 654 0300 07F10802 		add	r2, r7, #8
+ 655 0304 1046     		mov	r0, r2
+ 656 0306 1946     		mov	r1, r3
+ 657 0308 254A     		ldr	r2, .L59+12
+ 658 030a 7B68     		ldr	r3, [r7, #4]
+ 659 030c FFF7FEFF 		bl	usnprintf
+ 125:../src/HC05.c **** 			str);
+ 126:../src/HC05.c **** 	UART4_PutS(data);
+ 660              		.loc 1 126 0
+ 661 0310 07F10803 		add	r3, r7, #8
+ 662 0314 1846     		mov	r0, r3
+ 663 0316 FFF7FEFF 		bl	UART4_PutS
+ 127:../src/HC05.c **** 	//delay_ms(100); //set name
+ 128:../src/HC05.c **** 	last_check_time = MiliCount + 100; //set timeout point
+ 664              		.loc 1 128 0
+ 665 031a 224B     		ldr	r3, .L59+16
+ 666 031c 1B68     		ldr	r3, [r3, #0]
+ 667 031e 03F16402 		add	r2, r3, #100
+ 668 0322 214B     		ldr	r3, .L59+20
+ 669 0324 1A60     		str	r2, [r3, #0]
+ 670 0326 00E0     		b	.L54
+ 671              	.L58:
+ 129:../src/HC05.c **** 	//waiting for response
+ 130:../src/HC05.c **** 	while (1) {
+ 131:../src/HC05.c **** 		if ((last_check_time < MiliCount)
+ 132:../src/HC05.c **** 				|| (BLE_buff_temp[BLE_buff_idx] == 0x0a))
+ 133:../src/HC05.c **** 			break;
+ 134:../src/HC05.c **** 	}
+ 672              		.loc 1 134 0
+ 673 0328 00BF     		nop
+ 674              	.L54:
+ 131:../src/HC05.c **** 		if ((last_check_time < MiliCount)
+ 675              		.loc 1 131 0
+ 676 032a 1F4B     		ldr	r3, .L59+20
+ 677 032c 1A68     		ldr	r2, [r3, #0]
+ 678 032e 1D4B     		ldr	r3, .L59+16
+ 679 0330 1B68     		ldr	r3, [r3, #0]
+ 680 0332 9A42     		cmp	r2, r3
+ 681 0334 05D3     		bcc	.L53
+ 132:../src/HC05.c **** 				|| (BLE_buff_temp[BLE_buff_idx] == 0x0a))
+ 682              		.loc 1 132 0
+ 683 0336 194B     		ldr	r3, .L59+8
+ 684 0338 1B68     		ldr	r3, [r3, #0]
+ 685 033a 174A     		ldr	r2, .L59+4
+ 686 033c D35C     		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 687 033e 0A2B     		cmp	r3, #10
+ 688 0340 F2D1     		bne	.L58
+ 689              	.L53:
+ 135:../src/HC05.c **** 	//xprintf("Response:%s", BLE_buff_temp);
+ 136:../src/HC05.c **** 	if (strcmp(BLE_buff_temp, "OK\r\n") == 0) {
+ 690              		.loc 1 136 0
+ 691 0342 1548     		ldr	r0, .L59+4
+ 692 0344 1949     		ldr	r1, .L59+24
+ 693 0346 FFF7FEFF 		bl	strcmp
+ 694 034a 0346     		mov	r3, r0
+ 695 034c 002B     		cmp	r3, #0
+ 696 034e 0ED1     		bne	.L55
+ 137:../src/HC05.c **** 		HC05_DIS;
+ 697              		.loc 1 137 0
+ 698 0350 1048     		ldr	r0, .L59
+ 699 0352 4FF48041 		mov	r1, #16384
+ 700 0356 FFF7FEFF 		bl	GPIO_ResetBits
+ 138:../src/HC05.c **** 		delay_ms(100);
+ 701              		.loc 1 138 0
+ 702 035a 4FF06400 		mov	r0, #100
+ 703 035e FFF7FEFF 		bl	delay_ms
+ 139:../src/HC05.c **** 		UART4_PutS("AT+RESET\r\n");
+ 704              		.loc 1 139 0
+ 705 0362 1348     		ldr	r0, .L59+28
+ 706 0364 FFF7FEFF 		bl	UART4_PutS
+ 140:../src/HC05.c **** 		return 1; //ok
+ 707              		.loc 1 140 0
+ 708 0368 4FF00103 		mov	r3, #1
+ 709 036c 0DE0     		b	.L57
+ 710              	.L55:
+ 141:../src/HC05.c **** 	} else {
+ 142:../src/HC05.c **** 		HC05_DIS;
+ 711              		.loc 1 142 0
+ 712 036e 0948     		ldr	r0, .L59
+ 713 0370 4FF48041 		mov	r1, #16384
+ 714 0374 FFF7FEFF 		bl	GPIO_ResetBits
+ 143:../src/HC05.c **** 		delay_ms(100);
+ 715              		.loc 1 143 0
+ 716 0378 4FF06400 		mov	r0, #100
+ 717 037c FFF7FEFF 		bl	delay_ms
+ 144:../src/HC05.c **** 		UART4_PutS("AT+RESET\r\n");
+ 718              		.loc 1 144 0
+ 719 0380 0B48     		ldr	r0, .L59+28
+ 720 0382 FFF7FEFF 		bl	UART4_PutS
+ 145:../src/HC05.c **** 		return 0; //fail
+ 721              		.loc 1 145 0
+ 722 0386 4FF00003 		mov	r3, #0
+ 723              	.L57:
+ 146:../src/HC05.c **** 	}
+ 147:../src/HC05.c **** }
+ 724              		.loc 1 147 0
+ 725 038a 1846     		mov	r0, r3
+ 726 038c 07F14807 		add	r7, r7, #72
+ 727 0390 BD46     		mov	sp, r7
+ 728 0392 80BD     		pop	{r7, pc}
+ 729              	.L60:
+ 730              		.align	2
+ 731              	.L59:
+ 732 0394 000C0140 		.word	1073810432
+ 733 0398 00000000 		.word	BLE_buff_temp
+ 734 039c 00000000 		.word	BLE_buff_idx
+ 735 03a0 1C000000 		.word	.LC3
+ 736 03a4 00000000 		.word	MiliCount
+ 737 03a8 00000000 		.word	last_check_time
+ 738 03ac 2C000000 		.word	.LC4
+ 739 03b0 34000000 		.word	.LC5
+ 740              		.cfi_endproc
+ 741              	.LFE63:
+ 743              		.section	.rodata
+ 744 003f 00       		.align	2
+ 745              	.LC6:
+ 746 0040 41542B4E 		.ascii	"AT+NAME=%s\015\012\000"
+ 746      414D453D 
+ 746      25730D0A 
+ 746      00
+ 747 004d 000000   		.align	2
+ 748              	.LC7:
+ 749 0050 52657370 		.ascii	"Response:%s\000"
+ 749      6F6E7365 
+ 749      3A257300 
+ 750              		.text
+ 751              		.align	2
+ 752              		.global	HC05_SetName
+ 753              		.thumb
+ 754              		.thumb_func
+ 756              	HC05_SetName:
+ 757              	.LFB64:
+ 148:../src/HC05.c **** int HC05_SetName(char *str) {
+ 758              		.loc 1 148 0
+ 759              		.cfi_startproc
+ 760              		@ args = 0, pretend = 0, frame = 72
+ 761              		@ frame_needed = 1, uses_anonymous_args = 0
+ 762 03b4 80B5     		push	{r7, lr}
+ 763              	.LCFI24:
+ 764              		.cfi_def_cfa_offset 8
+ 765              		.cfi_offset 7, -8
+ 766              		.cfi_offset 14, -4
+ 767 03b6 92B0     		sub	sp, sp, #72
+ 768              	.LCFI25:
+ 769              		.cfi_def_cfa_offset 80
+ 770 03b8 00AF     		add	r7, sp, #0
+ 771              	.LCFI26:
+ 772              		.cfi_def_cfa_register 7
+ 773 03ba 7860     		str	r0, [r7, #4]
+ 149:../src/HC05.c **** 	char data[64] = { 0 };
+ 774              		.loc 1 149 0
+ 775 03bc 07F10802 		add	r2, r7, #8
+ 776 03c0 4FF04003 		mov	r3, #64
+ 777 03c4 1046     		mov	r0, r2
+ 778 03c6 4FF00001 		mov	r1, #0
+ 779 03ca 1A46     		mov	r2, r3
+ 780 03cc FFF7FEFF 		bl	memset
+ 150:../src/HC05.c **** 	HC05_EN;
+ 781              		.loc 1 150 0
+ 782 03d0 3348     		ldr	r0, .L68
+ 783 03d2 4FF48041 		mov	r1, #16384
+ 784 03d6 FFF7FEFF 		bl	GPIO_SetBits
+ 151:../src/HC05.c **** 	delay_ms(100);
+ 785              		.loc 1 151 0
+ 786 03da 4FF06400 		mov	r0, #100
+ 787 03de FFF7FEFF 		bl	delay_ms
+ 152:../src/HC05.c **** 	//UART4_PutS("AT+RESET\r\n");
+ 153:../src/HC05.c **** 	//delay_ms(100);
+ 154:../src/HC05.c **** 	memset(BLE_buff_temp, 0, sizeof(BLE_buff_temp)); //clear buff
+ 788              		.loc 1 154 0
+ 789 03e2 3048     		ldr	r0, .L68+4
+ 790 03e4 4FF00001 		mov	r1, #0
+ 791 03e8 4FF48072 		mov	r2, #256
+ 792 03ec FFF7FEFF 		bl	memset
+ 155:../src/HC05.c **** 	BLE_buff_idx = 0; //reset index
+ 793              		.loc 1 155 0
+ 794 03f0 2D4B     		ldr	r3, .L68+8
+ 795 03f2 4FF00002 		mov	r2, #0
+ 796 03f6 1A60     		str	r2, [r3, #0]
+ 156:../src/HC05.c **** 	usnprintf(data, strlen(str) + strlen("AT+NAME=\r\n"), "AT+NAME=%s\r\n",
+ 797              		.loc 1 156 0
+ 798 03f8 7868     		ldr	r0, [r7, #4]
+ 799 03fa FFF7FEFF 		bl	strlen
+ 800 03fe 0346     		mov	r3, r0
+ 801 0400 03F10A03 		add	r3, r3, #10
+ 802 0404 07F10802 		add	r2, r7, #8
+ 803 0408 1046     		mov	r0, r2
+ 804 040a 1946     		mov	r1, r3
+ 805 040c 274A     		ldr	r2, .L68+12
+ 806 040e 7B68     		ldr	r3, [r7, #4]
+ 807 0410 FFF7FEFF 		bl	usnprintf
+ 157:../src/HC05.c **** 			str);
+ 158:../src/HC05.c **** 	UART4_PutS(data);
+ 808              		.loc 1 158 0
+ 809 0414 07F10803 		add	r3, r7, #8
+ 810 0418 1846     		mov	r0, r3
+ 811 041a FFF7FEFF 		bl	UART4_PutS
+ 159:../src/HC05.c **** 	//delay_ms(100); //set name
+ 160:../src/HC05.c **** 	last_check_time = MiliCount + 100; //set timeout point
+ 812              		.loc 1 160 0
+ 813 041e 244B     		ldr	r3, .L68+16
+ 814 0420 1B68     		ldr	r3, [r3, #0]
+ 815 0422 03F16402 		add	r2, r3, #100
+ 816 0426 234B     		ldr	r3, .L68+20
+ 817 0428 1A60     		str	r2, [r3, #0]
+ 818 042a 00E0     		b	.L63
+ 819              	.L67:
+ 161:../src/HC05.c **** 	//waiting for response
+ 162:../src/HC05.c **** 	while (1) {
+ 163:../src/HC05.c **** 		if ((last_check_time < MiliCount)
+ 164:../src/HC05.c **** 				|| (BLE_buff_temp[BLE_buff_idx] == 0x0a))
+ 165:../src/HC05.c **** 			break;
+ 166:../src/HC05.c **** 	}
+ 820              		.loc 1 166 0
+ 821 042c 00BF     		nop
+ 822              	.L63:
+ 163:../src/HC05.c **** 		if ((last_check_time < MiliCount)
+ 823              		.loc 1 163 0
+ 824 042e 214B     		ldr	r3, .L68+20
+ 825 0430 1A68     		ldr	r2, [r3, #0]
+ 826 0432 1F4B     		ldr	r3, .L68+16
+ 827 0434 1B68     		ldr	r3, [r3, #0]
+ 828 0436 9A42     		cmp	r2, r3
+ 829 0438 05D3     		bcc	.L62
+ 164:../src/HC05.c **** 				|| (BLE_buff_temp[BLE_buff_idx] == 0x0a))
+ 830              		.loc 1 164 0
+ 831 043a 1B4B     		ldr	r3, .L68+8
+ 832 043c 1B68     		ldr	r3, [r3, #0]
+ 833 043e 194A     		ldr	r2, .L68+4
+ 834 0440 D35C     		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 835 0442 0A2B     		cmp	r3, #10
+ 836 0444 F2D1     		bne	.L67
+ 837              	.L62:
+ 167:../src/HC05.c **** 	xprintf("Response:%s", BLE_buff_temp);
+ 838              		.loc 1 167 0
+ 839 0446 1C48     		ldr	r0, .L68+24
+ 840 0448 1649     		ldr	r1, .L68+4
+ 841 044a FFF7FEFF 		bl	xprintf
+ 168:../src/HC05.c **** 	if (strcmp(BLE_buff_temp, "OK\r\n") == 0) {
+ 842              		.loc 1 168 0
+ 843 044e 1548     		ldr	r0, .L68+4
+ 844 0450 1A49     		ldr	r1, .L68+28
+ 845 0452 FFF7FEFF 		bl	strcmp
+ 846 0456 0346     		mov	r3, r0
+ 847 0458 002B     		cmp	r3, #0
+ 848 045a 0ED1     		bne	.L64
+ 169:../src/HC05.c **** 		HC05_DIS;
+ 849              		.loc 1 169 0
+ 850 045c 1048     		ldr	r0, .L68
+ 851 045e 4FF48041 		mov	r1, #16384
+ 852 0462 FFF7FEFF 		bl	GPIO_ResetBits
+ 170:../src/HC05.c **** 		delay_ms(100);
+ 853              		.loc 1 170 0
+ 854 0466 4FF06400 		mov	r0, #100
+ 855 046a FFF7FEFF 		bl	delay_ms
+ 171:../src/HC05.c **** 		UART4_PutS("AT+RESET\r\n");
+ 856              		.loc 1 171 0
+ 857 046e 1448     		ldr	r0, .L68+32
+ 858 0470 FFF7FEFF 		bl	UART4_PutS
+ 172:../src/HC05.c **** 		return 1; //ok
+ 859              		.loc 1 172 0
+ 860 0474 4FF00103 		mov	r3, #1
+ 861 0478 0DE0     		b	.L66
+ 862              	.L64:
+ 173:../src/HC05.c **** 	} else {
+ 174:../src/HC05.c **** 		HC05_DIS;
+ 863              		.loc 1 174 0
+ 864 047a 0948     		ldr	r0, .L68
+ 865 047c 4FF48041 		mov	r1, #16384
+ 866 0480 FFF7FEFF 		bl	GPIO_ResetBits
+ 175:../src/HC05.c **** 		delay_ms(100);
+ 867              		.loc 1 175 0
+ 868 0484 4FF06400 		mov	r0, #100
+ 869 0488 FFF7FEFF 		bl	delay_ms
+ 176:../src/HC05.c **** 		UART4_PutS("AT+RESET\r\n");
+ 870              		.loc 1 176 0
+ 871 048c 0C48     		ldr	r0, .L68+32
+ 872 048e FFF7FEFF 		bl	UART4_PutS
+ 177:../src/HC05.c **** 		return 0; //fail
+ 873              		.loc 1 177 0
+ 874 0492 4FF00003 		mov	r3, #0
+ 875              	.L66:
+ 178:../src/HC05.c **** 	}
+ 179:../src/HC05.c **** }
+ 876              		.loc 1 179 0
+ 877 0496 1846     		mov	r0, r3
+ 878 0498 07F14807 		add	r7, r7, #72
+ 879 049c BD46     		mov	sp, r7
+ 880 049e 80BD     		pop	{r7, pc}
+ 881              	.L69:
+ 882              		.align	2
+ 883              	.L68:
+ 884 04a0 000C0140 		.word	1073810432
+ 885 04a4 00000000 		.word	BLE_buff_temp
+ 886 04a8 00000000 		.word	BLE_buff_idx
+ 887 04ac 40000000 		.word	.LC6
+ 888 04b0 00000000 		.word	MiliCount
+ 889 04b4 00000000 		.word	last_check_time
+ 890 04b8 50000000 		.word	.LC7
+ 891 04bc 2C000000 		.word	.LC4
+ 892 04c0 34000000 		.word	.LC5
+ 893              		.cfi_endproc
+ 894              	.LFE64:
+ 896              		.section	.rodata
+ 897              		.align	2
+ 898              	.LC8:
+ 899 005c 41542B55 		.ascii	"AT+UART=38400,0,0\012\015\000"
+ 899      4152543D 
+ 899      33383430 
+ 899      302C302C 
+ 899      300A0D00 
+ 900              		.text
+ 901              		.align	2
+ 902              		.global	HC05_SetUsart
+ 903              		.thumb
+ 904              		.thumb_func
+ 906              	HC05_SetUsart:
+ 907              	.LFB65:
+ 180:../src/HC05.c **** int HC05_SetUsart(void) {
+ 908              		.loc 1 180 0
+ 909              		.cfi_startproc
+ 910              		@ args = 0, pretend = 0, frame = 0
+ 911              		@ frame_needed = 1, uses_anonymous_args = 0
+ 912 04c4 80B5     		push	{r7, lr}
+ 913              	.LCFI27:
+ 914              		.cfi_def_cfa_offset 8
+ 915              		.cfi_offset 7, -8
+ 916              		.cfi_offset 14, -4
+ 917 04c6 00AF     		add	r7, sp, #0
+ 918              	.LCFI28:
+ 919              		.cfi_def_cfa_register 7
+ 181:../src/HC05.c **** 	HC05_EN;
+ 920              		.loc 1 181 0
+ 921 04c8 1D48     		ldr	r0, .L78
+ 922 04ca 4FF48041 		mov	r1, #16384
+ 923 04ce FFF7FEFF 		bl	GPIO_SetBits
+ 182:../src/HC05.c **** 	memset(BLE_buff_temp, 0, sizeof(BLE_buff_temp)); //clear buff
+ 924              		.loc 1 182 0
+ 925 04d2 1C48     		ldr	r0, .L78+4
+ 926 04d4 4FF00001 		mov	r1, #0
+ 927 04d8 4FF48072 		mov	r2, #256
+ 928 04dc FFF7FEFF 		bl	memset
+ 183:../src/HC05.c **** 	BLE_buff_idx = 0; //reset index
+ 929              		.loc 1 183 0
+ 930 04e0 194B     		ldr	r3, .L78+8
+ 931 04e2 4FF00002 		mov	r2, #0
+ 932 04e6 1A60     		str	r2, [r3, #0]
+ 184:../src/HC05.c **** 	UART4_PutS("AT+UART=38400,0,0\n\r"); //set name
+ 933              		.loc 1 184 0
+ 934 04e8 1848     		ldr	r0, .L78+12
+ 935 04ea FFF7FEFF 		bl	UART4_PutS
+ 185:../src/HC05.c **** 	last_check_time = MiliCount + 5; //set timeout point
+ 936              		.loc 1 185 0
+ 937 04ee 184B     		ldr	r3, .L78+16
+ 938 04f0 1B68     		ldr	r3, [r3, #0]
+ 939 04f2 03F10502 		add	r2, r3, #5
+ 940 04f6 174B     		ldr	r3, .L78+20
+ 941 04f8 1A60     		str	r2, [r3, #0]
+ 186:../src/HC05.c **** 	//waiting for response
+ 187:../src/HC05.c **** 	while (BLE_buff_temp[0] == 0) {
+ 942              		.loc 1 187 0
+ 943 04fa 05E0     		b	.L71
+ 944              	.L73:
+ 188:../src/HC05.c **** 		if (last_check_time < MiliCount)
+ 945              		.loc 1 188 0
+ 946 04fc 154B     		ldr	r3, .L78+20
+ 947 04fe 1A68     		ldr	r2, [r3, #0]
+ 948 0500 134B     		ldr	r3, .L78+16
+ 949 0502 1B68     		ldr	r3, [r3, #0]
+ 950 0504 9A42     		cmp	r2, r3
+ 951 0506 04D3     		bcc	.L77
+ 952              	.L71:
+ 187:../src/HC05.c **** 	while (BLE_buff_temp[0] == 0) {
+ 953              		.loc 1 187 0 discriminator 1
+ 954 0508 0E4B     		ldr	r3, .L78+4
+ 955 050a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 956 050c 002B     		cmp	r3, #0
+ 957 050e F5D0     		beq	.L73
+ 958 0510 00E0     		b	.L72
+ 959              	.L77:
+ 189:../src/HC05.c **** 			break; //time out
+ 960              		.loc 1 189 0
+ 961 0512 00BF     		nop
+ 962              	.L72:
+ 190:../src/HC05.c **** 	}
+ 191:../src/HC05.c **** 	if (BLE_buff_temp[0] != 0) {
+ 963              		.loc 1 191 0
+ 964 0514 0B4B     		ldr	r3, .L78+4
+ 965 0516 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 966 0518 002B     		cmp	r3, #0
+ 967 051a 0CD0     		beq	.L74
+ 192:../src/HC05.c **** 		if (strcmp(BLE_buff_temp, "OK\r\n")) {
+ 968              		.loc 1 192 0
+ 969 051c 0948     		ldr	r0, .L78+4
+ 970 051e 0E49     		ldr	r1, .L78+24
+ 971 0520 FFF7FEFF 		bl	strcmp
+ 972 0524 0346     		mov	r3, r0
+ 973 0526 002B     		cmp	r3, #0
+ 974 0528 02D0     		beq	.L75
+ 193:../src/HC05.c **** 			return 1; //ok
+ 975              		.loc 1 193 0
+ 976 052a 4FF00103 		mov	r3, #1
+ 977 052e 04E0     		b	.L76
+ 978              	.L75:
+ 194:../src/HC05.c **** 		} else {
+ 195:../src/HC05.c **** 			return 0; //fail
+ 979              		.loc 1 195 0
+ 980 0530 4FF00003 		mov	r3, #0
+ 981 0534 01E0     		b	.L76
+ 982              	.L74:
+ 196:../src/HC05.c **** 		}
+ 197:../src/HC05.c **** 	} else
+ 198:../src/HC05.c **** 		return -1; //no response
+ 983              		.loc 1 198 0
+ 984 0536 4FF0FF33 		mov	r3, #-1
+ 985              	.L76:
+ 199:../src/HC05.c **** 
+ 200:../src/HC05.c **** }
+ 986              		.loc 1 200 0
+ 987 053a 1846     		mov	r0, r3
+ 988 053c 80BD     		pop	{r7, pc}
+ 989              	.L79:
+ 990 053e 00BF     		.align	2
+ 991              	.L78:
+ 992 0540 000C0140 		.word	1073810432
+ 993 0544 00000000 		.word	BLE_buff_temp
+ 994 0548 00000000 		.word	BLE_buff_idx
+ 995 054c 5C000000 		.word	.LC8
+ 996 0550 00000000 		.word	MiliCount
+ 997 0554 00000000 		.word	last_check_time
+ 998 0558 2C000000 		.word	.LC4
+ 999              		.cfi_endproc
+ 1000              	.LFE65:
+ 1002              		.align	2
+ 1003              		.global	HC05_seting
+ 1004              		.thumb
+ 1005              		.thumb_func
+ 1007              	HC05_seting:
+ 1008              	.LFB66:
+ 201:../src/HC05.c **** int HC05_seting(void) {
+ 1009              		.loc 1 201 0
+ 1010              		.cfi_startproc
+ 1011              		@ args = 0, pretend = 0, frame = 8
+ 1012              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1013 055c 80B5     		push	{r7, lr}
+ 1014              	.LCFI29:
+ 1015              		.cfi_def_cfa_offset 8
+ 1016              		.cfi_offset 7, -8
+ 1017              		.cfi_offset 14, -4
+ 1018 055e 82B0     		sub	sp, sp, #8
+ 1019              	.LCFI30:
+ 1020              		.cfi_def_cfa_offset 16
+ 1021 0560 00AF     		add	r7, sp, #0
+ 1022              	.LCFI31:
+ 1023              		.cfi_def_cfa_register 7
+ 202:../src/HC05.c **** 	HC05_EN;
+ 1024              		.loc 1 202 0
+ 1025 0562 0C48     		ldr	r0, .L84
+ 1026 0564 4FF48041 		mov	r1, #16384
+ 1027 0568 FFF7FEFF 		bl	GPIO_SetBits
+ 1028              	.LBB2:
+ 203:../src/HC05.c **** 	for (int i = 0; i < 5; i++) {
+ 1029              		.loc 1 203 0
+ 1030 056c 4FF00003 		mov	r3, #0
+ 1031 0570 7B60     		str	r3, [r7, #4]
+ 1032 0572 07E0     		b	.L81
+ 1033              	.L83:
+ 204:../src/HC05.c **** 		if (HC05_Reset())
+ 1034              		.loc 1 204 0
+ 1035 0574 FFF7FEFF 		bl	HC05_Reset
+ 1036 0578 0346     		mov	r3, r0
+ 1037 057a 002B     		cmp	r3, #0
+ 203:../src/HC05.c **** 	for (int i = 0; i < 5; i++) {
+ 1038              		.loc 1 203 0
+ 1039 057c 7B68     		ldr	r3, [r7, #4]
+ 1040 057e 03F10103 		add	r3, r3, #1
+ 1041 0582 7B60     		str	r3, [r7, #4]
+ 1042              	.L81:
+ 203:../src/HC05.c **** 	for (int i = 0; i < 5; i++) {
+ 1043              		.loc 1 203 0 is_stmt 0 discriminator 1
+ 1044 0584 7B68     		ldr	r3, [r7, #4]
+ 1045 0586 042B     		cmp	r3, #4
+ 1046 0588 F4DD     		ble	.L83
+ 1047              	.LBE2:
+ 205:../src/HC05.c **** 			continue;
+ 206:../src/HC05.c **** 	}
+ 207:../src/HC05.c **** 
+ 208:../src/HC05.c **** }
+ 1048              		.loc 1 208 0 is_stmt 1
+ 1049 058a 1846     		mov	r0, r3
+ 1050 058c 07F10807 		add	r7, r7, #8
+ 1051 0590 BD46     		mov	sp, r7
+ 1052 0592 80BD     		pop	{r7, pc}
+ 1053              	.L85:
+ 1054              		.align	2
+ 1055              	.L84:
+ 1056 0594 000C0140 		.word	1073810432
+ 1057              		.cfi_endproc
+ 1058              	.LFE66:
+ 1060              		.align	2
+ 1061              		.global	HC05_SetingMode
+ 1062              		.thumb
+ 1063              		.thumb_func
+ 1065              	HC05_SetingMode:
+ 1066              	.LFB67:
+ 209:../src/HC05.c **** int HC05_SetingMode(void) {
+ 1067              		.loc 1 209 0
+ 1068              		.cfi_startproc
+ 1069              		@ args = 0, pretend = 0, frame = 0
+ 1070              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1071 0598 80B5     		push	{r7, lr}
+ 1072              	.LCFI32:
+ 1073              		.cfi_def_cfa_offset 8
+ 1074              		.cfi_offset 7, -8
+ 1075              		.cfi_offset 14, -4
+ 1076 059a 00AF     		add	r7, sp, #0
+ 1077              	.LCFI33:
+ 1078              		.cfi_def_cfa_register 7
+ 210:../src/HC05.c **** 	return HC05_Reset();
+ 1079              		.loc 1 210 0
+ 1080 059c FFF7FEFF 		bl	HC05_Reset
+ 1081 05a0 0346     		mov	r3, r0
+ 211:../src/HC05.c **** 
+ 212:../src/HC05.c **** }
+ 1082              		.loc 1 212 0
+ 1083 05a2 1846     		mov	r0, r3
+ 1084 05a4 80BD     		pop	{r7, pc}
+ 1085              		.cfi_endproc
+ 1086              	.LFE67:
+ 1088 05a6 00BF     		.align	2
+ 1089              		.global	HC05_NormalMode
+ 1090              		.thumb
+ 1091              		.thumb_func
+ 1093              	HC05_NormalMode:
+ 1094              	.LFB68:
+ 213:../src/HC05.c **** int HC05_NormalMode(void) {
+ 1095              		.loc 1 213 0
+ 1096              		.cfi_startproc
+ 1097              		@ args = 0, pretend = 0, frame = 0
+ 1098              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1099 05a8 80B5     		push	{r7, lr}
+ 1100              	.LCFI34:
+ 1101              		.cfi_def_cfa_offset 8
+ 1102              		.cfi_offset 7, -8
+ 1103              		.cfi_offset 14, -4
+ 1104 05aa 00AF     		add	r7, sp, #0
+ 1105              	.LCFI35:
+ 1106              		.cfi_def_cfa_register 7
+ 214:../src/HC05.c **** 	HC05_DIS;
+ 1107              		.loc 1 214 0
+ 1108 05ac 0448     		ldr	r0, .L90
+ 1109 05ae 4FF48041 		mov	r1, #16384
+ 1110 05b2 FFF7FEFF 		bl	GPIO_ResetBits
+ 215:../src/HC05.c **** 	return HC05_Reset();
+ 1111              		.loc 1 215 0
+ 1112 05b6 FFF7FEFF 		bl	HC05_Reset
+ 1113 05ba 0346     		mov	r3, r0
+ 216:../src/HC05.c **** }
+ 1114              		.loc 1 216 0
+ 1115 05bc 1846     		mov	r0, r3
+ 1116 05be 80BD     		pop	{r7, pc}
+ 1117              	.L91:
+ 1118              		.align	2
+ 1119              	.L90:
+ 1120 05c0 000C0140 		.word	1073810432
+ 1121              		.cfi_endproc
+ 1122              	.LFE68:
+ 1124              		.align	2
+ 1125              		.global	HC05_init
+ 1126              		.thumb
+ 1127              		.thumb_func
+ 1129              	HC05_init:
+ 1130              	.LFB69:
+ 217:../src/HC05.c **** void HC05_init(void) {
+ 1131              		.loc 1 217 0
+ 1132              		.cfi_startproc
+ 1133              		@ args = 0, pretend = 0, frame = 0
+ 1134              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1135              		@ link register save eliminated.
+ 1136 05c4 80B4     		push	{r7}
+ 1137              	.LCFI36:
+ 1138              		.cfi_def_cfa_offset 4
+ 1139              		.cfi_offset 7, -4
+ 1140 05c6 00AF     		add	r7, sp, #0
+ 1141              	.LCFI37:
+ 1142              		.cfi_def_cfa_register 7
+ 218:../src/HC05.c **** 
+ 219:../src/HC05.c **** }
+ 1143              		.loc 1 219 0
+ 1144 05c8 BD46     		mov	sp, r7
+ 1145 05ca 80BC     		pop	{r7}
+ 1146 05cc 7047     		bx	lr
+ 1147              		.cfi_endproc
+ 1148              	.LFE69:
+ 1150 05ce 00BF     		.align	2
+ 1151              		.global	HC05_WorkingMode
+ 1152              		.thumb
+ 1153              		.thumb_func
+ 1155              	HC05_WorkingMode:
+ 1156              	.LFB70:
+ 220:../src/HC05.c **** 
+ 221:../src/HC05.c **** int HC05_WorkingMode(void) {
+ 1157              		.loc 1 221 0
+ 1158              		.cfi_startproc
+ 1159              		@ args = 0, pretend = 0, frame = 0
+ 1160              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1161              		@ link register save eliminated.
+ 1162 05d0 80B4     		push	{r7}
+ 1163              	.LCFI38:
+ 1164              		.cfi_def_cfa_offset 4
+ 1165              		.cfi_offset 7, -4
+ 1166 05d2 00AF     		add	r7, sp, #0
+ 1167              	.LCFI39:
+ 1168              		.cfi_def_cfa_register 7
+ 222:../src/HC05.c **** 	return 0;
+ 1169              		.loc 1 222 0
+ 1170 05d4 4FF00003 		mov	r3, #0
+ 223:../src/HC05.c **** }
+ 1171              		.loc 1 223 0
+ 1172 05d8 1846     		mov	r0, r3
+ 1173 05da BD46     		mov	sp, r7
+ 1174 05dc 80BC     		pop	{r7}
+ 1175 05de 7047     		bx	lr
+ 1176              		.cfi_endproc
+ 1177              	.LFE70:
+ 1179              		.align	2
+ 1180              		.global	HC05_change_baudrate
+ 1181              		.thumb
+ 1182              		.thumb_func
+ 1184              	HC05_change_baudrate:
+ 1185              	.LFB71:
+ 224:../src/HC05.c **** int HC05_change_baudrate(int baudrate) {
+ 1186              		.loc 1 224 0
+ 1187              		.cfi_startproc
+ 1188              		@ args = 0, pretend = 0, frame = 8
+ 1189              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1190              		@ link register save eliminated.
+ 1191 05e0 80B4     		push	{r7}
+ 1192              	.LCFI40:
+ 1193              		.cfi_def_cfa_offset 4
+ 1194              		.cfi_offset 7, -4
+ 1195 05e2 83B0     		sub	sp, sp, #12
+ 1196              	.LCFI41:
+ 1197              		.cfi_def_cfa_offset 16
+ 1198 05e4 00AF     		add	r7, sp, #0
+ 1199              	.LCFI42:
+ 1200              		.cfi_def_cfa_register 7
+ 1201 05e6 7860     		str	r0, [r7, #4]
+ 225:../src/HC05.c **** 	/*
+ 226:../src/HC05.c **** 	 char str[5] = { 0 };
+ 227:../src/HC05.c **** 	 UART4_PutS("AT+UART=%d,0,0\n\r", baudrate);
+ 228:../src/HC05.c **** 	 return HC05_TestOk();
+ 229:../src/HC05.c **** 	 */
+ 230:../src/HC05.c **** 
+ 231:../src/HC05.c **** }
+ 1202              		.loc 1 231 0
+ 1203 05e8 1846     		mov	r0, r3
+ 1204 05ea 07F10C07 		add	r7, r7, #12
+ 1205 05ee BD46     		mov	sp, r7
+ 1206 05f0 80BC     		pop	{r7}
+ 1207 05f2 7047     		bx	lr
+ 1208              		.cfi_endproc
+ 1209              	.LFE71:
+ 1211              		.section	.rodata
+ 1212              		.align	2
+ 1213              	.LC9:
+ 1214 0070 6E6F7420 		.ascii	"not connect\015\012\000"
+ 1214      636F6E6E 
+ 1214      6563740D 
+ 1214      0A00
+ 1215 007e 0000     		.text
+ 1216              		.align	2
+ 1217              		.global	HC05_SendData
+ 1218              		.thumb
+ 1219              		.thumb_func
+ 1221              	HC05_SendData:
+ 1222              	.LFB72:
+ 232:../src/HC05.c **** void HC05_SendData(char *S) {
+ 1223              		.loc 1 232 0
+ 1224              		.cfi_startproc
+ 1225              		@ args = 0, pretend = 0, frame = 8
+ 1226              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1227 05f4 80B5     		push	{r7, lr}
+ 1228              	.LCFI43:
+ 1229              		.cfi_def_cfa_offset 8
+ 1230              		.cfi_offset 7, -8
+ 1231              		.cfi_offset 14, -4
+ 1232 05f6 82B0     		sub	sp, sp, #8
+ 1233              	.LCFI44:
+ 1234              		.cfi_def_cfa_offset 16
+ 1235 05f8 00AF     		add	r7, sp, #0
+ 1236              	.LCFI45:
+ 1237              		.cfi_def_cfa_register 7
+ 1238 05fa 7860     		str	r0, [r7, #4]
+ 233:../src/HC05.c **** 	if (HC05_Get_Connected()) {
+ 1239              		.loc 1 233 0
+ 1240 05fc FFF7FEFF 		bl	HC05_Get_Connected
+ 1241 0600 0346     		mov	r3, r0
+ 1242 0602 002B     		cmp	r3, #0
+ 1243 0604 03D0     		beq	.L97
+ 234:../src/HC05.c **** 		UART4_PutS(S);
+ 1244              		.loc 1 234 0
+ 1245 0606 7868     		ldr	r0, [r7, #4]
+ 1246 0608 FFF7FEFF 		bl	UART4_PutS
+ 1247 060c 02E0     		b	.L96
+ 1248              	.L97:
+ 235:../src/HC05.c **** 	} else {
+ 236:../src/HC05.c **** 		xprintf("not connect\r\n");
+ 1249              		.loc 1 236 0
+ 1250 060e 0348     		ldr	r0, .L99
+ 1251 0610 FFF7FEFF 		bl	xprintf
+ 1252              	.L96:
+ 237:../src/HC05.c **** 	}
+ 238:../src/HC05.c **** }
+ 1253              		.loc 1 238 0
+ 1254 0614 07F10807 		add	r7, r7, #8
+ 1255 0618 BD46     		mov	sp, r7
+ 1256 061a 80BD     		pop	{r7, pc}
+ 1257              	.L100:
+ 1258              		.align	2
+ 1259              	.L99:
+ 1260 061c 70000000 		.word	.LC9
+ 1261              		.cfi_endproc
+ 1262              	.LFE72:
+ 1264              	.Letext0:
+ 1265              		.file 2 "c:\\program files (x86)\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/
+ 1266              		.file 3 "D:\\EclipseIndigo\\workspace\\xelo\\src/stm32f10x.h"
+ 1267              		.file 4 "D:\\EclipseIndigo\\workspace\\xelo\\Libraries\\CMSIS\\Include/core_cm3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 HC05.c
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:23     .bss:00000000 last_check_time
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:20     .bss:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:26     .text:00000000 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:31     .text:00000000 UART4_PutC
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:74     .text:00000030 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:78     .text:00000034 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:83     .text:00000034 UART4_PutS
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:131    .text:00000060 UART4_getC
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:195    .text:000000b4 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:200    .text:000000bc $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:205    .text:000000bc UART4_getS
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:278    .text:0000011c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:283    .text:00000124 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:288    .text:00000124 HC05_Get_Connected
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:322    .text:00000148 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:327    .rodata:00000000 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:331    .text:0000014c $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:336    .text:0000014c HC05_TestOk
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:385    .text:0000018c $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:394    .text:00000190 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:399    .text:00000190 HC05_check
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:511    .text:00000234 HC05_Reset
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:491    .text:00000218 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:506    .text:00000234 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:583    .text:00000298 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:603    .text:000002b0 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:608    .text:000002b0 HC05_SetPassword
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:732    .text:00000394 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:751    .text:000003b4 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:756    .text:000003b4 HC05_SetName
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:884    .text:000004a0 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:901    .text:000004c4 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:906    .text:000004c4 HC05_SetUsart
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:992    .text:00000540 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1002   .text:0000055c $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1007   .text:0000055c HC05_seting
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1056   .text:00000594 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1060   .text:00000598 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1065   .text:00000598 HC05_SetingMode
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1093   .text:000005a8 HC05_NormalMode
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1120   .text:000005c0 $d
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1124   .text:000005c4 $t
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1129   .text:000005c4 HC05_init
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1155   .text:000005d0 HC05_WorkingMode
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1184   .text:000005e0 HC05_change_baudrate
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1221   .text:000005f4 HC05_SendData
+C:\Users\THANGN~1\AppData\Local\Temp\ccHOFWUZ.s:1260   .text:0000061c $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.1.6e5f3786b89b666b3dcc7c4c84d9d480
+                           .group:00000000 wm4.xprintf.h.6.d201a07af5ece6e00f55504afb5b0533
+                           .group:00000000 wm4.newlib.h.8.e1d498e57c12962fc6d7be5061a6981a
+                           .group:00000000 wm4.config.h.148.52fe83653334d06815a0c57b59a3e584
+                           .group:00000000 wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04
+                           .group:00000000 wm4._default_types.h.6.1dbd2e581fd590860c7c17f21d147e91
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4.stddef.h.349.31f4c5baff3fa2689010b32028da9c47
+                           .group:00000000 wm4.reent.h.16.58b23a9f0faf0e7f2dfe7e2d33154afd
+                           .group:00000000 wm4.stddef.h.187.9e651b6b8b16e149c1353259404973ea
+                           .group:00000000 wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05
+                           .group:00000000 wm4.stm32f10x.h.57.69ab29c83f735418a543aa508b559235
+                           .group:00000000 wm4.core_cm3.h.32.49180ccb4d36cabd2d7016d2a51d91ae
+                           .group:00000000 wm4.core_cmInstr.h.25.f50f886f2edf670cf199b35fd96f5c91
+                           .group:00000000 wm4.core_cm3.h.130.36d879c1aefb6e578e399a5de749a503
+                           .group:00000000 wm4.stm32f10x.h.532.b2b0c08e77686a45dbc3252d064cb2e1
+                           .group:00000000 wm4.stm32f10x_adc.h.89.9f2b285fa0070185d48a05b61a05798c
+                           .group:00000000 wm4.stm32f10x_bkp.h.31.74a586c036c8ee5d9205c6728cc8d6ab
+                           .group:00000000 wm4.stm32f10x_can.h.31.b14273b95de79d8fbb020ba042473fb1
+                           .group:00000000 wm4.stm32f10x_cec.h.31.29c77e36bfe4567e85f26cdcc60def64
+                           .group:00000000 wm4.stm32f10x_dac.h.31.116c27cadc3b4ee8aa44ed11b14b64ae
+                           .group:00000000 wm4.stm32f10x_dbgmcu.h.31.45f176e9b7a15051b8c69cb2700c78b8
+                           .group:00000000 wm4.stm32f10x_dma.h.31.ef16218235edc52b414c0353f44b4bf0
+                           .group:00000000 wm4.stm32f10x_exti.h.31.b25bcb4f1a2daad39d2d7dfa4e901646
+                           .group:00000000 wm4.stm32f10x_flash.h.31.0203bc95b65c5396b67991e07a675efb
+                           .group:00000000 wm4.stm32f10x_fsmc.h.31.a761d459aa046c2769a99b93e8763ba0
+                           .group:00000000 wm4.stm32f10x_gpio.h.31.0a32659dbac1fc1055c7cbdc248963be
+                           .group:00000000 wm4.stm32f10x_i2c.h.31.93d7dc2d477856f119d957730d4c6f1c
+                           .group:00000000 wm4.stm32f10x_iwdg.h.31.959ae9b7e1d603f1e5ae6468c0fc1624
+                           .group:00000000 wm4.stm32f10x_pwr.h.31.9168b6921e0cf03b467c7ed90861c701
+                           .group:00000000 wm4.stm32f10x_rcc.h.31.2ee3219a25ef4ced658f2fe9d8cd94aa
+                           .group:00000000 wm4.stm32f10x_rtc.h.31.00ba78fc0dbb06b6e6783a1e7fccf5a0
+                           .group:00000000 wm4.stm32f10x_sdio.h.31.37dab89d08b2364a3dfaace444dec7c3
+                           .group:00000000 wm4.stm32f10x_spi.h.31.d2f6e4626887cabe8c98f3a185590a36
+                           .group:00000000 wm4.stm32f10x_tim.h.31.6c06f7f26e0864f9cd59597f46ca2c7c
+                           .group:00000000 wm4.stm32f10x_wwdg.h.31.4504f930b88ade4f56d1e3f2a11c098b
+                           .group:00000000 wm4.misc.h.31.a89fba2040036f6f8c835a78a213e0cd
+                           .group:00000000 wm4.stm32f10x.h.8356.9fd2fa84655112ac7dfc5c88beeb383d
+                           .group:00000000 wm4.stm32f10x_usart.h.113.35dd04e5de58e8091b7629e12d638517
+
+UNDEFINED SYMBOLS
+USART_GetFlagStatus
+USART_SendData
+USART_ReceiveData
+MiliCount
+GPIO_ReadInputDataBit
+strcmp
+GPIO_SetBits
+memset
+GPIO_ResetBits
+BLE_buff_temp
+BLE_buff_idx
+delay_ms
+strlen
+usnprintf
+xprintf
